@@ -2,6 +2,7 @@
 
 'use client';  // If you are using React hooks
 
+import Link from 'next/link';
 import { AuthProvider } from '../context/AuthContext'; // Authentication context
 import '../styles/globals.css'; // Global styles
 
@@ -22,13 +23,13 @@ export default function Layout({ children }) {
                 <nav className="mt-4">
                   <ul className="flex space-x-4">
                     <li>
-                      <a href="/" className="hover:text-yellow-400 transition duration-200">Home</a>
+                      <Link href="/" className="hover:text-yellow-400 transition duration-200">Home</Link>
                     </li>
                     <li>
-                      <a href="/login" className="hover:text-yellow-400 transition duration-200">Login</a>
+                      <Link href="/login" className="hover:text-yellow-400 transition duration-200">Login</Link>
                     </li>
                     <li>
-                      <a href="/profile" className="hover:text-yellow-400 transition duration-200">Profile</a>
+                      <Link href="/profile" className="hover:text-yellow-400 transition duration-200">Profile</Link>
                     </li>
                     {/* Add more links if needed */}
                   </ul>
