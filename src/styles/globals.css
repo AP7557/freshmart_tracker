@@ -21,6 +21,10 @@ body {
   input, select, button {
     margin: 10px 0;
   }
+
+  button{
+    cursor: pointer;
+  }
   
   @media (max-width: 600px) {
     .container {
