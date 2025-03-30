@@ -22,7 +22,7 @@ export default function Layout({ children }) {
                 <nav className="mt-4">
                   <ul className="flex space-x-4">
                     <li>
-                      <a href="/home" className="hover:text-yellow-400 transition duration-200">Home</a>
+                      <a href="/" className="hover:text-yellow-400 transition duration-200">Home</a>
                     </li>
                     <li>
                       <a href="/login" className="hover:text-yellow-400 transition duration-200">Login</a>

@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { fetchLists } from '@/database/getList';
 import { addTransactionToStoreDoc } from '@/database/addToDB';
-import RegisterNewStore from './registerNewStore';
-import ShowTodaysList from './showTodaysList';
-import ConfirmModal from './confirmModal';
+import RegisterNewStore from './home/registerNewStore';
+import ShowTodaysList from './home/showTodaysList';
+import ConfirmModal from './home/confirmModal';
 
 export default function Home() {
   const [storeSelected, setStoreSelected] = useState('');
