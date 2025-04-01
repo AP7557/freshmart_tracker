@@ -1,39 +1,35 @@
 import { setStoreOrComapinesToDB } from "@/database/addTransactionToStoreSelectedDB";
 import { useState } from "react";
 
-export default function RegisterNewCompany({
-  setCompanyList,
-  companyList,
-}) {
-  const [newCompany, setNewCompany] = useState(""); // State for new Company input
+export default function RegisterNewStore() {
+  const [newStore, setNewStore] = useState(""); // State for new store input
 
-  const handleAddCompany = async (e) => {
+  const handleAddStore = async (e) => {
     e.preventDefault();
-    if (newCompany) {
-      setCompanyList([...companyList, newCompany]); // Update Company list in UI
-      setStoreOrComapinesToDB("Companies", newCompany);
-      setNewCompany(""); // Reset the input field
+    if (newStore) {
+      setStoreOrComapinesToDB("Stores", newStore);
+      setNewStore(""); // Reset the input field
     }
   };
 
   return (
     <div className="mt-8">
       <h3 className="text-xl font-semibold text-gray-700">
-        Register New Company
+        Register New Store
       </h3>
-      <form onSubmit={handleAddCompany} className="mt-4">
+      <form onSubmit={handleAddStore} className="mt-4">
         <input
           type="text"
-          value={newCompany}
-          onChange={(e) => setNewCompany(e.target.value)}
-          placeholder="Enter Company Name"
+          value={newStore}
+          onChange={(e) => setNewStore(e.target.value)}
+          placeholder="Enter Store Name"
           className="w-full p-3 border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
           className="w-full mt-4 p-3 bg-green-600 text-white rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200"
         >
-          Register Company
+          Register Store
         </button>
       </form>
     </div>
