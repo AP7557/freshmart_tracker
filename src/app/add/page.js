@@ -1,12 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useAuth } from "../../context/AuthContext";
-import {
-  getListOfStoresAndCompanies,
-  getDocsFromDB,
-} from "@/database/getDocsFromDB";
+import { useData } from "../../context/DataContext"; // Import the context hook
 import { addTransactionToStoreSelectedDB } from "@/database/addTransactionToStoreSelectedDB";
 import RegisterNewStore from "./registerNewStore";
 import ShowTodaysList from "./showTodaysList";
@@ -17,16 +13,13 @@ import CompanySelection from "@/utils/CompanySelection";
 
 export default function AddTransactions() {
   const [storeSelected, setStoreSelected] = useState("");
-  const [companySelected, setCompanySelected] = useState(""); // Track selected company
-  const [transactionData, setTransactionData] = useState([]);
-  const { user } = useAuth();
-  const { register, handleSubmit, reset } = useForm();
-  const [companyList, setCompanyList] = useState([]);
-  const [storesList, setStoresList] = useState([]);
-
-  // New state to control the modal visibility
+  const [companySelected, setCompanySelected] = useState("");
+  const { register, handleSubmit, reset, watch } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(null);
+
+  // Use the data from the DataContext
+  const { addTodaysTransaction } = useData();
 
   const onSubmit = (data) => {
     let newTransaction = {
@@ -34,15 +27,11 @@ export default function AddTransactions() {
       date: new Date().toLocaleDateString(),
     };
     addTransactionToStoreSelectedDB(storeSelected, { ...newTransaction });
-    setTransactionData([
-      ...transactionData,
-      { ...newTransaction, store: storeSelected },
-    ]);
+    addTodaysTransaction({ ...newTransaction, store: storeSelected });
     setCompanySelected("");
     reset();
   };
 
-  // Handle form submission after confirmation
   const handleConfirmSubmit = () => {
     onSubmit(formData); // Submit the form data after confirmation
     setIsModalOpen(false); // Close the modal
@@ -53,37 +42,6 @@ export default function AddTransactions() {
     setIsModalOpen(true); // Open the confirmation modal
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      const [companyList, storeList] = await getListOfStoresAndCompanies(
-        "Lists"
-      );
-      const storeListValues = Object.values(storeList);
-      setStoresList(storeListValues);
-      setCompanyList(Object.values(companyList));
-
-      const allTransactionsForEachStore = await getDocsFromDB(storeListValues);
-      const today = new Date().toLocaleDateString("en-US");
-      const todaysTransactions = allTransactionsForEachStore
-        .map(({ store, transactions }) =>
-          transactions
-            .filter(
-              (transaction) =>
-                transaction.date === today && transaction.date !== ""
-            )
-            .map((transaction) => ({
-              ...transaction,
-              store,
-            }))
-        )
-        .flat();
-
-      setTransactionData(todaysTransactions);
-    };
-
-    loadData();
-  }, []);
-
   return (
     <div className="bg-white shadow-lg rounded-lg p-6">
       <h2 className="text-2xl font-semibold text-gray-700">Add Transaction</h2>
@@ -91,7 +49,6 @@ export default function AddTransactions() {
       <StoreSelection
         setStoreSelected={setStoreSelected}
         storeSelected={storeSelected}
-        storesList={storesList}
       />
 
       {/* Show Company Selection ONLY if store is selected */}
@@ -100,16 +57,11 @@ export default function AddTransactions() {
           <CompanySelection
             companySelected={companySelected}
             setCompanySelected={setCompanySelected}
-            companyList={companyList}
+            register={register}
           />
 
           {/* Register New Company only if no company is selected */}
-          {!companySelected && (
-            <RegisterNewCompany
-              setCompanyList={setCompanyList}
-              companyList={companyList}
-            />
-          )}
+          {!companySelected && <RegisterNewCompany />}
         </>
       )}
 
@@ -119,11 +71,10 @@ export default function AddTransactions() {
           onSubmit={handleSubmit((data) => handleOpenModal(data))}
           className="mt-6 space-y-4"
         >
-          {/* Amount and Type fields are only shown if a company is selected */}
           <div>
             <div>Amount:</div>
             <input
-              {...register("amount", { required: true })}
+              {...register("amount", { required: true, valueAsNumber: true })}
               type="number"
               step=".01"
               placeholder="Enter Amount"
@@ -153,12 +104,7 @@ export default function AddTransactions() {
       )}
 
       {/* Register New Store Component */}
-      {!storeSelected && (
-        <RegisterNewStore
-          setStoresList={setStoresList}
-          storesList={storesList}
-        />
-      )}
+      {!storeSelected && <RegisterNewStore />}
 
       <ConfirmModal
         isModalOpen={isModalOpen}
@@ -166,10 +112,7 @@ export default function AddTransactions() {
         setIsModalOpen={setIsModalOpen}
       />
 
-      <ShowTodaysList
-        transactionData={transactionData}
-        storeSelected={storeSelected}
-      />
+      <ShowTodaysList storeSelected={storeSelected} />
     </div>
   );
 }

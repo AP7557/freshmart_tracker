@@ -1,16 +1,13 @@
 import { setStoreOrComapinesToDB } from "@/database/addTransactionToStoreSelectedDB";
 import { useState } from "react";
 
-export default function RegisterNewCompany({
-  setCompanyList,
-  companyList,
-}) {
+export default function RegisterNewCompany() {
+
   const [newCompany, setNewCompany] = useState(""); // State for new Company input
 
   const handleAddCompany = async (e) => {
     e.preventDefault();
     if (newCompany) {
-      setCompanyList([...companyList, newCompany]); // Update Company list in UI
       setStoreOrComapinesToDB("Companies", newCompany);
       setNewCompany(""); // Reset the input field
     }

@@ -1,16 +1,12 @@
 import { setStoreOrComapinesToDB } from "@/database/addTransactionToStoreSelectedDB";
 import { useState } from "react";
 
-export default function RegisterNewStore({
-  setStoresList,
-  storesList,
-}) {
+export default function RegisterNewStore() {
   const [newStore, setNewStore] = useState(""); // State for new store input
 
   const handleAddStore = async (e) => {
     e.preventDefault();
     if (newStore) {
-      setStoresList([...storesList, newStore]); // Update store list in UI
       setStoreOrComapinesToDB("Stores", newStore);
       setNewStore(""); // Reset the input field
     }

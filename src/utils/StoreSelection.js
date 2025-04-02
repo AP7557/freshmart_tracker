@@ -1,6 +1,9 @@
+import { useData } from "@/context/DataContext";
 import React from "react";
 
-function StoreSelection({setStoreSelected, storeSelected, storesList}) {
+function StoreSelection({ setStoreSelected, storeSelected }) {
+  const { storesList } = useData();
+
   return (
     <div className="mt-4">
       <select

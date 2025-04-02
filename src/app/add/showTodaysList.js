@@ -1,10 +1,13 @@
-export default function ShowTodaysList({ storeSelected, transactionData }) {
+import { useData } from "@/context/DataContext";
+
+export default function ShowTodaysList({ storeSelected }) {
+  const { todaysTransactionData } = useData();
   // Filter transactions based on the selected store
   const filteredTransactions = storeSelected
-    ? transactionData.filter(
+    ? todaysTransactionData.filter(
         (transaction) => transaction.store === storeSelected
       )
-    : transactionData;
+    : todaysTransactionData;
 
   return (
     storeSelected &&
