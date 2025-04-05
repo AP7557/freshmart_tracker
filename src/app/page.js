@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useData } from "@/context/DataContext";
-import StoreSelection from "@/utils/StoreSelection";
-import { useEffect, useState } from "react";
+import { useData } from '@/context/DataContext';
+import AllTransactionsTable from '@/utils/AllTransactionsTable';
+import RemainingInvoice from '@/utils/RemainingInvoice';
+import { useEffect, useState } from 'react';
 
-export default function Overview() {
-  const [storeSelected, setStoreSelected] = useState("");
+export default function Overview2222() {
+  const [storeSelected, setStoreSelected] = useState('');
   const [totalInvoiceLeftToPay, setTotalInvoiceLeftToPay] = useState({});
   const { storesList, allTransactionsForEachStore } = useData(); // Get storesList and transactionData from context
 
@@ -29,9 +30,9 @@ export default function Overview() {
           };
         }
 
-        if (type === "Payment") {
+        if (type === 'Payment') {
           newTotalInvoiceLeftToPay[store][company].totalPayment += value;
-        } else if (type === "Invoice") {
+        } else if (type === 'Invoice') {
           newTotalInvoiceLeftToPay[store][company].totalInvoice += value;
         }
       });
@@ -41,48 +42,63 @@ export default function Overview() {
     setTotalInvoiceLeftToPay(newTotalInvoiceLeftToPay);
   }, [allTransactionsForEachStore]);
 
-  // Function to get the total invoices for a selected store
   const getTotalInvoiceForStore = (storeName) => {
     if (totalInvoiceLeftToPay[storeName]) {
       return Object.values(totalInvoiceLeftToPay[storeName]).reduce(
-        (acc, companyData) => acc + companyData.totalInvoice,
+        (acc, companyData) => {
+          // Calculate the remaining amount to pay
+          const remainingAmount = Math.max(
+            0,
+            companyData.totalInvoice - companyData.totalPayment
+          );
+          return acc + remainingAmount; // Add the non-negative remaining amount
+        },
         0
       );
     }
-    return 0;
+    return 0; // Return 0 if no data for the store
   };
 
   return (
-    <div>
-      Overview Page
-      <StoreSelection
-        setStoreSelected={setStoreSelected}
-        storeSelected={storeSelected}
-      />
-      <div className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-semibold text-gray-700 mb-6">
-          Store Invoices Summary
-        </h2>
+    <div className='container !max-w-full mx-auto px-4 py-8'>
+      <h2 className='text-3xl font-semibold text-gray-700 mb-6'>
+        Store Invoices Summary
+      </h2>
 
-        {/* Grid to display stores and invoice totals */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {storesList.map((store, index) => (
-            <div
-              key={index}
-              className="bg-white shadow-lg rounded-lg p-6 flex justify-between items-center"
-            >
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800">{store}</h3>
-              </div>
-              <div>
-                <span className="text-lg font-bold text-red-600">
-                  ${getTotalInvoiceForStore(store).toFixed(2)}
-                </span>
-              </div>
+      {/* Display grid of stores */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        {storesList.map((store, index) => (
+          <div
+            key={index}
+            className='bg-white shadow-lg rounded-lg p-6 flex justify-between items-center cursor-pointer'
+            onClick={() => setStoreSelected(store)}
+          >
+            <div>
+              <h3 className='text-xl font-semibold text-gray-800'>{store}</h3>
             </div>
-          ))}
-        </div>
+            <div>
+              <span className='text-lg font-bold text-red-600'>
+                ${getTotalInvoiceForStore(store).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
+
+      {/* Conditional render when a store is selected */}
+      {storeSelected && (
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8'>
+          <AllTransactionsTable
+            allTransactionsForEachStore={allTransactionsForEachStore}
+            storeSelected={storeSelected}
+          />
+
+          <RemainingInvoice
+            storeSelected={storeSelected}
+            totalInvoiceLeftToPay={totalInvoiceLeftToPay}
+          />
+        </div>
+      )}
     </div>
   );
 }
