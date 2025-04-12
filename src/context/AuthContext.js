@@ -1,7 +1,6 @@
 // context/AuthContext.js
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -39,7 +38,7 @@ export function AuthProvider({ children }) {
       }
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, [user]);
 
   const value = {
