@@ -1,6 +1,7 @@
-import { useData } from '@/context/DataContext';
-import { Autocomplete, TextField } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import { useData } from "@/context/DataContext";
+import { Autocomplete, TextField } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { FiBriefcase } from "react-icons/fi";
 
 function CompanySelection({
   companySelected,
@@ -11,16 +12,18 @@ function CompanySelection({
   const { companyList } = useData();
   const autocompleteRef = useRef(null);
 
-  // Sync the Autocomplete input with the selected value
   useEffect(() => {
     if (autocompleteRef.current && companySelected) {
-      autocompleteRef.current.querySelector('input').value = companySelected;
+      autocompleteRef.current.querySelector("input").value = companySelected;
     }
   }, [companySelected]);
 
   return (
-    <div className='mt-4'>
-      <div className='mb-1 text-gray-700'>Company:</div>
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+        <FiBriefcase className="text-green-600" />
+        Company
+      </label>
       <Autocomplete
         ref={autocompleteRef}
         options={companyList}
@@ -32,10 +35,10 @@ function CompanySelection({
         renderInput={(params) => (
           <TextField
             {...params}
-            {...register('company', { required: true })}
-            label='Select a Company'
-            variant='outlined'
-            className='bg-white rounded-md'
+            {...register("company", { required: true })}
+            label="Select a Company"
+            variant="outlined"
+            className="bg-white"
             fullWidth
           />
         )}

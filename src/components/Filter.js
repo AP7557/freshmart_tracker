@@ -6,67 +6,106 @@ import {
   Select,
   InputLabel,
   FormControl,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { FiSearch, FiX } from "react-icons/fi";
 
-const FilterComponent = ({ setFilteredTransactions, sortedTransactions }) => {
+const FilterComponent = ({
+  setFilteredTransactions,
+  sortedTransactions,
+  setHasActiveFilters,
+}) => {
   const [filterText, setFilterText] = useState({
     company: "",
     type: "",
-    dateFilterType: "equal", // or "range"
+    dateFilterType: "equal",
     date: "",
     dateStart: "",
     dateEnd: "",
   });
 
   useEffect(() => {
-    // Apply filtering logic when any filter text or sorted transactions change
     const applyFilters = () => {
-      const { company, type } = filterText;
-      const filtered = sortedTransactions.filter((transaction) => {
-        const matchesCompany = transaction.company
-          .toLowerCase()
-          .includes(company.toLowerCase());
-        const matchesType = transaction.type
-          .toLowerCase()
-          .includes(type.toLowerCase());
+      const { company, type, dateFilterType, date, dateStart, dateEnd } =
+        filterText;
 
-        // Filter by date logic
+      // Check if any filters are active
+      const filtersActive =
+        company !== "" ||
+        type !== "" ||
+        (dateFilterType === "equal" && date !== "") ||
+        (dateFilterType === "range" && (dateStart !== "" || dateEnd !== ""));
+
+      setHasActiveFilters(filtersActive);
+
+      const filtered = sortedTransactions.filter((transaction) => {
+        if (!filtersActive) return true;
+
+        const matchesCompany =
+          company === "" ||
+          transaction.company.toLowerCase().includes(company.toLowerCase());
+        const matchesType =
+          type === "" || transaction.type.toLowerCase() === type.toLowerCase();
         const matchesDate = applyDateFilter(transaction);
 
         return matchesCompany && matchesType && matchesDate;
       });
 
-      setFilteredTransactions(filtered); // Set the filtered transactions here
+      setFilteredTransactions(filtered);
     };
-
     applyFilters();
   }, [filterText, sortedTransactions]);
 
-  const getDateInLocaleString = (dateToChange) =>
-    new Date(dateToChange).toLocaleDateString("en-US", { timeZone: "UTC" });
+  const parseDate = (dateString) => {
+    if (!dateString) return null;
+    // Handle both MM/DD/YYYY (transaction dates) and YYYY-MM-DD (input dates)
+    const parts = dateString.includes("/")
+      ? dateString.split("/") // MM/DD/YYYY format
+      : dateString.split("-"); // YYYY-MM-DD format
 
-  // Function to apply date filters
+    if (parts.length === 3) {
+      // If format is YYYY-MM-DD (from date inputs)
+      if (parts[0].length === 4) {
+        return new Date(parts[0], parts[1] - 1, parts[2]);
+      }
+      // If format is MM/DD/YYYY (from transaction data)
+      return new Date(parts[2], parts[0] - 1, parts[1]);
+    }
+    return null;
+  };
+
   const applyDateFilter = (transaction) => {
     const { dateFilterType, dateStart, dateEnd, date } = filterText;
 
-    if (dateFilterType === "equal" && date) {
-      return transaction.date === getDateInLocaleString(date);
+    const transactionDate = parseDate(transaction.date);
+    if (!transactionDate) return false;
+
+    if (dateFilterType === "equal") {
+      if (!date) return true;
+      const filterDate = parseDate(date);
+      return (
+        filterDate &&
+        transactionDate.toDateString() === filterDate.toDateString()
+      );
     }
 
     if (dateFilterType === "range") {
-      if (dateStart && !dateEnd) {
-        return transaction.date >= getDateInLocaleString(dateStart);
-      }
-      if (!dateStart && dateEnd) {
-        return transaction.date <= getDateInLocaleString(dateEnd);
-      }
-      if (dateStart && dateEnd) {
-        const transactionDate = transaction.date;
-        return (
-          transactionDate >= getDateInLocaleString(dateStart) &&
-          transactionDate <= getDateInLocaleString(dateEnd)
-        );
-      }
+      const startDate = parseDate(dateStart);
+      const endDate = parseDate(dateEnd);
+
+      // If no dates are selected, show all
+      if (!startDate && !endDate) return true;
+
+      // Check if transaction is after start date (if specified)
+      const afterStart = startDate ? transactionDate >= startDate : true;
+
+      // Check if transaction is before end date (if specified)
+      const beforeEnd = endDate
+        ? transactionDate <= new Date(endDate.setHours(23, 59, 59, 999))
+        : true;
+
+      return afterStart && beforeEnd;
     }
 
     return true;
@@ -74,111 +113,173 @@ const FilterComponent = ({ setFilteredTransactions, sortedTransactions }) => {
 
   const handleDateFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilterText((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setFilterText((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilterText({
+      company: "",
+      type: "",
+      dateFilterType: "equal",
+      date: "",
+      dateStart: "",
+      dateEnd: "",
+    });
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        paddingBottom: "2rem",
-      }}
-    >
-      {/* Date Filter Type */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <FormControl fullWidth size="small">
-          <InputLabel>Date Filter Type</InputLabel>
-          <Select
-            value={filterText.dateFilterType}
-            onChange={(e) =>
-              setFilterText({ ...filterText, dateFilterType: e.target.value })
-            }
-          >
-            <MenuItem value="equal">Equal to</MenuItem>
-            <MenuItem value="range">Range</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Filter Inputs */}
-      <Box sx={{ display: "flex", gap: 2 }}>
+    <Box className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4">
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        {/* Company Search */}
         <TextField
-          label="Company"
+          label="Search Company"
           variant="outlined"
           size="small"
+          fullWidth
           value={filterText.company}
           onChange={(e) =>
             setFilterText({ ...filterText, company: e.target.value })
           }
-        />
-        <TextField
-          label="Type"
-          variant="outlined"
-          size="small"
-          value={filterText.type}
-          onChange={(e) =>
-            setFilterText({ ...filterText, type: e.target.value })
-          }
-        />
-      </Box>
-
-      {/* Date Filters */}
-      {filterText.dateFilterType === "equal" && (
-        <TextField
-          label="Date (m/d/yyyy)"
-          variant="outlined"
-          size="small"
-          value={filterText.date}
-          onChange={handleDateFilterChange}
-          fullWidth
-          name="date"
-          type="date"
           slotProps={{
-            inputLabel: {
-              shrink: true,
+            root: { className: "w-full" },
+            input: {
+              className: "py-2 px-2",
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FiSearch className="text-gray-400" />
+                </InputAdornment>
+              ),
+              endAdornment: filterText.company && (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      setFilterText({ ...filterText, company: "" })
+                    }
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <FiX size={16} />
+                  </IconButton>
+                </InputAdornment>
+              ),
             },
           }}
         />
-      )}
 
-      {filterText.dateFilterType === "range" && (
-        <Box sx={{ display: "flex", gap: 2 }}>
-          <TextField
-            label="Start Date"
-            variant="outlined"
-            size="small"
-            value={filterText.dateStart}
-            onChange={handleDateFilterChange}
-            fullWidth
-            name="dateStart"
-            type="date"
+        {/* Type Filter */}
+        <FormControl fullWidth size="small">
+          <InputLabel>Transaction Type</InputLabel>
+          <Select
+            label="Transaction Type"
+            value={filterText.type}
+            onChange={(e) =>
+              setFilterText({ ...filterText, type: e.target.value })
+            }
             slotProps={{
-              inputLabel: {
-                shrink: true,
+              root: { className: "w-full" },
+            }}
+          >
+            <MenuItem value="">All Types</MenuItem>
+            <MenuItem value="Invoice">Invoice</MenuItem>
+            <MenuItem value="Payment">Payment</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Date Filter Type */}
+        <FormControl fullWidth size="small">
+          <InputLabel>Date Filter</InputLabel>
+          <Select
+            label="Date Filter"
+            value={filterText.dateFilterType}
+            onChange={(e) =>
+              setFilterText({ ...filterText, dateFilterType: e.target.value })
+            }
+            slotProps={{
+              root: { className: "w-full" },
+            }}
+          >
+            <MenuItem value="equal">Specific Date</MenuItem>
+            <MenuItem value="range">Date Range</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
+
+      {/* Date Filters */}
+      <div className="flex flex-col md:flex-row gap-4">
+        {filterText.dateFilterType === "equal" ? (
+          <TextField
+            label="Select Date"
+            type="date"
+            size="small"
+            fullWidth
+            value={filterText.date}
+            onChange={handleDateFilterChange}
+            name="date"
+            slotProps={{
+              inputLabel: { shrink: true },
+              input: {
+                className: "py-2",
+                endAdornment: filterText.date && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => setFilterText({ ...filterText, date: "" })}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <FiX size={16} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               },
             }}
           />
-          <TextField
-            label="End Date"
-            variant="outlined"
-            size="small"
-            value={filterText.dateEnd}
-            onChange={handleDateFilterChange}
-            fullWidth
-            name="dateEnd"
-            type="date"
-            slotProps={{
-              inputLabel: {
-                shrink: true,
-              },
-            }}
-          />
-        </Box>
+        ) : (
+          <>
+            <TextField
+              label="Start Date"
+              type="date"
+              size="small"
+              fullWidth
+              value={filterText.dateStart}
+              onChange={handleDateFilterChange}
+              name="dateStart"
+              slotProps={{
+                inputLabel: { shrink: true },
+                input: { className: "py-2" },
+              }}
+            />
+            <TextField
+              label="End Date"
+              type="date"
+              size="small"
+              fullWidth
+              value={filterText.dateEnd}
+              onChange={handleDateFilterChange}
+              name="dateEnd"
+              slotProps={{
+                inputLabel: { shrink: true },
+                input: { className: "py-2" },
+              }}
+            />
+          </>
+        )}
+      </div>
+
+      {/* Clear All Button */}
+      {(filterText.company ||
+        filterText.type ||
+        filterText.date ||
+        filterText.dateStart ||
+        filterText.dateEnd) && (
+        <div className="flex justify-end mt-2">
+          <button
+            onClick={clearFilters}
+            className="text-sm text-primary-600 hover:text-primary-800 font-medium flex items-center"
+          >
+            <FiX size={14} className="mr-1" />
+            Clear all filters
+          </button>
+        </div>
       )}
     </Box>
   );

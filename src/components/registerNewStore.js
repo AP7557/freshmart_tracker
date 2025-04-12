@@ -1,37 +1,37 @@
-import { setStoreOrComapinesToDB } from '@/database/addTransactionToStoreSelectedDB';
-import { useState } from 'react';
+import { setStoreOrComapinesToDB } from "@/database/addTransactionToStoreSelectedDB";
+import { useState } from "react";
+import { FiPlus, FiHome } from "react-icons/fi";
 
 export default function RegisterNewStore() {
-  const [newStore, setNewStore] = useState(''); // State for new store input
+  const [newStore, setNewStore] = useState("");
 
   const handleAddStore = async (e) => {
     e.preventDefault();
     if (newStore) {
-      setStoreOrComapinesToDB('Stores', newStore);
-      setNewStore(''); // Reset the input field
+      setStoreOrComapinesToDB("Stores", newStore);
+      setNewStore("");
     }
   };
 
   return (
-    <div className='mt-8'>
-      <h3 className='text-xl font-semibold text-gray-700'>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+        <FiHome className="text-green-600" />
         Register New Store
       </h3>
-      <form
-        onSubmit={handleAddStore}
-        className='mt-4'
-      >
+      <form onSubmit={handleAddStore} className="space-y-4">
         <input
-          type='text'
+          type="text"
           value={newStore}
           onChange={(e) => setNewStore(e.target.value)}
-          placeholder='Enter Store Name'
-          className='w-full p-3 border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+          placeholder="Enter Store Name"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
         />
         <button
-          type='submit'
-          className='w-full mt-4 p-3 bg-green-600 text-white rounded-md shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200'
+          type="submit"
+          className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 flex items-center justify-center gap-2"
         >
+          <FiPlus />
           Register Store
         </button>
       </form>

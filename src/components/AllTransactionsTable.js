@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
   Table,
   TableBody,
   TableCell,
@@ -9,6 +8,9 @@ import {
   TableRow,
   TableSortLabel,
   TablePagination,
+  Paper,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import FilterComponent from "./Filter";
 
@@ -16,27 +18,31 @@ const AllTransactionsTable = ({
   allTransactionsForEachStore,
   storeSelected,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("desc");
   const [orderBy, setOrderBy] = useState("date");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [sortedTransactions, setSortedTransactions] = useState([]);
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
-  useEffect(() => {
-    // Find the selected store's transactions
+  // Get the base transactions for the selected store
+  const getBaseTransactions = () => {
     const storeData = allTransactionsForEachStore.find(
       (store) => store.store === storeSelected
     );
-    const transactions = storeData ? storeData.transactions : [];
+    return storeData
+      ? storeData.transactions.map((t, i) => ({
+          ...t,
+          id: `${storeSelected}-${i}`,
+        }))
+      : [];
+  };
 
-    // Add an id to each transaction
-    const transactionsWithId = transactions.map((transaction, index) => ({
-      ...transaction,
-      id: `${storeSelected}-${index}`,
-    }));
-
-    // Sort transactions based on order and orderBy
-    const sorted = [...transactionsWithId].sort((a, b) => {
+  // Sort transactions based on current order/orderBy
+  const sortTransactions = (transactions) => {
+    return [...transactions].sort((a, b) => {
       if (orderBy === "company") {
         return order === "asc"
           ? a.company.localeCompare(b.company)
@@ -52,12 +58,22 @@ const AllTransactionsTable = ({
       }
       return 0;
     });
-    setSortedTransactions(sorted);
-  }, [storeSelected, order, orderBy]);
+  };
 
+  // Update transactions when store, filters, or sort changes
   useEffect(() => {
-    setFilteredTransactions(sortedTransactions); // Set filtered transactions
-  }, [sortedTransactions]);
+    const baseTransactions = getBaseTransactions();
+    const transactionsToSort = hasActiveFilters
+      ? filteredTransactions
+      : baseTransactions;
+    const sorted = sortTransactions(transactionsToSort);
+    setSortedTransactions(sorted);
+
+    // If no filters are active, update filteredTransactions to match sorted
+    if (!hasActiveFilters) {
+      setFilteredTransactions(sorted);
+    }
+  }, [storeSelected, order, orderBy, hasActiveFilters]);
 
   const handleRequestSort = (property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -70,28 +86,34 @@ const AllTransactionsTable = ({
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Transactions</h3>
-      <ul className="space-y-4">
+    <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
+        <h3 className="text-xl font-semibold text-gray-800">
+          Transaction History
+        </h3>
+      </div>
+
+      <div className="p-4">
         <FilterComponent
           setFilteredTransactions={setFilteredTransactions}
           sortedTransactions={sortedTransactions}
+          setHasActiveFilters={setHasActiveFilters}
         />
+      </div>
 
-        {/* Table Layout for Larger Screens */}
-        <TableContainer
-          sx={{ maxHeight: 400, display: { xs: "none", sm: "block" } }}
-        >
-          <Table stickyHeader>
+      {/* Desktop Table View */}
+      {!isMobile && (
+        <TableContainer component={Paper} elevation={0}>
+          <Table>
             <TableHead>
-              <TableRow>
+              <TableRow className="bg-gray-50">
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === "company"}
                     direction={orderBy === "company" ? order : "asc"}
                     onClick={() => handleRequestSort("company")}
                   >
-                    Company
+                    <span className="font-semibold">Company</span>
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
@@ -100,17 +122,19 @@ const AllTransactionsTable = ({
                     direction={orderBy === "amount" ? order : "asc"}
                     onClick={() => handleRequestSort("amount")}
                   >
-                    Amount
+                    <span className="font-semibold">Amount</span>
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>Type</TableCell>
+                <TableCell>
+                  <span className="font-semibold">Type</span>
+                </TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={orderBy === "date"}
                     direction={orderBy === "date" ? order : "asc"}
                     onClick={() => handleRequestSort("date")}
                   >
-                    Date
+                    <span className="font-semibold">Date</span>
                   </TableSortLabel>
                 </TableCell>
               </TableRow>
@@ -119,51 +143,83 @@ const AllTransactionsTable = ({
               {filteredTransactions
                 .slice(page * 5, page * 5 + 5)
                 .map((transaction) => (
-                  <TableRow key={transaction.id}>
+                  <TableRow
+                    key={transaction.id}
+                    hover
+                    className="hover:bg-gray-50"
+                  >
                     <TableCell>{transaction.company}</TableCell>
-                    <TableCell>${transaction.amount}</TableCell>
-                    <TableCell>{transaction.type}</TableCell>
-                    <TableCell>{transaction.date}</TableCell>
+                    <TableCell>
+                      $
+                      {transaction.amount
+                        .toFixed(2)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.type === "Invoice"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {transaction.type}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(transaction.date).toLocaleDateString()}
+                    </TableCell>
                   </TableRow>
                 ))}
             </TableBody>
           </Table>
         </TableContainer>
+      )}
 
-        {/* Mobile Stacked Layout */}
-        <Box sx={{ display: { xs: "block", sm: "none" } }}>
+      {/* Mobile Card View */}
+      {isMobile && (
+        <div className="space-y-3 p-4">
           {filteredTransactions
             .slice(page * 5, page * 5 + 5)
             .map((transaction) => (
-              <Box
+              <div
                 key={transaction.id}
-                sx={{
-                  border: "1px solid #ddd",
-                  borderRadius: 2,
-                  padding: 2,
-                  marginBottom: 2,
-                  boxShadow: 2,
-                }}
+                className="border border-gray-200 rounded-lg p-4 shadow-sm"
               >
-                <Box sx={{ fontWeight: "bold" }}>
-                  Company: {transaction.company}
-                </Box>
-                <Box>Amount: ${transaction.amount}</Box>
-                <Box>Type: {transaction.type}</Box>
-                <Box>Date: {transaction.date}</Box>
-              </Box>
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-semibold text-gray-800">
+                    {transaction.company}
+                  </span>
+                  <span className="font-bold">
+                    ${transaction.amount.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      transaction.type === "Invoice"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {transaction.type}
+                  </span>
+                  <span>{new Date(transaction.date).toLocaleDateString()}</span>
+                </div>
+              </div>
             ))}
-        </Box>
+        </div>
+      )}
 
-        <TablePagination
-          component="div"
-          rowsPerPageOptions={[5]}
-          count={filteredTransactions.length}
-          rowsPerPage={5}
-          page={page}
-          onPageChange={handleChangePage}
-        />
-      </ul>
+      <TablePagination
+        rowsPerPageOptions={[5]}
+        component="div"
+        count={filteredTransactions.length}
+        rowsPerPage={5}
+        page={page}
+        onPageChange={handleChangePage}
+        className="border-t border-gray-200"
+      />
     </div>
   );
 };

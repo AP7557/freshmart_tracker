@@ -1,24 +1,21 @@
-'use client';
-
-import { useData } from '@/context/DataContext';
-import AllTransactionsTable from '@/components/AllTransactionsTable';
-import RemainingInvoice from '@/components/RemainingInvoice';
-import { useEffect, useState } from 'react';
-import { withAuth } from '../../components/withAuth';
+"use client";
+import { useData } from "@/context/DataContext";
+import AllTransactionsTable from "@/components/AllTransactionsTable";
+import RemainingInvoice from "@/components/RemainingInvoice";
+import { withAuth } from "@/components/withAuth";
+import { useEffect, useState } from "react";
 
 function Overview({ user }) {
-  const [storeSelected, setStoreSelected] = useState('');
+  const [storeSelected, setStoreSelected] = useState("");
   const [totalInvoiceLeftToPay, setTotalInvoiceLeftToPay] = useState({});
-  const { allTransactionsForEachStore } = useData(); // Get storesList and transactionData from context
+  const { allTransactionsForEachStore } = useData();
 
   useEffect(() => {
-    // Create a new object to hold the updated totalInvoiceLeftToPay
     const newTotalInvoiceLeftToPay = {};
-
     allTransactionsForEachStore.forEach(({ store, transactions }) => {
       transactions.forEach((transaction) => {
-        const company = transaction.company; // Assuming Company is in column B
-        const value = transaction.amount; // Assuming Value is in column C
+        const company = transaction.company;
+        const value = transaction.amount;
         const type = transaction.type;
 
         if (!newTotalInvoiceLeftToPay[store]) {
@@ -31,82 +28,87 @@ function Overview({ user }) {
           };
         }
 
-        if (type === 'Payment') {
+        if (type === "Payment") {
           newTotalInvoiceLeftToPay[store][company].totalPayment += value;
-        } else if (type === 'Invoice') {
+        } else if (type === "Invoice") {
           newTotalInvoiceLeftToPay[store][company].totalInvoice += value;
         }
       });
     });
-
-    // Update the state once with the new calculated data
     setTotalInvoiceLeftToPay(newTotalInvoiceLeftToPay);
   }, [allTransactionsForEachStore]);
 
   const getTotalInvoiceForStore = (storeName) => {
     if (totalInvoiceLeftToPay[storeName]) {
       return Object.values(totalInvoiceLeftToPay[storeName]).reduce(
-        (acc, companyData) => {
-          // Calculate the remaining amount to pay
-          const remainingAmount = Math.max(
-            0,
-            companyData.totalInvoice - companyData.totalPayment
-          );
-          return acc + remainingAmount; // Add the non-negative remaining amount
-        },
+        (acc, companyData) =>
+          acc +
+          Math.max(0, companyData.totalInvoice - companyData.totalPayment),
         0
       );
     }
-    return 0; // Return 0 if no data for the store
+    return 0;
   };
 
   return (
-    <div className='container !max-w-full mx-auto px-4 py-8'>
-      <h2 className='text-3xl font-semibold text-gray-700 mb-6'>
-        Store Invoices Summary
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <h2 className="text-3xl font-bold text-gray-800 mb-8 border-b border-gray-200 pb-4">
+        Store Financial Overview
       </h2>
 
-      {/* Display grid of stores */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      {/* Store Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {user.stores?.map((store, index) => (
           <div
             key={index}
-            className='bg-white shadow-lg rounded-lg p-6 flex justify-between items-center cursor-pointer'
+            className={`bg-white rounded-xl shadow-md overflow-hidden border-l-4 transition-all duration-200 
+              ${
+                storeSelected === store
+                  ? "border-primary-600 scale-[1.02]"
+                  : "border-transparent hover:border-gray-300"
+              }`}
             onClick={() => setStoreSelected(store)}
           >
-            <div>
-              <h3 className='text-xl font-semibold text-gray-800'>{store}</h3>
-            </div>
-            <div>
-              <span className='text-lg font-bold text-red-600'>
-                ${getTotalInvoiceForStore(store).toFixed(2)}
-              </span>
+            <div className="p-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-800">{store}</h3>
+                <span
+                  className={`text-xl font-bold ${
+                    getTotalInvoiceForStore(store) > 0
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  $
+                  {getTotalInvoiceForStore(store)
+                    .toFixed(2)
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </span>
+              </div>
+              <div className="mt-4 text-sm text-gray-500">
+                {allTransactionsForEachStore.find((s) => s.store === store)
+                  ?.transactions.length || 0}{" "}
+                transactions
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Conditional render when a store is selected */}
       {storeSelected && (
-        <div className='flex flex-col lg:flex-row gap-8 mt-8'>
-          {/* On mobile, RemainingInvoice is above AllTransactionsTable */}
-          <div className='order-1 lg:order-2 w-full'>
-            <RemainingInvoice
-              storeSelected={storeSelected}
-              totalInvoiceLeftToPay={totalInvoiceLeftToPay}
-            />
-          </div>
-
-          <div className='order-2 lg:order-1 w-full'>
-            <AllTransactionsTable
-              allTransactionsForEachStore={allTransactionsForEachStore}
-              storeSelected={storeSelected}
-            />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <RemainingInvoice
+            storeSelected={storeSelected}
+            totalInvoiceLeftToPay={totalInvoiceLeftToPay}
+          />
+          <AllTransactionsTable
+            allTransactionsForEachStore={allTransactionsForEachStore}
+            storeSelected={storeSelected}
+          />
         </div>
       )}
     </div>
   );
 }
 
-export default withAuth(Overview, ['master', 'manager']);
+export default withAuth(Overview, ["master", "manager"]);
