@@ -1,26 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useData } from '../../context/DataContext'; // Import the context hook
-import { addTransactionToStoreSelectedDB } from '@/app/addTransactions/db/addTransactionToStoreSelectedDB';
-import RegisterNewStore from './registerNewStore';
-import ShowTodaysList from './showTodaysList';
-import ConfirmModal from './confirmModal';
-import RegisterNewCompany from './registerNewCompany';
-import StoreSelection from '@/utils/StoreSelection';
-import CompanySelection from '@/utils/CompanySelection';
-import { withAuth } from '../login/withAuth';
+import { addTransactionToStoreSelectedDB } from '@/database/addTransactionToStoreSelectedDB';
+import RegisterNewStore from '../../components/registerNewStore';
+import ShowTodaysList from '../../components/showTodaysList';
+import ConfirmModal from '../../components/confirmModal';
+import RegisterNewCompany from '../../components/registerNewCompany';
+import StoreSelection from '@/components/StoreSelection';
+import CompanySelection from '@/components/CompanySelection';
+import { withAuth } from '../../components/withAuth';
 
 function AddTransactions({ user }) {
   const [storeSelected, setStoreSelected] = useState('');
   const [companySelected, setCompanySelected] = useState('');
-  const { register, handleSubmit, reset, watch } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(null);
 
   // Use the data from the DataContext
   const { addTodaysTransaction } = useData();
+
+  const checkNumber = watch('check');
+
+  useEffect(() => {
+    if (checkNumber && checkNumber !== '') {
+      setValue('type', 'Payment');
+    } else {
+      setValue('type', '');
+    }
+  }, [checkNumber]);
 
   const onSubmit = (data) => {
     let newTransaction = {
@@ -60,6 +77,7 @@ function AddTransactions({ user }) {
             companySelected={companySelected}
             setCompanySelected={setCompanySelected}
             register={register}
+            errors={errors}
           />
 
           {/* Register New Company only if no company is selected */}
@@ -74,6 +92,15 @@ function AddTransactions({ user }) {
           className='mt-6 space-y-4'
         >
           <div>
+            <div>Check Number:</div>
+            <input
+              {...register('check', { required: false, valueAsNumber: true })}
+              type='number'
+              placeholder='Enter Check Number'
+              className='w-full p-3 border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+          </div>
+          <div>
             <div>Amount:</div>
             <input
               {...register('amount', { required: true, valueAsNumber: true })}
@@ -82,10 +109,15 @@ function AddTransactions({ user }) {
               placeholder='Enter Amount'
               className='w-full p-3 border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
+            {errors.amount && (
+              <p className='text-red-500 text-sm'>Amount is required.</p>
+            )}
           </div>
+
           <div>
             <div>Type:</div>
             <select
+              disabled={(checkNumber && checkNumber !== '') || false}
               {...register('type', { required: true })}
               className='w-full p-3 border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             >

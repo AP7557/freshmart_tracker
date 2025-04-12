@@ -1,10 +1,8 @@
+import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import React, { useEffect } from 'react';
 
 function StoreSelection({ setStoreSelected, storeSelected }) {
   const { user } = useAuth();
-
-  useEffect(() => {}, [user.stores]);
 
   return (
     <div className='mt-4'>

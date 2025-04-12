@@ -1,15 +1,15 @@
 'use client';
 
 import { useData } from '@/context/DataContext';
-import AllTransactionsTable from '@/utils/AllTransactionsTable';
-import RemainingInvoice from '@/utils/RemainingInvoice';
+import AllTransactionsTable from '@/components/AllTransactionsTable';
+import RemainingInvoice from '@/components/RemainingInvoice';
 import { useEffect, useState } from 'react';
-import { withAuth } from '../login/withAuth';
+import { withAuth } from '../../components/withAuth';
 
-function Overview() {
+function Overview({ user }) {
   const [storeSelected, setStoreSelected] = useState('');
   const [totalInvoiceLeftToPay, setTotalInvoiceLeftToPay] = useState({});
-  const { storesList, allTransactionsForEachStore } = useData(); // Get storesList and transactionData from context
+  const { allTransactionsForEachStore } = useData(); // Get storesList and transactionData from context
 
   useEffect(() => {
     // Create a new object to hold the updated totalInvoiceLeftToPay
@@ -68,7 +68,7 @@ function Overview() {
 
       {/* Display grid of stores */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {storesList.map((store, index) => (
+        {user.stores?.map((store, index) => (
           <div
             key={index}
             className='bg-white shadow-lg rounded-lg p-6 flex justify-between items-center cursor-pointer'

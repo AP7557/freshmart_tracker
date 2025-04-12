@@ -1,4 +1,4 @@
-import { setStoreOrComapinesToDB } from '@/app/addTransactions/db/addTransactionToStoreSelectedDB';
+import { setStoreOrComapinesToDB } from '@/database/addTransactionToStoreSelectedDB';
 import { useState } from 'react';
 
 export default function RegisterNewStore() {

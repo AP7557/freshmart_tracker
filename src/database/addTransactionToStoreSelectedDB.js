@@ -1,4 +1,4 @@
-import { db } from '../../../firebase';
+import { db } from '../firebase';
 import { addDoc, collection, setDoc, doc } from 'firebase/firestore';
 
 // Function to add a transaction to a specific store document (with arrayUnion)

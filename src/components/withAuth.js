@@ -1,4 +1,3 @@
-// components/withAuth.js
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -21,7 +20,7 @@ export function withAuth(Component, allowedRoles = []) {
         allowedRoles.length > 0 &&
         !allowedRoles.includes(user.role)
       ) {
-        router.push('/addTransactions'); // or your fallback route
+        router.push('/addTransactions');
       }
     }, [user, loading, router]);
 

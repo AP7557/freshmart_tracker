@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { useData } from '@/context/DataContext';
 import { auth, db } from '@/firebase';
-import { withAuth } from '../login/withAuth';
+import { withAuth } from '../../components/withAuth';
 import { useRouter } from 'next/navigation';
 
 // Available roles and store options
