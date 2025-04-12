@@ -1,29 +1,55 @@
 // context/AuthContext.js
-
-'use client';  // <-- Add this directive to mark this file as a client component
-
-import { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../firebase';
+'use client';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { auth } from '@/firebase';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '@/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
-
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch additional user data from Firestore
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            ...userData,
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setLoading(false);
+      }
     });
 
-    return unsubscribe;
-  }, []);
+    return () => unsubscribe();
+  }, [user]);
 
-  return (
-    <AuthContext.Provider value={{ user }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const value = {
+    user,
+    loading,
+    setUser,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}

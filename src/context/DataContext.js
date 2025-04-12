@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import {
   getListOfStoresAndCompanies,
-  getDocsFromDB,
+  getAllTransactionsWithStore,
 } from "@/database/getDocsFromDB";
 
 const DataContext = createContext();
@@ -25,7 +25,7 @@ export const DataProvider = ({ children }) => {
       setStoresList(storeListValues);
       setCompanyList(Object.values(companyList));
 
-      const allTransactions = await getDocsFromDB(storeListValues);
+      const allTransactions = await getAllTransactionsWithStore(storeListValues);
       const today = new Date().toLocaleDateString("en-US");
       const todaysTransactions = allTransactionsForEachStore
         .map(({ store, transactions }) =>
