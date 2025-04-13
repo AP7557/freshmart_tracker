@@ -12,11 +12,25 @@ import {
   FiUsers,
   FiLogOut,
 } from "react-icons/fi";
+import { AiOutlineBank } from "react-icons/ai";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null); // Immediately clear the user state
+      router.push("/login"); // Redirect to login page
+      setMobileMenuOpen(false); // Close mobile menu
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -61,6 +75,15 @@ export default function Navbar() {
                     <span>Overview</span>
                   </Link>
                 )}
+                {user.role !== "user" && (
+                  <Link
+                    href="/depositChecks"
+                    className="flex items-center space-x-1 hover:text-[#bbf7d0] transition-colors"
+                  >
+                    <AiOutlineBank size={18} />
+                    <span>Deposit Checks</span>
+                  </Link>
+                )}
                 <Link
                   href="/addTransactions"
                   className="flex items-center space-x-1 hover:text-[#bbf7d0] transition-colors"
@@ -74,11 +97,11 @@ export default function Navbar() {
                     className="flex items-center space-x-1 hover:text-[#bbf7d0] transition-colors"
                   >
                     <FiUsers size={18} />
-                    <span>Users</span>
+                    <span>Manage Users</span>
                   </Link>
                 )}
                 <button
-                  onClick={() => signOut(auth)}
+                  onClick={handleSignOut}
                   className="flex items-center space-x-1 hover:text-[#bbf7d0] transition-colors"
                 >
                   <FiLogOut size={18} />
@@ -97,35 +120,46 @@ export default function Navbar() {
                 {user.role !== "user" && (
                   <Link
                     href="/overview"
-                    className="block p-2 hover:bg-[#166534] rounded transition-colors"
+                    className="flex items-center gap-2 p-2 hover:bg-[#166534] rounded transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <FiHome size={18} />
                     Overview
+                  </Link>
+                )}
+                {user.role !== "user" && (
+                  <Link
+                    href="/depositChecks"
+                    className="flex items-center gap-2 p-2 hover:bg-[#166534] rounded transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <AiOutlineBank size={18} />
+                    Deposit Checks
                   </Link>
                 )}
                 <Link
                   href="/addTransactions"
-                  className="block p-2 hover:bg-[#166534] rounded transition-colors"
+                  className="flex items-center gap-2 p-2 hover:bg-[#166534] rounded transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
+                  <FiPlusCircle size={18} />
                   Add Transaction
                 </Link>
                 {user.role === "admin" && (
                   <Link
                     href="/userManagement"
-                    className="block p-2 hover:bg-[#166534] rounded transition-colors"
+                    className="flex items-center gap-2 p-2 hover:bg-[#166534] rounded transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <FiUsers size={18} />
                     User Management
                   </Link>
                 )}
                 <button
-                  onClick={() => {
-                    signOut(auth);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full text-left p-2 hover:bg-[#166534] rounded transition-colors"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 w-full text-left p-2 hover:bg-[#166534] rounded transition-colors"
                 >
+                  <FiLogOut size={18} />
                   Sign Out
                 </button>
               </>

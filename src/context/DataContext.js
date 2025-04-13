@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   getListOfStoresAndCompanies,
   getAllTransactionsWithStore,
-} from "@/database/getDocsFromDB";
+} from '@/database/getDocsFromDB';
 
 const DataContext = createContext();
 
@@ -19,20 +19,22 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     const loadData = async () => {
       const [companyList, storeList] = await getListOfStoresAndCompanies(
-        "Lists"
+        'Lists'
       );
       const storeListValues = Object.values(storeList);
       setStoresList(storeListValues);
       setCompanyList(Object.values(companyList));
 
-      const allTransactions = await getAllTransactionsWithStore(storeListValues);
-      const today = new Date().toLocaleDateString("en-US");
+      const allTransactions = await getAllTransactionsWithStore(
+        storeListValues
+      );
+      const today = new Date().toLocaleDateString('en-US');
       const todaysTransactions = allTransactionsForEachStore
         .map(({ store, transactions }) =>
           transactions
             .filter(
               (transaction) =>
-                transaction.date === today && transaction.date !== ""
+                transaction.date === today && transaction.date !== ''
             )
             .map((transaction) => ({
               ...transaction,
@@ -45,7 +47,7 @@ export const DataProvider = ({ children }) => {
     };
 
     loadData();
-  }, [companyList, storesList]);
+  }, [companyList, storesList]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update transaction data when a new transaction is added
   const addTodaysTransaction = (newTransaction) => {

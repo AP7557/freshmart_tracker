@@ -2,7 +2,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "@/firebase";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -13,8 +13,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (!authUser) {
         setUser(null);
         setLoading(false);
         return;
@@ -22,13 +22,26 @@ export function AuthProvider({ children }) {
 
       try {
         // Fetch additional user data from Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userDoc = await getDoc(doc(db, "users", authUser.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setUser({
-            uid: user.uid,
-            email: user.email,
+            uid: authUser.uid,
+            email: authUser.email,
             ...userData,
+          });
+        } else {
+          // If no user document exists, create one with default values
+          await setDoc(doc(db, "users", authUser.uid), {
+            email: authUser.email,
+            role: "user",
+            stores: [],
+          });
+          setUser({
+            uid: authUser.uid,
+            email: authUser.email,
+            role: "user",
+            stores: [],
           });
         }
       } catch (error) {
@@ -39,7 +52,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, []); // Removed user from dependencies to prevent infinite loops
 
   const value = {
     user,
