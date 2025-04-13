@@ -1,7 +1,7 @@
 // app/login/page.js
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { doc, setDoc, getDoc, getFirestore } from "firebase/firestore";
 import { auth, db } from "@/firebase";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,13 @@ export default function AuthPage() {
   const [error, setError] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.push("/addTransactions");
+    }
+  }, [user]);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -37,12 +45,10 @@ export default function AuthPage() {
           email: email,
           role: "user",
           stores: [],
-          canViewOverview: false,
         });
       }
-      router.push("/addTransactions");
     } catch (err) {
-      setError(err.message);
+      setError("Error " + err.message.split("/")[1].split(")")[0]);
     }
   };
 
@@ -58,13 +64,10 @@ export default function AuthPage() {
           email: user.email,
           role: "user",
           stores: [],
-          canViewOverview: false,
         });
       }
-
-      router.push("/addTransactions");
     } catch (err) {
-      setError(err.message);
+      setError("Error " + err.message.split("/")[1].split(")")[0]);
     }
   };
 
@@ -75,13 +78,11 @@ export default function AuthPage() {
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
             {isLogin ? "Welcome Back" : "Create Account"}
           </h1>
-
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm">
               {error}
             </div>
           )}
-
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
               <label
@@ -127,7 +128,6 @@ export default function AuthPage() {
               {isLogin ? "Login to Dashboard" : "Create Account"}
             </button>
           </form>
-
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -138,7 +138,6 @@ export default function AuthPage() {
               </span>
             </div>
           </div>
-
           <button
             onClick={handleGoogleSignIn}
             className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md bg-white hover:bg-gray-50 transition-colors mb-4"
@@ -146,11 +145,10 @@ export default function AuthPage() {
             <FcGoogle className="mr-2 text-lg" />
             <span>Google</span>
           </button>
-
           <div className="text-center text-sm text-gray-600">
             {isLogin ? (
               <p>
-                New to Freshmart?{" "}
+                New to Freshmart?
                 <button
                   onClick={() => setIsLogin(false)}
                   className="text-primary-600 hover:text-primary-700 font-medium underline"
@@ -160,7 +158,7 @@ export default function AuthPage() {
               </p>
             ) : (
               <p>
-                Already have an account?{" "}
+                Already have an account?
                 <button
                   onClick={() => setIsLogin(true)}
                   className="text-primary-600 hover:text-primary-700 font-medium underline"

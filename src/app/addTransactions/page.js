@@ -83,7 +83,7 @@ function AddTransactions({ user }) {
               errors={errors}
             />
 
-            {!companySelected && <RegisterNewCompany />}
+            {!companySelected && user?.role !== "user" && <RegisterNewCompany />}
           </>
         )}
 
@@ -149,7 +149,7 @@ function AddTransactions({ user }) {
           </form>
         )}
 
-        {!storeSelected && <RegisterNewStore />}
+        {!storeSelected && user?.role !== "user" && <RegisterNewStore />}
 
         <ShowTodaysList storeSelected={storeSelected} />
       </div>

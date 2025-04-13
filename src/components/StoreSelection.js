@@ -14,7 +14,7 @@ function StoreSelection({ setStoreSelected, storeSelected, user }) {
         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
       >
         <option value="">Select a Store</option>
-        {user.stores?.map((storeOption, index) => (
+        {user?.stores?.map((storeOption, index) => (
           <option key={index} value={storeOption}>
             {storeOption}
           </option>

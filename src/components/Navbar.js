@@ -42,7 +42,7 @@ export default function Navbar() {
               {mobileMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
             <Link
-              href="/"
+              href="/overview"
               className="text-xl font-bold hover:text-[#bbf7d0] transition-colors"
             >
               Freshmart Tracker
@@ -52,7 +52,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-6">
             {user && (
               <>
-                {user.canViewOverview && (
+                {user.role !== "user" && (
                   <Link
                     href="/overview"
                     className="flex items-center space-x-1 hover:text-[#bbf7d0] transition-colors"
@@ -68,7 +68,7 @@ export default function Navbar() {
                   <FiPlusCircle size={18} />
                   <span>Add Transaction</span>
                 </Link>
-                {user.role === "master" && (
+                {user.role === "admin" && (
                   <Link
                     href="/userManagement"
                     className="flex items-center space-x-1 hover:text-[#bbf7d0] transition-colors"
@@ -94,7 +94,7 @@ export default function Navbar() {
           <div className="md:hidden mt-4 pb-4 space-y-2">
             {user ? (
               <>
-                {user.canViewOverview && (
+                {user.role !== "user" && (
                   <Link
                     href="/overview"
                     className="block p-2 hover:bg-[#166534] rounded transition-colors"
@@ -110,7 +110,7 @@ export default function Navbar() {
                 >
                   Add Transaction
                 </Link>
-                {user.role === "master" && (
+                {user.role === "admin" && (
                   <Link
                     href="/userManagement"
                     className="block p-2 hover:bg-[#166534] rounded transition-colors"

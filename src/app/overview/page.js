@@ -58,7 +58,7 @@ function Overview({ user }) {
 
       {/* Store Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        {user.stores?.map((store, index) => (
+        {user?.stores?.map((store, index) => (
           <div
             key={index}
             className={`bg-white rounded-xl shadow-md overflow-hidden border-l-4 transition-all duration-200 
@@ -87,7 +87,7 @@ function Overview({ user }) {
               </div>
               <div className="mt-4 text-sm text-gray-500">
                 {allTransactionsForEachStore.find((s) => s.store === store)
-                  ?.transactions.length || 0}{" "}
+                  ?.transactions.length || 0}
                 transactions
               </div>
             </div>
@@ -111,4 +111,4 @@ function Overview({ user }) {
   );
 }
 
-export default withAuth(Overview, ["master", "manager"]);
+export default withAuth(Overview, ["admin", "manager"]);

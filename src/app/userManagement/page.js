@@ -18,7 +18,7 @@ import { auth, db } from "@/firebase";
 import { withAuth } from "@/components/withAuth";
 
 // Available roles and store options
-const ROLES = ["master", "manager", "user"];
+const ROLES = ["admin", "manager", "user"];
 
 function UserManagementPage({ user }) {
   const router = useRouter();
@@ -29,8 +29,8 @@ function UserManagementPage({ user }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Only allow master admins to access this page
-  if (user.role !== "master") {
+  // Only allow admins to access this page
+  if (user?.role !== "admin") {
     router.push("/addTransactions");
   }
 
@@ -73,7 +73,7 @@ function UserManagementPage({ user }) {
   const handleStoreAccessChange = async (userId, storeId, isChecked) => {
     try {
       const user = users.find((u) => u.id === userId);
-      let updatedStores = user.stores || [];
+      let updatedStores = user?.stores || [];
 
       if (isChecked) {
         updatedStores = [...updatedStores, storeId];
@@ -98,24 +98,6 @@ function UserManagementPage({ user }) {
     }
   };
 
-  const handleOverviewAccessChange = async (userId, canView) => {
-    try {
-      await updateDoc(doc(db, "users", userId), {
-        canViewOverview: canView,
-      });
-      setUsers(
-        users.map((u) =>
-          u.id === userId ? { ...u, canViewOverview: canView } : u
-        )
-      );
-      setSuccess("Overview access updated successfully");
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError("Failed to update overview access");
-      console.error(err);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -134,7 +116,7 @@ function UserManagementPage({ user }) {
       </div>
 
       <p className="text-gray-600 mb-6">
-        As a master admin, you can manage user roles and store access.
+        As a admin, you can manage user roles and store access.
       </p>
 
       {error && (
@@ -164,7 +146,7 @@ function UserManagementPage({ user }) {
               </div>
               <span
                 className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  user.role === "master"
+                  user.role === "admin"
                     ? "bg-purple-100 text-purple-800"
                     : user.role === "manager"
                     ? "bg-green-100 text-green-800"
@@ -226,29 +208,6 @@ function UserManagementPage({ user }) {
                   ))}
                 </div>
               </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={`${user.id}-overview`}
-                  checked={user.canViewOverview || false}
-                  onChange={(e) =>
-                    handleOverviewAccessChange(user.id, e.target.checked)
-                  }
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor={`${user.id}-overview`}
-                  className="ml-2 text-sm text-gray-700 flex items-center gap-2"
-                >
-                  {user.canViewOverview ? (
-                    <FiEye className="text-green-600" />
-                  ) : (
-                    <FiEyeOff className="text-gray-500" />
-                  )}
-                  Can View Overview
-                </label>
-              </div>
             </div>
           </div>
         ))}
@@ -257,4 +216,4 @@ function UserManagementPage({ user }) {
   );
 }
 
-export default withAuth(UserManagementPage, ["master"]);
+export default withAuth(UserManagementPage, ["admin"]);

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 export function withAuth(Component, allowedRoles = []) {
   return function AuthenticatedComponent(props) {
@@ -11,7 +11,7 @@ export function withAuth(Component, allowedRoles = []) {
 
     useEffect(() => {
       if (!loading && !user) {
-        router.push('/login');
+        router.push("/login");
       }
 
       if (
@@ -20,20 +20,20 @@ export function withAuth(Component, allowedRoles = []) {
         allowedRoles.length > 0 &&
         !allowedRoles.includes(user.role)
       ) {
-        router.push('/addTransactions');
+        router.push("/addTransactions");
       }
     }, [user, loading, router]);
 
-    if (loading || !user) return <div>Loading...</div>;
+    if (loading || !user)
+      return (
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      );
     if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-      return <div>Unauthorized</div>;
+      return null;
     }
 
-    return (
-      <Component
-        {...props}
-        user={user}
-      />
-    );
+    return <Component {...props} user={user} />;
   };
 }
