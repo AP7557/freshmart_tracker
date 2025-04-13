@@ -7,8 +7,6 @@ import {
   FiUser,
   FiUserCheck,
   FiShield,
-  FiEye,
-  FiEyeOff,
   FiCheck,
   FiX,
 } from "react-icons/fi";
@@ -56,11 +54,25 @@ function UserManagementPage({ user }) {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await updateDoc(doc(db, "users", userId), {
-        role: newRole,
-      });
+      const updates = { role: newRole };
+
+      // If changing to admin, give access to all stores
+      if (newRole === "admin") {
+        updates.stores = storesList;
+      }
+
+      await updateDoc(doc(db, "users", userId), updates);
+
       setUsers(
-        users.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+        users.map((u) =>
+          u.id === userId
+            ? {
+                ...u,
+                role: newRole,
+                ...(newRole === "admin" && { stores: storesList }),
+              }
+            : u
+        )
       );
       setSuccess("Role updated successfully");
       setTimeout(() => setSuccess(""), 3000);
@@ -177,37 +189,39 @@ function UserManagementPage({ user }) {
                 </select>
               </div>
 
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                  <FiUserCheck className="text-green-600" />
-                  Store Access
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {storesList.map((storeId) => (
-                    <div key={storeId} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`${user.id}-${storeId}`}
-                        checked={user.stores?.includes(storeId) || false}
-                        onChange={(e) =>
-                          handleStoreAccessChange(
-                            user.id,
-                            storeId,
-                            e.target.checked
-                          )
-                        }
-                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                      />
-                      <label
-                        htmlFor={`${user.id}-${storeId}`}
-                        className="ml-2 block text-sm text-gray-700"
-                      >
-                        {storeId}
-                      </label>
-                    </div>
-                  ))}
+              {user.role !== "admin" && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                    <FiUserCheck className="text-green-600" />
+                    Store Access
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {storesList.map((storeId) => (
+                      <div key={storeId} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`${user.id}-${storeId}`}
+                          checked={user.stores?.includes(storeId) || false}
+                          onChange={(e) =>
+                            handleStoreAccessChange(
+                              user.id,
+                              storeId,
+                              e.target.checked
+                            )
+                          }
+                          className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                        />
+                        <label
+                          htmlFor={`${user.id}-${storeId}`}
+                          className="ml-2 block text-sm text-gray-700"
+                        >
+                          {storeId}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         ))}

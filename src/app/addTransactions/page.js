@@ -19,6 +19,7 @@ function AddTransactions({ user }) {
   const [companySelected, setCompanySelected] = useState("");
   const {
     register,
+    unregister,
     handleSubmit,
     reset,
     watch,
@@ -34,8 +35,11 @@ function AddTransactions({ user }) {
   useEffect(() => {
     if (checkNumber && checkNumber !== "") {
       setValue("type", "Payment");
+      register("isCheckDeposited");
+      setValue("isCheckDeposited", false);
     } else {
       setValue("type", "");
+      unregister("isCheckDeposited");
     }
   }, [checkNumber]);
 
@@ -83,7 +87,9 @@ function AddTransactions({ user }) {
               errors={errors}
             />
 
-            {!companySelected && user?.role !== "user" && <RegisterNewCompany />}
+            {!companySelected && user?.role !== "user" && (
+              <RegisterNewCompany />
+            )}
           </>
         )}
 
@@ -149,7 +155,9 @@ function AddTransactions({ user }) {
           </form>
         )}
 
-        {!storeSelected && user?.role !== "user" && <RegisterNewStore />}
+        {!storeSelected && user?.role !== "user" && (
+          <RegisterNewStore user={user} />
+        )}
 
         <ShowTodaysList storeSelected={storeSelected} />
       </div>
