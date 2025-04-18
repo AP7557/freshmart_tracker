@@ -9,7 +9,6 @@ const DataContext = createContext();
 export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
-  const [companyList, setCompanyList] = useState([]);
   const [storesList, setStoresList] = useState([]);
   const [todaysTransactionData, setTodaysTransactionData] = useState([]);
   const [allTransactionsForEachStore, setAllTransactionsForEachStore] =
@@ -18,12 +17,11 @@ export const DataProvider = ({ children }) => {
   // Fetch initial data
   useEffect(() => {
     const loadData = async () => {
-      const [companyList, storeList] = await getListOfStoresAndCompanies(
+      const [_, storeList] = await getListOfStoresAndCompanies(
         'Lists'
       );
       const storeListValues = Object.values(storeList);
       setStoresList(storeListValues);
-      setCompanyList(Object.values(companyList));
 
       const allTransactions = await getAllTransactionsWithStore(
         storeListValues
@@ -47,7 +45,7 @@ export const DataProvider = ({ children }) => {
     };
 
     loadData();
-  }, [companyList, storesList]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [storesList]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update transaction data when a new transaction is added
   const addTodaysTransaction = (newTransaction) => {
@@ -57,7 +55,6 @@ export const DataProvider = ({ children }) => {
   return (
     <DataContext.Provider
       value={{
-        companyList,
         storesList,
         todaysTransactionData,
         addTodaysTransaction,

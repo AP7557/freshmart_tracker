@@ -1,5 +1,5 @@
 import { useData } from "@/context/DataContext";
-import { FiList, FiDollarSign, FiType } from "react-icons/fi";
+import { FiList, FiType } from "react-icons/fi";
 
 export default function ShowTodaysList({ storeSelected }) {
   const { todaysTransactionData } = useData();
@@ -33,13 +33,13 @@ export default function ShowTodaysList({ storeSelected }) {
               <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
                 <FiType className="text-green-500" size={14} />
                 <span
-                  className={`capitalize px-2 py-1 rounded-full text-xs font-medium ${
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
                     data.type === "Invoice"
                       ? "bg-blue-100 text-blue-800"
                       : "bg-green-100 text-green-800"
                   }`}
                 >
-                  {data.type.toLowerCase()}
+                  {data.type}
                 </span>
               </div>
             </li>
