@@ -2,20 +2,27 @@
 
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useData } from '../../context/DataContext';
-import { addTransactionToStoreSelectedDB } from '@/database/addTransactionToStoreSelectedDB';
-import RegisterNewStore from '@/components/registerNewStore';
-import ShowTodaysList from '@/components/showTodaysList';
-import ConfirmModal from '@/components/confirmModal';
-import RegisterNewCompany from '@/components/registerNewCompany';
-import StoreSelection from '@/components/StoreSelection';
-import CompanySelection from '@/components/CompanySelection';
-import { withAuth } from '@/components/withAuth';
 import { FiPlus, FiDollarSign, FiCheck, FiType } from 'react-icons/fi';
 import { LiaMoneyCheckAltSolid } from 'react-icons/lia';
+import {
+  Button,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/firebase';
+import ShowTodaysList from '@/components/addTransactions/showTodaysList';
+import ConfirmModal from '@/components/addTransactions/confirmModal';
+import CompanySelection from '@/components/addTransactions/CompanySelection';
+import StoreSelection from '@/components/StoreSelection';
+import { withAuth } from '@/components/withAuth';
 
 function AddTransactions({ user }) {
-  const [storeSelected, setStoreSelected] = useState('');
+  const [selectedStore, setSelectedStore] = useState('');
   const [companySelected, setCompanySelected] = useState('');
   const {
     register,
@@ -24,13 +31,13 @@ function AddTransactions({ user }) {
     reset,
     watch,
     setValue,
-    formState: { errors },
+    getValues,
   } = useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(null);
+  const [todaysTransactions, setTodaysTransactions] = useState([]);
 
-  const { addTodaysTransaction } = useData();
-  const checkNumber = watch('check');
+  const checkNumber = watch('checkNumber');
 
   useEffect(() => {
     if (checkNumber && checkNumber !== '') {
@@ -43,18 +50,24 @@ function AddTransactions({ user }) {
     }
   }, [checkNumber]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onSubmit = (data) => {
-    let newTransaction = {
-      ...data,
-      date: new Date().toLocaleDateString(),
-    };
-    addTransactionToStoreSelectedDB(storeSelected, { ...newTransaction });
-    addTodaysTransaction({ ...newTransaction, store: storeSelected });
-    setCompanySelected('');
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      let newTransaction = {
+        ...data,
+        date: new Date().toLocaleDateString(),
+      };
+      await addDoc(collection(db, selectedStore), { ...newTransaction });
+
+      setTodaysTransactions((prevData) => [...prevData, newTransaction]);
+
+      setCompanySelected('');
+      reset();
+    } catch (error) {
+      console.error('Error adding transactions: ', error);
+    }
   };
 
-  const handleConfirmSubmit = () => {
+  const handleModalConfirmSubmit = () => {
     onSubmit(formData);
     setIsModalOpen(false);
   };
@@ -73,98 +86,124 @@ function AddTransactions({ user }) {
 
       <div className='space-y-6'>
         <StoreSelection
-          setStoreSelected={setStoreSelected}
-          storeSelected={storeSelected}
+          isFromAddTransactions
+          selectedStore={selectedStore}
+          setSelectedStore={(e) => setSelectedStore(e.target.value)}
           user={user}
         />
 
-        {storeSelected && (
-          <>
-            <CompanySelection
-              companySelected={companySelected}
-              setCompanySelected={setCompanySelected}
-              register={register}
-              errors={errors}
-            />
-
-            {!companySelected && user?.role !== 'user' && (
-              <RegisterNewCompany />
-            )}
-          </>
+        {selectedStore && (
+          <CompanySelection
+            companySelected={companySelected}
+            setCompanySelected={setCompanySelected}
+            register={register}
+          />
         )}
 
-        {storeSelected && companySelected && (
+        {selectedStore && companySelected && (
           <form
             onSubmit={handleSubmit((data) => handleOpenModal(data))}
-            className='space-y-4'
+            className='flex flex-col gap-4'
           >
-            <div className='space-y-2'>
-              <label className=' text-sm font-medium text-gray-700 flex items-center gap-2'>
-                <LiaMoneyCheckAltSolid className='text-green-600' />
-                Check Number
-              </label>
-              <input
-                {...register('check', { required: false, valueAsNumber: true })}
+            <FormControl>
+              <TextField
+                {...register('checkNumber', {
+                  required: false,
+                  valueAsNumber: true,
+                })}
+                id='checkNumber'
                 type='number'
                 placeholder='Enter Check Number'
-                className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                label='Check Number'
+                variant='filled'
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <LiaMoneyCheckAltSolid className='text-green-600' />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
-            </div>
-
-            <div className='space-y-2'>
-              <label className='text-sm font-medium text-gray-700 flex items-center gap-2'>
-                <FiDollarSign className='text-green-600' />
-                Amount
-                <span className='text-red-500'>*</span>
-              </label>
-              <input
+            </FormControl>
+            <FormControl>
+              <TextField
                 {...register('amount', { required: true, valueAsNumber: true })}
+                id='amount'
                 type='number'
-                step='.01'
                 placeholder='Enter Amount'
-                className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                label='Amount'
+                variant='filled'
+                required
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <FiDollarSign className='text-green-600' />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
               />
-              {errors.amount && (
-                <p className='text-red-500 text-sm'>Amount is required.</p>
-              )}
-            </div>
-
-            <div className='space-y-2'>
-              <label className=' text-sm font-medium text-gray-700 flex items-center gap-2'>
-                <FiType className='text-green-600' />
-                Type
-              </label>
-              <select
-                disabled={(checkNumber && checkNumber !== '') || false}
+            </FormControl>
+            <FormControl variant='filled'>
+              <InputLabel id='select-type-label'>Type</InputLabel>
+              <Select
                 {...register('type', { required: true })}
-                className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500'
+                labelId='select-type-label'
+                id='select-type'
+                displayEmpty
+                value={getValues('type')}
+                disabled={(checkNumber && checkNumber !== '') || false}
+                required
+                startAdornment={
+                  <InputAdornment position='start'>
+                    <FiType className='text-green-600' />
+                  </InputAdornment>
+                }
               >
-                <option value=''>Select a Type</option>
-                <option value='Invoice'>Invoice</option>
-                <option value='Payment'>Payment</option>
-              </select>
-            </div>
+                <MenuItem
+                  disabled
+                  value=''
+                >
+                  <em>Select a Type</em>
+                </MenuItem>
+                <MenuItem value='Invoice'>Invoice</MenuItem>
+                <MenuItem value='Payment'>Payment</MenuItem>
+              </Select>
+            </FormControl>
 
-            <button
+            <Button
               type='submit'
-              className='w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 flex items-center justify-center gap-2'
+              variant='contained'
+              startIcon={<FiCheck />}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 500,
+                py: 1.5,
+                backgroundColor: 'var(--color-green-600)',
+                ':hover': {
+                  backgroundColor: 'var(--color-green-700)',
+                },
+              }}
             >
-              <FiCheck />
               Save Transaction
-            </button>
+            </Button>
           </form>
         )}
 
-        {!storeSelected && user?.role !== 'user' && (
-          <RegisterNewStore user={user} />
-        )}
-
-        <ShowTodaysList storeSelected={storeSelected} />
+        <ShowTodaysList
+          selectedStore={selectedStore}
+          todaysTransactions={todaysTransactions}
+          setTodaysTransactions={setTodaysTransactions}
+        />
       </div>
 
       <ConfirmModal
         isModalOpen={isModalOpen}
-        handleConfirmSubmit={handleConfirmSubmit}
+        handleConfirmSubmit={handleModalConfirmSubmit}
+        getValues={getValues}
         setIsModalOpen={setIsModalOpen}
       />
     </div>

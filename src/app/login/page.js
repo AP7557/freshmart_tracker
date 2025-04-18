@@ -13,36 +13,45 @@ import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
 import { auth, db } from '@/firebase';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '@/context/AuthContext';
+import { FormControl, TextField } from '@mui/material';
 
 export default function AuthPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loginCredentials, setLoginCredentials] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
   const [error, setError] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
+    if (user && user.role !== 'user') {
+      router.push('/overview');
+    } else if (user) {
       router.push('/addTransactions');
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleAuth = async (e) => {
+  const handleEmailAndPasswordSignIn = async (e) => {
     e.preventDefault();
-    setError(null);
-
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(
+          auth,
+          loginCredentials.email,
+          loginCredentials.password
+        );
       } else {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
-          email,
-          password
+          loginCredentials.email,
+          loginCredentials.password
         );
         await setDoc(doc(db, 'users', userCredential.user.uid), {
-          email: email,
+          name: loginCredentials.name,
+          email: loginCredentials.email,
           role: 'user',
           stores: [],
         });
@@ -72,7 +81,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-b from-primary-50 to-white p-4'>
+    <div className='flex items-center justify-center bg-gradient-to-b from-primary-50 to-white p-4'>
       <div className='w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden border border-gray-200'>
         <div className='p-6'>
           <h1 className='text-2xl font-bold text-center text-gray-800 mb-6'>
@@ -83,46 +92,64 @@ export default function AuthPage() {
               {error}
             </div>
           )}
+
           <form
-            onSubmit={handleAuth}
-            className='space-y-4'
+            onSubmit={handleEmailAndPasswordSignIn}
+            className='flex flex-col gap-4'
           >
-            <div>
-              <label
-                htmlFor='email'
-                className='block text-sm font-medium text-gray-700 mb-1'
-              >
-                Email
-              </label>
-              <input
+            {!isLogin && (
+              <FormControl>
+                <TextField
+                  id='name'
+                  variant='filled'
+                  label='Name'
+                  value={loginCredentials.name}
+                  onChange={(e) =>
+                    setLoginCredentials((prev) => ({
+                      ...prev,
+                      name: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </FormControl>
+            )}
+            <FormControl>
+              <TextField
                 id='email'
                 type='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                label='Email'
+                variant='filled'
+                value={loginCredentials.email}
+                onChange={(e) =>
+                  setLoginCredentials((prev) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
                 placeholder='your@email.com'
                 required
-                className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500'
               />
-            </div>
+            </FormControl>
 
-            <div>
-              <label
-                htmlFor='password'
-                className='block text-sm font-medium text-gray-700 mb-1'
-              >
-                Password
-              </label>
-              <input
+            <FormControl>
+              <TextField
                 id='password'
+                label='Password'
+                variant='filled'
                 type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={loginCredentials.password}
+                onChange={(e) =>
+                  setLoginCredentials((prev) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+                }
                 placeholder='••••••••'
                 required
                 minLength='6'
-                className='w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500'
               />
-            </div>
+            </FormControl>
 
             <button
               type='submit'
@@ -131,6 +158,7 @@ export default function AuthPage() {
               {isLogin ? 'Login to Dashboard' : 'Create Account'}
             </button>
           </form>
+
           <div className='relative my-6'>
             <div className='absolute inset-0 flex items-center'>
               <div className='w-full border-t border-gray-300'></div>
@@ -141,30 +169,32 @@ export default function AuthPage() {
               </span>
             </div>
           </div>
+
           <button
             onClick={handleGoogleSignIn}
-            className='w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md bg-white hover:bg-gray-50 transition-colors mb-4'
+            className='w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition-colors mb-4'
           >
             <FcGoogle className='mr-2 text-lg' />
             <span>Google</span>
           </button>
+
           <div className='text-center text-sm text-gray-600'>
             {isLogin ? (
               <p>
-                New to Freshmart?
+                New to Freshmart?{' '}
                 <button
                   onClick={() => setIsLogin(false)}
-                  className='text-primary-600 hover:text-primary-700 font-medium underline'
+                  className='text-primary-600 hover:text-[#15803d] font-medium underline'
                 >
                   Create an account
                 </button>
               </p>
             ) : (
               <p>
-                Already have an account?
+                Already have an account?{' '}
                 <button
                   onClick={() => setIsLogin(true)}
-                  className='text-primary-600 hover:text-primary-700 font-medium underline'
+                  className='text-primary-600 hover:text-[#15803d] font-medium underline'
                 >
                   Sign in instead
                 </button>
