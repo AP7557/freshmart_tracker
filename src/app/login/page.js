@@ -24,7 +24,7 @@ export default function AuthPage() {
   const [error, setError] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   useEffect(() => {
     if (user && user.role !== 'user') {
@@ -65,15 +65,20 @@ export default function AuthPage() {
     try {
       const googleProvider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      const userDoc = await getDoc(doc(getFirestore(), 'users', user.uid));
-
+      const googleUser = result.user;
+      
+      const userDoc = await getDoc(
+        doc(getFirestore(), 'users', googleUser.uid)
+      );
       if (!userDoc.exists()) {
-        await setDoc(doc(getFirestore(), 'users', user.uid), {
-          email: user.email,
+        const setUserDoc = {
+          name: googleUser.displayName,
+          email: googleUser.email,
           role: 'user',
           stores: [],
-        });
+        };
+        await setDoc(doc(getFirestore(), 'users', googleUser.uid), setUserDoc);
+        setUser(setUserDoc);
       }
     } catch (err) {
       setError('Error ' + err.message.split('/')[1].split(')')[0]);
@@ -175,7 +180,7 @@ export default function AuthPage() {
             className='w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-md bg-white hover:bg-gray-100 transition-colors mb-4'
           >
             <FcGoogle className='mr-2 text-lg' />
-            <span>Google</span>
+            <span> Google</span>
           </button>
 
           <div className='text-center text-sm text-gray-600'>

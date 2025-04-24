@@ -31,21 +31,6 @@ export function AuthProvider({ children }) {
             email: authUser.email,
             ...userData,
           });
-        } else {
-          // If no user document exists, create one with default values
-          await setDoc(doc(db, 'users', authUser.uid), {
-            email: authUser.email,
-            name: authUser.name,
-            role: 'user',
-            stores: [],
-          });
-          setUser({
-            uid: authUser.uid,
-            name: authUser.name,
-            email: authUser.email,
-            role: 'user',
-            stores: [],
-          });
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
