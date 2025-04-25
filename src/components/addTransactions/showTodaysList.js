@@ -58,20 +58,25 @@ export default function ShowTodaysList({
                   {data.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 </div>
               </div>
-              <div className='flex items-center gap-2 mt-1 text-sm text-gray-600'>
-                <FiType
-                  className='text-green-500'
-                  size={14}
-                />
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    data.type === 'Invoice'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}
-                >
-                  {data.type}
-                </span>
+              <div className='flex justify-between items-center'>
+                <div className='flex items-center gap-2 mt-1 text-sm text-gray-600'>
+                  <FiType
+                    className='text-green-500'
+                    size={14}
+                  />
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      data.type === 'Invoice'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}
+                  >
+                    {data.type}
+                  </span>
+                </div>
+                <div className='font-medium text-gray-800'>
+                  {data.invoiceNumber}
+                </div>
               </div>
             </li>
           ))}

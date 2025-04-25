@@ -28,6 +28,7 @@ const AllTransactionsTable = ({ allTransactionsForSelectedStore }) => {
       headerName: 'Date',
       width: isMobile ? 90 : 120,
       type: 'date',
+      filterable: true,
       valueGetter: (_, row) => new Date(row.date),
       filterOperators: [
         {
@@ -105,6 +106,7 @@ const AllTransactionsTable = ({ allTransactionsForSelectedStore }) => {
       headerName: 'Amount',
       width: isMobile ? 100 : 120,
       type: 'number',
+      filterable: true,
       filterOperators: [
         {
           label: '>=',
@@ -141,6 +143,12 @@ const AllTransactionsTable = ({ allTransactionsForSelectedStore }) => {
           InputComponent: InBetweenAmounts,
         },
       ],
+    },
+    {
+      field: 'invoiceNumber',
+      headerName: 'Invoice',
+      width: isMobile ? 100 : 120,
+      filterable: true,
     },
     {
       field: 'type',

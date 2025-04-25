@@ -8,7 +8,7 @@ export default function ConfirmModal({
   typeValue,
 }) {
   const values = getValues();
-  const { company, checkNumber, amount } = values;
+  const { company, checkNumber, amount, invoiceNumber } = values;
   const labelStyle = 'text-sm font-medium text-gray-500';
   const valueStyle = 'text-sm font-semibold text-gray-800';
 
@@ -52,6 +52,12 @@ export default function ConfirmModal({
                 <span className={labelStyle}>Amount</span>
                 <span className='text-sm font-semibold text-green-600'>
                   ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                </span>
+              </div>
+              <div className='flex justify-between'>
+                <span className={labelStyle}>Invoice #</span>
+                <span className={valueStyle}>
+                  {invoiceNumber ? invoiceNumber : 'N/A'}
                 </span>
               </div>
             </div>

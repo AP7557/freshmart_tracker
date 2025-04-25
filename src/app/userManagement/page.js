@@ -259,7 +259,7 @@ function UserManagementPage({ user }) {
               </div>
             ) : (
               <div className='text-center mt-3'>
-                You have access to the Stores
+                You have access to all the Stores
               </div>
             )}
           </div>

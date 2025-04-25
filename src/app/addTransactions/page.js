@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiPlus, FiDollarSign, FiCheck, FiType } from 'react-icons/fi';
 import { LiaMoneyCheckAltSolid } from 'react-icons/lia';
+import { PiInvoiceFill } from 'react-icons/pi';
 import {
   Button,
   FormControl,
@@ -84,7 +85,7 @@ function AddTransactions({ user }) {
         <FiPlus className='text-green-600' />
         Add Transaction
       </h2>
-      
+
       <div className='space-y-6'>
         <StoreSelection
           isFromAddTransactions
@@ -142,6 +143,24 @@ function AddTransactions({ user }) {
                     startAdornment: (
                       <InputAdornment position='start'>
                         <FiDollarSign className='text-green-600' />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </FormControl>
+            <FormControl>
+              <TextField
+                {...register('invoiceNumber')}
+                id='invoiceNumber'
+                placeholder='Enter Invoice Number'
+                label='Invoice Number'
+                variant='filled'
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <PiInvoiceFill className='text-green-600' />
                       </InputAdornment>
                     ),
                   },
