@@ -36,16 +36,15 @@ function AddTransactions({ user }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(null);
   const [todaysTransactions, setTodaysTransactions] = useState([]);
-
+  const [typeValue, setTypeValue] = useState('');
   const checkNumber = watch('checkNumber');
 
   useEffect(() => {
     if (checkNumber && checkNumber !== '') {
-      setValue('type', 'Payment');
+      setTypeValue('Payment');
       register('isCheckDeposited');
       setValue('isCheckDeposited', false);
     } else {
-      setValue('type', '');
       unregister('isCheckDeposited');
     }
   }, [checkNumber]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -54,6 +53,7 @@ function AddTransactions({ user }) {
     try {
       let newTransaction = {
         ...data,
+        type: typeValue,
         date: new Date().toLocaleDateString(),
       };
       await addDoc(collection(db, selectedStore), { ...newTransaction });
@@ -61,6 +61,7 @@ function AddTransactions({ user }) {
       setTodaysTransactions((prevData) => [...prevData, newTransaction]);
 
       setCompanySelected('');
+      setTypeValue('');
       reset();
     } catch (error) {
       console.error('Error adding transactions: ', error);
@@ -83,7 +84,7 @@ function AddTransactions({ user }) {
         <FiPlus className='text-green-600' />
         Add Transaction
       </h2>
-
+      
       <div className='space-y-6'>
         <StoreSelection
           isFromAddTransactions
@@ -150,11 +151,11 @@ function AddTransactions({ user }) {
             <FormControl variant='filled'>
               <InputLabel id='select-type-label'>Type</InputLabel>
               <Select
-                {...register('type', { required: true })}
                 labelId='select-type-label'
                 id='select-type'
                 displayEmpty
-                value={getValues('type')}
+                value={typeValue}
+                onChange={(e) => setTypeValue(e.target.value)}
                 disabled={(checkNumber && checkNumber !== '') || false}
                 required
                 startAdornment={
@@ -205,6 +206,7 @@ function AddTransactions({ user }) {
         handleConfirmSubmit={handleModalConfirmSubmit}
         getValues={getValues}
         setIsModalOpen={setIsModalOpen}
+        typeValue={typeValue}
       />
     </div>
   );

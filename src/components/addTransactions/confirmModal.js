@@ -5,12 +5,13 @@ export default function ConfirmModal({
   handleConfirmSubmit,
   setIsModalOpen,
   getValues,
+  typeValue,
 }) {
   const values = getValues();
-  const { company, type, checkNumber, amount } = values;
+  const { company, checkNumber, amount } = values;
   const labelStyle = 'text-sm font-medium text-gray-500';
   const valueStyle = 'text-sm font-semibold text-gray-800';
-  
+
   return (
     isModalOpen && (
       <div className='fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50 p-4'>
@@ -39,12 +40,12 @@ export default function ConfirmModal({
               </div>
               <div className='flex justify-between'>
                 <span className={labelStyle}>Type</span>
-                <span className={valueStyle}>{type}</span>
+                <span className={valueStyle}>{typeValue}</span>
               </div>
               <div className='flex justify-between'>
                 <span className={labelStyle}>Check #</span>
                 <span className={valueStyle}>
-                  {type === 'Payment' ? checkNumber || 'N/A-Cash' : 'N/A'}
+                  {typeValue === 'Payment' ? checkNumber || 'N/A-Cash' : 'N/A'}
                 </span>
               </div>
               <div className='flex justify-between'>

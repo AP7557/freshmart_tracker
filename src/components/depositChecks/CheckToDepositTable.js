@@ -62,6 +62,17 @@ export default function CheckToDepositTable({ handleMarkAsDeposited, state }) {
                     px: isMobile ? 1 : 2,
                   }}
                 >
+                  Company
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: 'white',
+                    fontWeight: 'medium',
+                    fontSize: isMobile && '0.65rem',
+                    py: isMobile ? 1 : 1.5,
+                    px: isMobile ? 1 : 2,
+                  }}
+                >
                   Amount
                 </TableCell>
                 <TableCell
@@ -94,7 +105,7 @@ export default function CheckToDepositTable({ handleMarkAsDeposited, state }) {
                     }}
                   >
                     {new Date(check.date).toLocaleDateString('en-US', {
-                      month: 'short',
+                      month: isMobile ? 'numeric' : 'short',
                       day: 'numeric',
                       year: isMobile ? '2-digit' : 'numeric',
                     })}
@@ -103,13 +114,24 @@ export default function CheckToDepositTable({ handleMarkAsDeposited, state }) {
                     component='th'
                     scope='row'
                     sx={{
-                      fontWeight: 'medium',
+                      fontWeight: 'bold',
                       fontSize: isMobile && '0.75rem',
                       py: isMobile ? 1 : 1.5,
                       px: isMobile ? 1 : 2,
                     }}
                   >
                     {check.checkNumber}
+                  </TableCell>
+                  <TableCell
+                    component='th'
+                    scope='row'
+                    sx={{
+                      fontSize: isMobile && '0.75rem',
+                      py: isMobile ? 1 : 1.5,
+                      px: isMobile ? 1 : 2,
+                    }}
+                  >
+                    {check.company}
                   </TableCell>
                   <TableCell
                     sx={{
