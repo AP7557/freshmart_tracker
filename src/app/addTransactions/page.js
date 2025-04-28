@@ -146,6 +146,9 @@ function AddTransactions({ user }) {
                       </InputAdornment>
                     ),
                   },
+                  htmlInput: {
+                    step: "0.01",
+                  },
                 }}
               />
             </FormControl>
