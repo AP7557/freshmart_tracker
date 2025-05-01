@@ -14,11 +14,13 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { FormControl, InputAdornment, TextField } from '@mui/material';
+import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterNewStoreOrCompany({
-  user,
   shouldRegisterCompany,
+  setIsRegisterComplete,
 }) {
+  const { user, setUser } = useAuth();
   const name = shouldRegisterCompany ? 'Company' : 'Store';
   const [register, setRegister] = useState({
     nameToRegister: '',
@@ -35,7 +37,7 @@ export default function RegisterNewStoreOrCompany({
         { [register.nameToRegister]: register.nameToRegister },
         { merge: true }
       );
-      
+
       if (!shouldRegisterCompany) {
         // Update current user's store access
         if (user?.uid) {
@@ -45,6 +47,10 @@ export default function RegisterNewStoreOrCompany({
           await updateDoc(userRef, {
             stores: [...currentStores, register.nameToRegister],
           });
+          setUser((prev) => ({
+            ...prev,
+            stores: [...currentStores, register.nameToRegister],
+          }));
         }
 
         // Update all admin users' store access
@@ -69,6 +75,8 @@ export default function RegisterNewStoreOrCompany({
         });
 
         await Promise.all(updatePromises);
+      } else {
+        setIsRegisterComplete(true);
       }
 
       setRegister((prev) => ({
@@ -117,10 +125,7 @@ export default function RegisterNewStoreOrCompany({
           {register.successMessage}
         </div>
       )}
-      <FormControl
-        fullWidth
-        sx={{ marginBottom: 2 }}
-      >
+      <FormControl fullWidth sx={{ marginBottom: 2 }}>
         <TextField
           id='name'
           variant='filled'

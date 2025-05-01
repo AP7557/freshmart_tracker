@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import {
   FormControl,
   InputAdornment,
@@ -5,7 +6,6 @@ import {
   MenuItem,
   Select,
 } from '@mui/material';
-import React from 'react';
 import { LiaStoreAltSolid } from 'react-icons/lia';
 import RegisterNewStoreOrCompany from './addTransactions/registerNewStoreOrCompany';
 
@@ -15,13 +15,15 @@ function StoreSelection({
   setSelectedStore,
   user,
 }) {
+  useEffect(() => {
+    if (user?.stores?.length === 1) {
+      setSelectedStore(user.stores[0]);
+    }
+  }, []);
+  
   return (
     <>
-      <FormControl
-        fullWidth
-        variant='filled'
-        sx={{ marginBottom: 2 }}
-      >
+      <FormControl fullWidth variant='filled' sx={{ marginBottom: 2 }}>
         <InputLabel id='select-store-label'>Store</InputLabel>
         <Select
           labelId='select-store-label'
@@ -36,10 +38,7 @@ function StoreSelection({
           }
           onChange={setSelectedStore}
         >
-          <MenuItem
-            disabled
-            value=''
-          >
+          <MenuItem disabled value=''>
             {user?.stores?.length === 0 ? (
               <em>
                 Uh-Oh Looks like you don't have access to any stores, please
@@ -50,23 +49,15 @@ function StoreSelection({
             )}
           </MenuItem>
           {user?.stores?.map((storeOption, index) => (
-            <MenuItem
-              key={index}
-              value={storeOption}
-            >
+            <MenuItem key={index} value={storeOption}>
               {storeOption}
             </MenuItem>
           ))}
-          {user?.stores?.length === 0 && (
-            <MenuItem disabled>
-              <em>Select a Store</em>
-            </MenuItem>
-          )}
         </Select>
       </FormControl>
 
       {isFromAddTransactions && !selectedStore && user?.role !== 'user' && (
-        <RegisterNewStoreOrCompany user={user} />
+        <RegisterNewStoreOrCompany shouldRegisterCompany={false} />
       )}
     </>
   );

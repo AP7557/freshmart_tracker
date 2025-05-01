@@ -7,6 +7,7 @@ import RegisterNewStoreOrCompany from './registerNewStoreOrCompany';
 
 function CompanySelection({ companySelected, setCompanySelected, register }) {
   const [companyList, setCompanyList] = useState([]);
+  const [isRegisterComplete, setIsRegisterComplete] = useState(false);
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -21,7 +22,7 @@ function CompanySelection({ companySelected, setCompanySelected, register }) {
     };
 
     fetchCompanies();
-  }, []);
+  }, [isRegisterComplete]);
 
   return (
     <>
@@ -57,7 +58,12 @@ function CompanySelection({ companySelected, setCompanySelected, register }) {
         )}
       />
 
-      {!companySelected && <RegisterNewStoreOrCompany shouldRegisterCompany />}
+      {!companySelected && (
+        <RegisterNewStoreOrCompany
+          shouldRegisterCompany
+          setIsRegisterComplete={setIsRegisterComplete}
+        />
+      )}
     </>
   );
 }

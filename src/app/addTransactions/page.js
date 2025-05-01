@@ -90,7 +90,7 @@ function AddTransactions({ user }) {
         <StoreSelection
           isFromAddTransactions
           selectedStore={selectedStore}
-          setSelectedStore={(e) => setSelectedStore(e.target.value)}
+          setSelectedStore={(e) => setSelectedStore(e.target?.value || e)}
           user={user}
         />
 
@@ -147,7 +147,7 @@ function AddTransactions({ user }) {
                     ),
                   },
                   htmlInput: {
-                    step: "0.01",
+                    step: '0.01',
                   },
                 }}
               />
@@ -186,10 +186,7 @@ function AddTransactions({ user }) {
                   </InputAdornment>
                 }
               >
-                <MenuItem
-                  disabled
-                  value=''
-                >
+                <MenuItem disabled value=''>
                   <em>Select a Type</em>
                 </MenuItem>
                 <MenuItem value='Invoice'>Invoice</MenuItem>

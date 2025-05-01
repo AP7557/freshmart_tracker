@@ -144,16 +144,13 @@ function DepositChecks({ user }) {
         <StoreSelection
           selectedStore={state.selectedStore}
           setSelectedStore={(e) => {
-            dispatch({ type: 'SET_STORE', payload: e.target.value });
+            dispatch({ type: 'SET_STORE', payload: e.target?.value || e });
           }}
           user={user}
         />
 
         {state.selectedStore && (
-          <FormControl
-            fullWidth
-            sx={{ marginBottom: 2 }}
-          >
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
             <TextField
               id='bankAmount'
               type='number'
