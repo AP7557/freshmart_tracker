@@ -188,11 +188,13 @@ function DepositChecks({ user }) {
           handleMarkAsDeposited={handleMarkAsDeposited}
         />
 
-        {state.selectedStore && !state.loading && (
-          <div className='text-center py-8 text-gray-500'>
-            No undeposited checks found for this store
-          </div>
-        )}
+        {state.selectedStore &&
+          !state.loading &&
+          state.undepositedChecks.length === 0 && (
+            <div className='text-center py-8 text-gray-500'>
+              No undeposited checks found for this store
+            </div>
+          )}
       </div>
     </div>
   );

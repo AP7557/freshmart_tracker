@@ -153,10 +153,10 @@ const AllTransactionsTable = ({ allTransactionsForSelectedStore }) => {
     {
       field: 'type',
       headerName: 'Type',
-      width: isMobile ? 80 : 100,
+      width: isMobile ? 80 : 120,
       filterable: true,
       type: 'singleSelect',
-      valueOptions: ['Payment', 'Invoice'],
+      valueOptions: ['Check Payment', 'Cash Payment', 'Invoice'],
       renderCell: (params) => (
         <div
           className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -166,8 +166,10 @@ const AllTransactionsTable = ({ allTransactionsForSelectedStore }) => {
           }`}
         >
           {isMobile
-            ? params.value === 'Payment'
-              ? 'Pymt'
+            ? params.value.includes('Payment')
+              ? params.value === 'Cash Payment'
+                ? 'Ch-Pymt'
+                : 'Ck-Pymt'
               : 'Inv'
             : params.value}
         </div>

@@ -18,10 +18,7 @@ export default function ConfirmModal({
         <div className='bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md border border-gray-100'>
           <div className='flex items-center gap-3 mb-5'>
             <div className='p-2 bg-red-50 rounded-full'>
-              <FiAlertTriangle
-                className='text-red-500'
-                size={20}
-              />
+              <FiAlertTriangle className='text-red-500' size={20} />
             </div>
             <h3 className='text-xl font-semibold text-gray-900'>
               Confirm Transaction
@@ -42,12 +39,12 @@ export default function ConfirmModal({
                 <span className={labelStyle}>Type</span>
                 <span className={valueStyle}>{typeValue}</span>
               </div>
-              <div className='flex justify-between'>
-                <span className={labelStyle}>Check #</span>
-                <span className={valueStyle}>
-                  {typeValue === 'Payment' ? checkNumber || 'N/A-Cash' : 'N/A'}
-                </span>
-              </div>
+              {typeValue === 'Check Payment' && (
+                <div className='flex justify-between'>
+                  <span className={labelStyle}>Check #</span>
+                  <span className={valueStyle}>{checkNumber}</span>
+                </div>
+              )}
               <div className='flex justify-between'>
                 <span className={labelStyle}>Amount</span>
                 <span className='text-sm font-semibold text-green-600'>

@@ -21,7 +21,7 @@ export default function CheckToDepositTable({ handleMarkAsDeposited, state }) {
     state.undepositedChecks.length > 0 && (
       <div className='space-y-3 md:space-y-4'>
         <h3 className='text-base md:text-lg font-medium text-gray-800'>
-          Checks to Deposit ({state.undepositedChecks.length})
+          Checks to Withdraw ({state.undepositedChecks.length})
         </h3>
         <TableContainer
           component={Paper}

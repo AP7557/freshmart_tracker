@@ -38,11 +38,11 @@ function AddTransactions({ user }) {
   const [formData, setFormData] = useState(null);
   const [todaysTransactions, setTodaysTransactions] = useState([]);
   const [typeValue, setTypeValue] = useState('');
+
   const checkNumber = watch('checkNumber');
 
   useEffect(() => {
     if (checkNumber && checkNumber !== '') {
-      setTypeValue('Payment');
       register('isCheckDeposited');
       setValue('isCheckDeposited', false);
     } else {
@@ -107,28 +107,54 @@ function AddTransactions({ user }) {
             onSubmit={handleSubmit((data) => handleOpenModal(data))}
             className='flex flex-col gap-4'
           >
-            <FormControl>
-              <TextField
-                {...register('checkNumber', {
-                  required: false,
-                  valueAsNumber: true,
-                })}
-                id='checkNumber'
-                type='number'
-                placeholder='Enter Check Number'
-                label='Check Number'
-                variant='filled'
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position='start'>
-                        <LiaMoneyCheckAltSolid className='text-green-600' />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
+            <FormControl variant='filled'>
+              <InputLabel id='select-type-label'>Type</InputLabel>
+              <Select
+                labelId='select-type-label'
+                id='select-type'
+                displayEmpty
+                value={typeValue}
+                onChange={(e) => setTypeValue(e.target.value)}
+                required
+                startAdornment={
+                  <InputAdornment position='start'>
+                    <FiType className='text-green-600' />
+                  </InputAdornment>
+                }
+              >
+                <MenuItem disabled value=''>
+                  <em>Select a Type</em>
+                </MenuItem>
+                <MenuItem value='Invoice'>Invoice</MenuItem>
+                <MenuItem value='Cash Payment'>Cash Payment</MenuItem>
+                <MenuItem value='Check Payment'>Check Payment</MenuItem>
+              </Select>
             </FormControl>
+            {typeValue === 'Check Payment' && (
+              <FormControl>
+                <TextField
+                  {...register('checkNumber', {
+                    required: true,
+                    valueAsNumber: true,
+                  })}
+                  id='checkNumber'
+                  type='number'
+                  required
+                  placeholder='Enter Check Number'
+                  label='Check Number'
+                  variant='filled'
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position='start'>
+                          <LiaMoneyCheckAltSolid className='text-green-600' />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              </FormControl>
+            )}
             <FormControl>
               <TextField
                 {...register('amount', { required: true, valueAsNumber: true })}
@@ -169,29 +195,6 @@ function AddTransactions({ user }) {
                   },
                 }}
               />
-            </FormControl>
-            <FormControl variant='filled'>
-              <InputLabel id='select-type-label'>Type</InputLabel>
-              <Select
-                labelId='select-type-label'
-                id='select-type'
-                displayEmpty
-                value={typeValue}
-                onChange={(e) => setTypeValue(e.target.value)}
-                disabled={(checkNumber && checkNumber !== '') || false}
-                required
-                startAdornment={
-                  <InputAdornment position='start'>
-                    <FiType className='text-green-600' />
-                  </InputAdornment>
-                }
-              >
-                <MenuItem disabled value=''>
-                  <em>Select a Type</em>
-                </MenuItem>
-                <MenuItem value='Invoice'>Invoice</MenuItem>
-                <MenuItem value='Payment'>Payment</MenuItem>
-              </Select>
             </FormControl>
 
             <Button

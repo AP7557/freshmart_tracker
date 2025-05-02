@@ -108,7 +108,7 @@ function Overview({ user }) {
               totalInvoice: 0,
             };
 
-            type === 'Payment'
+            type.includes('Payment')
               ? (outstandingInvoice[company].totalPayment += value)
               : (outstandingInvoice[company].totalInvoice += value);
           });
