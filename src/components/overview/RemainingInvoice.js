@@ -87,22 +87,22 @@ export default function RemainingInvoice({ outstandingInvoice, totalInvoice }) {
                   key={company}
                   className='hover:bg-gray-50'
                 >
-                  <td className='px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
+                  <td className='px-4 py-4 text-sm font-medium text-gray-900'>
                     {company}
                   </td>
-                  <td className='px-4 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td className='px-4 py-4 text-sm text-gray-500'>
                     $
                     {companyData.totalInvoice
                       .toFixed(2)
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   </td>
-                  <td className='px-4 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td className='px-4 py-4 text-sm text-gray-500'>
                     $
                     {companyData.totalPayment
                       .toFixed(2)
                       .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   </td>
-                  <td className='px-4 py-4 whitespace-nowrap text-sm font-semibold text-red-600'>
+                  <td className='px-4 py-4 text-sm font-semibold text-red-600'>
                     $
                     {remainingAmount
                       .toFixed(2)

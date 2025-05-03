@@ -63,13 +63,13 @@ export default function RemainingChecks({
                   key={index}
                   className='hover:bg-gray-50'
                 >
-                  <td className='px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
+                  <td className='px-4 py-4 text-sm font-medium text-gray-900'>
                     {undepositedTransaction.checkNumber}
                   </td>
-                  <td className='px-4 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td className='px-4 py-4 text-sm text-gray-500'>
                     {undepositedTransaction.company}
                   </td>
-                  <td className='px-4 py-4 whitespace-nowrap text-sm text-gray-500'>
+                  <td className='px-4 py-4 text-sm text-gray-500'>
                     $
                     {undepositedTransaction.amount
                       .toFixed(2)

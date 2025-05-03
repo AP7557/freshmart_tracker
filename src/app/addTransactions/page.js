@@ -122,12 +122,16 @@ function AddTransactions({ user }) {
                   </InputAdornment>
                 }
               >
-                <MenuItem disabled value=''>
+                <MenuItem
+                  disabled
+                  value=''
+                >
                   <em>Select a Type</em>
                 </MenuItem>
                 <MenuItem value='Invoice'>Invoice</MenuItem>
                 <MenuItem value='Cash Payment'>Cash Payment</MenuItem>
                 <MenuItem value='Check Payment'>Check Payment</MenuItem>
+                <MenuItem value='ACH Payment'>ACH Payment</MenuItem>
               </Select>
             </FormControl>
             {typeValue === 'Check Payment' && (
