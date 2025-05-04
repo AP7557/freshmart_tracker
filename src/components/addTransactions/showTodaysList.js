@@ -60,10 +60,7 @@ export default function ShowTodaysList({
               </div>
               <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-2 mt-1 text-sm text-gray-600'>
-                  <FiType
-                    className='text-green-500'
-                    size={14}
-                  />
+                  <FiType className='text-green-500' size={14} />
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       data.type === 'Invoice'

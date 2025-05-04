@@ -23,7 +23,9 @@ import StoreSelection from '@/components/StoreSelection';
 import { withAuth } from '@/components/withAuth';
 
 function AddTransactions({ user }) {
-  const [selectedStore, setSelectedStore] = useState('');
+  const [selectedStore, setSelectedStore] = useState(
+    user?.stores?.length === 1 ? user.stores[0] : ''
+  );
   const [companySelected, setCompanySelected] = useState('');
   const {
     register,
@@ -90,7 +92,7 @@ function AddTransactions({ user }) {
         <StoreSelection
           isFromAddTransactions
           selectedStore={selectedStore}
-          setSelectedStore={(e) => setSelectedStore(e.target?.value || e)}
+          setSelectedStore={(e) => setSelectedStore(e.target?.value)}
           user={user}
         />
 
@@ -122,10 +124,7 @@ function AddTransactions({ user }) {
                   </InputAdornment>
                 }
               >
-                <MenuItem
-                  disabled
-                  value=''
-                >
+                <MenuItem disabled value=''>
                   <em>Select a Type</em>
                 </MenuItem>
                 <MenuItem value='Invoice'>Invoice</MenuItem>

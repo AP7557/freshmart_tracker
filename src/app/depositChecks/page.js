@@ -144,7 +144,7 @@ function DepositChecks({ user }) {
         <StoreSelection
           selectedStore={state.selectedStore}
           setSelectedStore={(e) => {
-            dispatch({ type: 'SET_STORE', payload: e.target?.value || e });
+            dispatch({ type: 'SET_STORE', payload: e.target?.value});
           }}
           user={user}
         />

@@ -15,12 +15,6 @@ function StoreSelection({
   setSelectedStore,
   user,
 }) {
-  useEffect(() => {
-    if (user?.stores?.length === 1) {
-      setSelectedStore(user.stores[0]);
-    }
-  }, []);
-  
   return (
     <>
       <FormControl fullWidth variant='filled' sx={{ marginBottom: 2 }}>
