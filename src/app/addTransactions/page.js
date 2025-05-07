@@ -57,7 +57,7 @@ function AddTransactions({ user }) {
       let newTransaction = {
         ...data,
         type: typeValue,
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleDateString('en-US'),
       };
       await addDoc(collection(db, selectedStore), { ...newTransaction });
 

@@ -16,7 +16,7 @@ export default function ShowTodaysList({
         const checksRef = collection(db, selectedStore);
         const q = query(
           checksRef,
-          where('date', '==', new Date().toLocaleDateString())
+          where('date', '==', new Date().toLocaleDateString('en-US'))
         );
 
         const querySnapshot = await getDocs(q);
