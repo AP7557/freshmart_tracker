@@ -54,10 +54,14 @@ function AddTransactions({ user }) {
 
   const onSubmit = async (data) => {
     try {
+      const currentDate = new Date();
       let newTransaction = {
         ...data,
         type: typeValue,
-        date: new Date().toLocaleDateString('en-US'),
+        date: currentDate.toLocaleDateString('en-US'),
+        userName: user.name,
+        userEmail: user.email,
+        timestamp: currentDate.toLocaleTimeString('en-US'),
       };
       await addDoc(collection(db, selectedStore), { ...newTransaction });
 
@@ -124,7 +128,10 @@ function AddTransactions({ user }) {
                   </InputAdornment>
                 }
               >
-                <MenuItem disabled value=''>
+                <MenuItem
+                  disabled
+                  value=''
+                >
                   <em>Select a Type</em>
                 </MenuItem>
                 <MenuItem value='Invoice'>Invoice</MenuItem>
