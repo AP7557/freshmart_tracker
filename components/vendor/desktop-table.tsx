@@ -92,7 +92,7 @@ export default function DesktopTable({
                 ${' '}
                 {payout.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               </TableCell>
-              <TableCell className='border border-border px-3 py-2'>
+              <TableCell className='border border-border px-3 py-2 text-wrap'>
                 {payout.invoice_number}
               </TableCell>
               <TableCell className='border border-border px-3 py-2'>
