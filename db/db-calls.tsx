@@ -21,18 +21,6 @@ interface GetPayoutsToPostType extends PayoutsType {
   created_at: Date;
 }
 
-interface GetDashboardDataType extends PayoutsType {
-  is_check_deposited: boolean;
-}
-
-interface GetStorePayoutDetailsType extends PayoutsType {
-  is_check_deposited: boolean;
-  company: { id: number; name: string };
-  type: { id: number; name: string };
-  store: { name: string };
-  created_at: Date;
-}
-
 type GetAllUsersType = {
   user_name: string;
   id: string;
@@ -48,17 +36,39 @@ export const getTodaysPayouts = async (
   const storeId = storeOptions.find((store) => store.name === storeName)?.id;
   const supabase = createClient();
 
-  const startOfDay = new Date();
-  startOfDay.setUTCHours(0, 0, 0, 0);
+  // Get today's date in local time
+  const now = new Date();
+  const startOfDayLocal = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,
+    0,
+    0
+  );
+  const endOfDayLocal = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999
+  );
 
-  const endOfDay = new Date();
-  endOfDay.setUTCHours(23, 59, 59, 999);
+  // Convert to UTC
+  const startOfDayUTC = new Date(
+    startOfDayLocal.getTime() - startOfDayLocal.getTimezoneOffset() * 60000
+  );
+  const endOfDayUTC = new Date(
+    endOfDayLocal.getTime() - endOfDayLocal.getTimezoneOffset() * 60000
+  );
 
   const { data, error } = await supabase
     .from('payouts')
     .select(
       `
-      id,
+    id,
     invoice_number,
     amount,
     check_number,
@@ -67,9 +77,9 @@ export const getTodaysPayouts = async (
     type:types(name)
   `
     )
-    .eq('store_id', storeId) // same as WHERE p.store_id = v_store_id
-    .gte('created_at', startOfDay.toISOString())
-    .lte('created_at', endOfDay.toISOString())
+    .eq('store_id', storeId)
+    .gte('created_at', startOfDayUTC.toISOString())
+    .lte('created_at', endOfDayUTC.toISOString())
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -87,6 +97,7 @@ export const getTodaysPayouts = async (
     type_name: p.type.name,
     store_name: storeName,
   }));
+
   return { payoutData };
 };
 
@@ -270,171 +281,43 @@ export const updatePayouts = async (payoutId: number) => {
 export const getDashboardData = async () => {
   const supabase = createClient();
 
-  const storeForUser = await getStoresForUser();
-  const stores = storeForUser?.stores ?? [];
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const result = await Promise.all(
-    stores.map(async ({ id, name }) => {
-      const { data } = (await supabase
-        .from('payouts')
-        .select(
-          ` 
-          invoice_number,
-          amount,
-          check_number,
-          is_check_deposited,
-          date_to_withdraw,
-          company:companies(name),
-          type:types(name)
-        `
-        )
-        .eq('store_id', id)) as unknown as {
-        data: GetDashboardDataType[];
-      };
+  const { data, error } = await supabase.rpc('get_dashboard_totals', {
+    p_user_id: user?.id,
+  });
 
-      let totalPostedLeft = 0;
+  if (error) {
+    console.error('get_dashboard_data rpc error', error);
+    throw error;
+  }
 
-      const companyTotals: Record<string, number> = {};
-
-      data?.forEach((payout) => {
-        const company = payout.company.name;
-        const type = payout.type.name.toLowerCase();
-        const amount = payout.amount;
-
-        // Initialize if not already present
-        if (!companyTotals[company]) {
-          companyTotals[company] = 0;
-        }
-
-        // Add for invoices
-        if (type === 'invoice') {
-          companyTotals[company] += amount;
-        } else {
-          // Subtract for any payment or credit
-          companyTotals[company] -= amount;
-        }
-        if (
-          (type === 'check payment' && !payout.is_check_deposited) ||
-          (type === 'ach payment' &&
-            payout.date_to_withdraw &&
-            format(new Date(payout.date_to_withdraw), 'yyyy-MM-dd') >=
-              format(new Date(), 'yyyy-MM-dd'))
-        ) {
-          totalPostedLeft += amount;
-        }
-      });
-
-      // Filter out companies with a negative or zero balance if needed
-      const positiveBalances = Object.fromEntries(
-        Object.entries(companyTotals).filter(([_, amount]) => amount > 0)
-      );
-
-      // Calculate total invoice left
-      const totalInvoiceLeft = Object.values(positiveBalances).reduce(
-        (sum, val) => sum + val,
-        0
-      );
-
-      return {
-        id,
-        name,
-        totalInvoiceLeft,
-        totalPostedLeft,
-      };
-    })
-  );
-
-  return result;
+  // data should be an array of rows
+  return data;
 };
 
 export const getStorePayoutDetails = async (storeId: number) => {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from('payouts')
-    .select(
-      `
-      created_at,
-      invoice_number,
-      amount,
-      check_number,
-      is_check_deposited,
-      date_to_withdraw,
-      company:companies(id, name),
-      type:types(id, name),
-      store:stores(name)
-    `
-    )
-    .eq('store_id', storeId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error getting Store Payout Details', error);
-    return null;
-  }
-  if (!data || data.length === 0) return null;
-
-  const companyTotals: Record<string, number> = {};
-  let futurePayments: FuturePaymentsType = [];
-
-  let allPayouts: AllPayoutsType[] = [];
-
-  (data as unknown as GetStorePayoutDetailsType[]).forEach((payout) => {
-    const company = payout.company.name;
-    const type = payout.type.name.toLowerCase();
-    const amount = payout.amount;
-
-    // Initialize if not already present
-    if (!companyTotals[company]) {
-      companyTotals[company] = 0;
-    }
-
-    // Add for invoices
-    if (type === 'invoice') {
-      companyTotals[company] += amount;
-    } else {
-      // Subtract for any payment or credit
-      companyTotals[company] -= amount;
-    }
-
-    if (
-      (type === 'check payment' && !payout.is_check_deposited) ||
-      (type === 'ach payment' &&
-        payout.date_to_withdraw &&
-        format(new Date(payout.date_to_withdraw), 'yyyy-MM-dd') >=
-          format(new Date(), 'yyyy-MM-dd'))
-    ) {
-      futurePayments.push({
-        company_name: company,
-        amount: amount,
-        date_to_withdraw: payout.date_to_withdraw,
-        check_number: payout.check_number,
-      });
-    }
-
-    allPayouts.push({
-      created_at: payout.created_at,
-      company_id: payout.company.id,
-      company_name: payout.company.name,
-      amount: payout.amount,
-      check_number: payout.check_number,
-      date_to_withdraw: payout.date_to_withdraw,
-      type_id: payout.type.id,
-      type_name: payout.type.name,
-      invoice_number: payout.invoice_number,
-    });
+  const { data, error } = await supabase.rpc('get_store_payout_details', {
+    p_store_id: storeId,
   });
 
-  const positiveBalances = Object.fromEntries(
-    Object.entries(companyTotals).filter(([_, amount]) => amount > 0)
-  );
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  let result = data as any;
+  if (typeof result === 'string') result = JSON.parse(result);
 
   return {
-    store_name:
-      (data as unknown as GetStorePayoutDetailsType[])[0].store.name || 'Store',
-    allPayouts,
-    companyTotals: positiveBalances,
-    futurePayments,
+    store_name: result.store_name,
+    allPayouts: result.all_payouts,
+    companyTotals: result.company_totals,
+    futurePayments: result.future_payments,
   };
 };
 

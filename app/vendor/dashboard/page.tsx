@@ -10,10 +10,10 @@ import { Wallet, Banknote, DollarSign, Store } from 'lucide-react';
 export default function DashboardPage() {
   const [data, setData] = useState<
     {
-      id: number;
-      name: string;
-      totalInvoiceLeft: number;
-      totalPostedLeft: number;
+      store_id: number;
+      store_name: string;
+      total_invoice_left: number;
+      total_posted_left: number;
     }[]
   >([]);
   const [loading, setLoading] = useState(true);
@@ -43,14 +43,14 @@ export default function DashboardPage() {
             ))
           : data.map((store) => (
               <Link
-                key={store.id}
-                href={`/vendor/dashboard/${store.id}`}
+                key={store.store_id}
+                href={`/vendor/dashboard/${store.store_id}`}
               >
                 <Card className='transition-transform hover:scale-[1.015] hover:shadow-md hover:border-primary'>
                   <CardHeader className='pb-2 flex items-center gap-2'>
                     <Store className='w-5 h-5 flex-shrink-0 text-primary' />
                     <CardTitle className='text-lg font-semibold truncate text-primary'>
-                      {store.name}
+                      {store.store_name}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className='space-y-2'>
@@ -61,7 +61,7 @@ export default function DashboardPage() {
                       </div>
                       <span className='font-semibold text-primary flex items-center gap-1'>
                         <DollarSign className='w-5 h-5 flex-shrink-0' />
-                        {store.totalInvoiceLeft
+                        {store.total_invoice_left
                           .toFixed(2)
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                       </span>
@@ -74,7 +74,7 @@ export default function DashboardPage() {
                       </div>
                       <span className='font-semibold text-primary flex items-center gap-1'>
                         <DollarSign className='w-5 h-5 flex-shrink-0' />
-                        {store.totalPostedLeft
+                        {store.total_posted_left
                           .toFixed(2)
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                       </span>
