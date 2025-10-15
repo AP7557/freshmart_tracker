@@ -16,13 +16,21 @@ export function DatePicker({
   selectedValue,
   setValue,
   shouldBeDisabled = true,
+  formatType = 'PPP',
+  styles
 }: {
   placeholder: string;
   selectedValue: Date;
   setValue: (value: Date) => void;
   shouldBeDisabled?: boolean;
+  formatType?: string;
+  styles?: object;
 }) {
   const [open, setOpen] = useState(false);
+
+  const now = new Date();
+  const startMonth3YrFromNow = new Date(now.getFullYear() - 3, now.getMonth() + 5);
+  const endMonth5MtFromNow = new Date(now.getFullYear(), now.getMonth() + 5);
 
   return (
     <Popover
@@ -41,7 +49,7 @@ export function DatePicker({
           )}
         >
           {selectedValue ? (
-            format(selectedValue, 'PPP')
+            format(selectedValue, formatType)
           ) : (
             <span>{placeholder}</span>
           )}
@@ -55,16 +63,28 @@ export function DatePicker({
         <Calendar
           mode='single'
           selected={selectedValue}
+          month={selectedValue} // set the current month view
           onSelect={(date) => {
             setValue(date as Date);
             setOpen(false);
           }}
+
+          onMonthChange={(monthDate) => {
+            const newDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+            setValue(newDate);
+            setOpen(false);
+          }}
+
+          startMonth={startMonth3YrFromNow}
+          endMonth={endMonth5MtFromNow}
+
           disabled={(date) => {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Strip time
             return shouldBeDisabled && date < today;
           }}
           captionLayout='dropdown'
+          styles={styles}
         />
       </PopoverContent>
     </Popover>

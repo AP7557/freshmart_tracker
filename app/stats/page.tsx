@@ -3,13 +3,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function StatsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to /dashboard immediately
-    router.replace('/dashboard');
+    router.replace('/stats/department');
   }, [router]);
 
-  return null;
+  return null; // Nothing needs to render since user is redirected
 }

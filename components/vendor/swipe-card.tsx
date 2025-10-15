@@ -17,7 +17,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PostedPayoutsType } from '@/types/type';
-import { getTypeBadgeStyle } from './get-badge';
+import { getTypeBadgeStyle } from '../shared/get-badge';
 
 export default function SwipeList({
   payout,

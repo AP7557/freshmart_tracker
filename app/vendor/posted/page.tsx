@@ -7,13 +7,13 @@ import {
   getStoresForUser,
   updatePayouts,
 } from '@/db/db-calls';
-import { ComboBox } from '@/components/vendor/combobox';
+import { ComboBox } from '@/components/shared/combobox';
 import SwipeList from '@/components/vendor/swipe-card';
 import { Input } from '@/components/ui/input';
-import DesktopTable from '@/components/vendor/desktop-table';
 import { OptionsType, PostedPayoutsType } from '@/types/type';
 import { Banknote, BanknoteArrowDown, Store } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import DesktopTable from '@/components/shared/desktop-table';
 
 export default function PostedPage() {
   const [storeOptions, setStoreOptions] = useState<OptionsType>([]);
@@ -118,8 +118,8 @@ export default function PostedPage() {
                   <p className='text-lg font-semibold text-[hsl(var(--primary))]'>
                     {bankBalance
                       ? `$${remainingBalance
-                          .toFixed(2)
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+                        .toFixed(2)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
                       : '—'}
                   </p>
                 </div>

@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { format } from 'date-fns';
-import { AllPayoutsType, FuturePaymentsType, OptionsType } from '../types/type';
+import { OptionsType } from '../types/type';
 
 type PayoutsType = {
   invoice_number: string;
@@ -136,6 +135,30 @@ export const addPayouts = async (values: {
   return { data };
 };
 
+export const addDepartmentStats = async (values: {
+  storeName: string;
+  monthYear: Date;
+  departments: {
+    department: string;
+    amount: number;
+  }[]
+}) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc('insert_department_stats', {
+    p_store_name: values.storeName,
+    p_date: values.monthYear,
+    p_departments: values.departments,
+  });
+
+  if (error) {
+    console.error('Error Adding Payouts', error);
+    return;
+  }
+
+  return { data };
+};
+
 export const getStoresForUser = async () => {
   const supabase = createClient();
   const {
@@ -165,6 +188,35 @@ export const getStoresForUser = async () => {
   return { stores };
 };
 
+export const getDepartmentStatsForHeatMap = async (storeId: number) => {
+  const supabase = createClient();
+
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  oneYearAgo.setMonth(0, 1); // Start from Jan of last year
+
+  const { data, error } = await supabase
+    .from('department_stats')
+    .select(`
+      amount,
+      date,
+      departments(name)
+    `)
+    .eq('store_id', storeId)
+    .gte('date', oneYearAgo.toISOString().split('T')[0])
+    .order('date', { ascending: true });
+  if (error) {
+    console.error('Error fetching department trends:', error);
+    throw error;
+  }
+
+  return (data as unknown as { amount: number; date: string; departments: { name: string } }[]).map((d) => ({
+    amount: Number(d.amount),
+    month: d.date,
+    department_name: d.departments.name,
+  })) ?? [];
+}
+
 export const getCompanies = async () => {
   const supabase = createClient();
 
@@ -191,6 +243,19 @@ export const getTypes = async () => {
   return { types: data };
 };
 
+export const getDepartments = async () => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.from('departments').select('*');
+
+  if (error) {
+    console.error('Error Getting Departments', error);
+    return;
+  }
+
+  return { departments: data };
+};
+
 export const getPayoutsToPost = async (
   storeOptions: OptionsType,
   storeName: string
@@ -215,8 +280,7 @@ export const getPayoutsToPost = async (
     )
     .eq('store_id', storeId)
     .or(
-      `date_to_withdraw.gte.${
-        new Date().toISOString().split('T')[0]
+      `date_to_withdraw.gte.${new Date().toISOString().split('T')[0]
       },and(check_number.not.is.null,is_check_deposited.eq.false)`
     );
 

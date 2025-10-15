@@ -66,3 +66,41 @@ export const FormSchema = z
       });
     }
   });
+
+
+export const DepartmentStatsSchema = z.object({
+  storeName: z.string().min(1, "Store is required"),
+  monthYear: z.date(),
+  departments: z
+    .array(
+      z
+        .object({
+          department: z.string(),
+          amount: z
+            .number()
+            .refine(
+              (val) =>
+                val === undefined ||
+                (/^\d+(\.\d{1,2})?$/.test(String(val)) && val >= 0),
+              "Amount must be a non-negative number with up to 2 decimal places"
+            ),
+        })
+        .refine(
+          (data) =>
+            // If department has value, amount must be filled (> 0)
+            !data.department || (data.amount !== undefined && data.amount > 0),
+          { message: "Amount is required when department is filled", path: ["amount"] }
+        )
+        .refine(
+          (data) =>
+            // If amount > 0, department must be filled
+            !data.amount || data.department,
+          { message: "Department is required when amount is filled", path: ["department"] }
+        )
+    )
+    .min(1, "At least one department required")
+    .refine(
+      (arr) => arr.some((d) => d.department || (d.amount && d.amount > 0)),
+      "At least one department entry must have valid data"
+    ),
+}); 

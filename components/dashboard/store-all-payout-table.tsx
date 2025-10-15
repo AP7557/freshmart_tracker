@@ -1,12 +1,12 @@
 'use client';
 import { useMemo, useState } from 'react';
-import { DatePicker } from './date-picker';
-import { ComboBox } from './combobox';
+import { DatePicker } from '../shared/date-picker';
+import { ComboBox } from '../shared/combobox';
 
-import DesktopTable from './desktop-table';
-import MobileTable from './mobile-table';
+import MobileTable from '../shared/mobile-table';
 import { AllPayoutsType, OptionsType } from '@/types/type';
 import { Button } from '../ui/button';
+import DesktopTable from '../shared/desktop-table';
 
 function toLocalYMD(date: Date) {
   const yyyy = date.getFullYear();

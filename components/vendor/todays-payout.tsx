@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import DesktopTable from './desktop-table';
-import MobileTable from './mobile-table';
+import MobileTable from '../shared/mobile-table';
 import { TodaysPayoutsType } from '@/types/type';
+import DesktopTable from '../shared/desktop-table';
 
 export function TodaysPayouts({
   todaysPayouts,

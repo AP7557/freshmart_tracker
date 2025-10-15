@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getStorePayoutDetails } from '@/db/db-calls';
+import { getDepartmentStatsForHeatMap, getStorePayoutDetails } from '@/db/db-calls';
 import { Skeleton } from '@/components/ui/skeleton';
-import { StorePayoutTable } from '@/components/vendor/store-all-payout-table';
+import { StorePayoutTable } from '@/components/dashboard/store-all-payout-table';
 import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
-import { Check, Calendar, Building } from 'lucide-react';
+import { Check, Calendar, Building, Activity } from 'lucide-react';
+import { DepartmentHeatmap } from '@/components/dashboard/department-stats-heatmap';
 
 export default function StoreDetailPage() {
   const { storeId } = useParams();
@@ -17,15 +18,19 @@ export default function StoreDetailPage() {
     companyTotals: Record<string, number>;
     futurePayments: FuturePaymentsType;
   } | null>(null);
+  const [departmentStats, setDepartmentStats] = useState<{ amount: number; month: string; department_name: string }[] | null>(null);
 
   useEffect(() => {
     (async () => {
       const data = await getStorePayoutDetails(Number(storeId));
       if (data) setDetails(data);
+
+      const departmentStatsData = await getDepartmentStatsForHeatMap(Number(storeId))
+      if (departmentStatsData) setDepartmentStats(departmentStatsData)
     })();
   }, [storeId]);
 
-  if (!details)
+  if (!details || !departmentStats)
     return <Skeleton className='h-32 w-full rounded-xl animate-pulse' />;
 
   return (
@@ -86,8 +91,8 @@ export default function StoreDetailPage() {
                       {payout.check_number
                         ? `Check # ${payout.check_number}`
                         : `ACH: ${new Date(
-                            payout.date_to_withdraw!
-                          ).toLocaleDateString()}`}
+                          payout.date_to_withdraw!
+                        ).toLocaleDateString()}`}
                     </span>
                   </div>
                 </div>
@@ -102,6 +107,26 @@ export default function StoreDetailPage() {
           </CardContent>
         </Card>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-primary">
+            Department Trend Heatmap
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center text-sm text-foreground h-48">
+          {departmentStats.length !== 0 ? (
+            <DepartmentHeatmap data={departmentStats} />
+          ) : (
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <Activity className="h-12 w-12 text-muted-foreground" />
+              <span className="text-center text-foreground">
+                Not enough data. Please add stats for at least one month.
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       {/* All Payouts Table */}
       <Card>
