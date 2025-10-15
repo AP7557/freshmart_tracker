@@ -128,7 +128,7 @@ export default function DepartmentStatsPage() {
                         )}
                     />
 
-                    <FormField
+                    {/* <FormField
                         control={form.control}
                         name='monthYear'
                         render={({ field }) => (
@@ -143,9 +143,24 @@ export default function DepartmentStatsPage() {
                                     styles={{
                                         month_grid: { display: 'none' } // remove the dot, use the key as in DayPicker
                                     }}
-                                    formatType="'MMMM yyyy'"
+                                    formatType="MMMM yyyy"
                                 />
                                 <FormMessage className='text-red-500 mt-1 text-sm' />
+                            </FormItem>
+                        )}
+                    /> */}
+
+                    <FormField
+                        control={form.control}
+                        name="monthYear"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Month & Year</FormLabel>
+                                <MonthYearPicker
+                                    selectedValue={field.value ?? new Date()}
+                                    setValue={(value: Date) => field.onChange(value)}
+                                />
+                                <FormMessage />
                             </FormItem>
                         )}
                     />

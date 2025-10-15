@@ -16,15 +16,11 @@ export function DatePicker({
   selectedValue,
   setValue,
   shouldBeDisabled = true,
-  styles,
-  formatType = 'PPP'
 }: {
   placeholder: string;
   selectedValue: Date;
   setValue: (value: Date) => void;
   shouldBeDisabled?: boolean;
-  styles: object;
-  formatType?: string
 }) {
   const [open, setOpen] = useState(false);
 
@@ -45,7 +41,7 @@ export function DatePicker({
           )}
         >
           {selectedValue ? (
-            format(selectedValue, formatType)
+            format(selectedValue, 'PPP')
           ) : (
             <span>{placeholder}</span>
           )}
@@ -69,7 +65,6 @@ export function DatePicker({
             return shouldBeDisabled && date < today;
           }}
           captionLayout='dropdown'
-          styles={styles}
         />
       </PopoverContent>
     </Popover>

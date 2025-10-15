@@ -1,44 +1,52 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 export function MonthYearPicker({
-    date,
-    setDate,
+    selectedValue,
+    setValue,
 }: {
-    date: Date | undefined;
-    setDate: (date: Date) => void;
+    selectedValue: Date;
+    setValue: (value: Date) => void;
 }) {
     const [open, setOpen] = useState(false);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
+            <PopoverTrigger asChild className='w-full'>
                 <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                    variant='secondary'
+                    className={cn(
+                        'pl-3 text-left font-normal text-base',
+                        !selectedValue && 'text-muted-foreground'
+                    )}
                 >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, 'MMMM yyyy') : 'Select month and year'}
+                    {selectedValue ? format(selectedValue, 'MMMM yyyy') : 'Select month and year'}
+                    <CalendarIcon className='ml-auto h-4 w-4 text-primary opacity-70' />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent align="start" className="p-3">
+
+            <PopoverContent className='w-auto p-0' align='start'>
                 <Calendar
                     mode="single"
-                    selected={date}
-                    onSelect={(newDate) => {
-                        if (newDate) {
-                            setDate(new Date(newDate.getFullYear(), newDate.getMonth(), 1));
-                            setOpen(false);
-                        }
-                    }}
+                    selected={selectedValue}
+                    month={selectedValue} // set the current month view
                     captionLayout="dropdown"
+                    onMonthChange={(monthDate) => {
+                        const newDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+                        setValue(newDate);
+                        setOpen(false);
+                    }}
                     styles={{
                         month_grid: { display: 'none' } // remove the dot, use the key as in DayPicker
-                    }} />
+                    }}
+                />
             </PopoverContent>
         </Popover>
     );
