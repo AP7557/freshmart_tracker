@@ -78,7 +78,6 @@ export const DepartmentStatsSchema = z.object({
           department: z.string(),
           amount: z
             .number()
-            .optional()
             .refine(
               (val) =>
                 val === undefined ||

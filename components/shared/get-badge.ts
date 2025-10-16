@@ -1,3 +1,5 @@
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+
 export const getTypeBadgeStyle = (type: string) => {
   switch (type.toLowerCase()) {
     case 'invoice':
@@ -13,4 +15,18 @@ export const getTypeBadgeStyle = (type: string) => {
     default:
       return 'bg-gray-200 text-gray-800';
   }
+};
+
+export const getChangeBadgeGradient = (change: number) => {
+  if (change > 0) return 'bg-gradient-to-r from-green-400 to-green-600 text-black';
+  if (change < 0) return 'bg-gradient-to-r from-red-400 to-red-600 text-black';
+  return 'bg-gray-200 text-gray-800';
+};
+
+
+export const getChangeIcon = (change?: number) => {
+  if (change === undefined || change === 0) return Minus;
+  if (change > 0) return TrendingUp;
+  if (change < 0) return TrendingDown;
+  return Minus;
 };

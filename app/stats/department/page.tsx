@@ -5,10 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { ComboBox } from '@/components/shared/combobox';
-import { MonthYearPicker } from '@/components/stats/month-year-picker';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Store, Plus, LucideIcon, Calendar, DollarSign, Building, Boxes } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import {
     Form,
     FormField,
@@ -16,11 +13,13 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { DatePicker } from '@/components/shared/date-picker';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Store, Plus, LucideIcon, Calendar, DollarSign, Boxes, TrendingUp } from 'lucide-react';
 import { DepartmentStatsSchema } from '@/types/type';
-
-type DepartmentStatsForm = z.infer<typeof DepartmentStatsSchema>;
+import { ComboBox } from '@/components/shared/combobox';
+import { DatePicker } from '@/components/shared/date-picker';
+import { useRouter } from 'next/navigation';
+import DepartmentStatsView from '@/components/stats/department-stats-view';
 
 // ---------------- Sample Options ----------------
 const stores = [
@@ -42,8 +41,29 @@ const departmentsOptions = [
     { id: 10, name: 'Floral' },
 ];
 
-// ---------------- Component ----------------
+// 🧮 Example "last month" data (you'll replace with Supabase fetch later)
+const lastMonthData: Record<string, number> = {
+    Produce: 12000,
+    Dairy: 8000,
+    Meat: 10000,
+    Bakery: 5000,
+    Grocery: 15000,
+    Frozen: 7000,
+    Beverages: 6000,
+    'Health & Beauty': 4000,
+    Household: 5500,
+    Floral: 2000,
+};
+
+type DepartmentStatsForm = z.infer<typeof DepartmentStatsSchema>;
+
 export default function DepartmentStatsPage() {
+    const [viewData, setViewData] = useState<
+        { storeName: string; department: string; prevAmount: number, amount: number; change: number }[]
+    >([]);
+    
+    const router = useRouter();
+
     const form = useForm<DepartmentStatsForm>({
         resolver: zodResolver(DepartmentStatsSchema),
         defaultValues: {
@@ -73,11 +93,21 @@ export default function DepartmentStatsPage() {
     };
 
     const onSubmit = (values: DepartmentStatsForm) => {
-        const cleanedData = values.departments.filter(
-            (d) => d.department || (d.amount && d.amount > 0)
+        const cleaned = values.departments.filter(
+            (d) => d.department && d.amount > 0
         );
-        console.log(values);
-        // TODO: send to backend or Supabase
+
+        // Include last month amount in computed data
+        const computed = cleaned.map((item) => {
+            const prevAmount = lastMonthData[item.department] ?? 0;
+            const change = prevAmount === 0 ? 0 : ((item.amount - prevAmount) / prevAmount) * 100;
+            return { ...item, prevAmount, change, storeName: values.storeName };
+        });
+
+        setViewData(computed);
+        router.refresh();
+        form.reset();
+        console.log('Submitted:', computed);
     };
 
     function LabelWithIcon({
@@ -96,7 +126,7 @@ export default function DepartmentStatsPage() {
     }
 
     return (
-        <div className="p-6 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm max-w-5xl mx-auto">
+        <div className="p-6 bg-card text-card-foreground flex flex-col gap-8 rounded-xl border py-6 shadow-sm max-w-5xl mx-auto">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     {/* Store + MonthYear */}
@@ -207,6 +237,22 @@ export default function DepartmentStatsPage() {
                     </div>
                 </form>
             </Form>
-        </div >
+
+            {/* ---- VIEW SECTION ---- */}
+            {viewData.length > 0 && (
+                <Card className="mt-8 border border-border/40 shadow-md">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-lg text-primary">
+                            <TrendingUp className="w-5 h-5 text-primary" />
+                            Department Stats Overview For {viewData[0].storeName}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <DepartmentStatsView viewData={viewData} />
+                    </CardContent>
+
+                </Card>
+            )}
+        </div>
     );
 }

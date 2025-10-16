@@ -20,7 +20,7 @@ import { getTypeBadgeStyle } from './get-badge';
 export default function DesktopTable({
   payouts,
   isActionable = false,
-  markCheckDeposited = () => {},
+  markCheckDeposited = () => { },
 }: {
   payouts: AllPayoutsType[] | PostedPayoutsType[] | TodaysPayoutsType[];
   isActionable?: boolean;
@@ -62,9 +62,8 @@ export default function DesktopTable({
           {payouts.map((payout, i) => (
             <TableRow
               key={i}
-              className={`transition-all duration-200 ${
-                i % 2 === 0 ? 'bg-[hsl(var(--muted)/0.25)]' : ''
-              } hover:shadow-md hover:bg-[hsl(var(--muted)/0.4)]`}
+              className={`transition-all duration-200 ${i % 2 === 0 ? 'bg-[hsl(var(--muted)/0.25)]' : ''
+                } hover:shadow-md hover:bg-[hsl(var(--muted)/0.4)]`}
             >
               {(payout as AllPayoutsType).created_at && (
                 <TableCell className='border border-border px-3 py-2'>
