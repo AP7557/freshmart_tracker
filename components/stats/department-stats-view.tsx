@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Badge, Boxes, DollarSign, Icon, Tag, TrendingUp } from 'lucide-react';
+import { Boxes, DollarSign } from 'lucide-react';
 import { getChangeBadgeGradient, getChangeIcon } from '../shared/get-badge';
 
 export default function DepartmentStatsView({

@@ -70,7 +70,7 @@ export async function updateSession(request: NextRequest) {
   }
 
 
-  if (path === "/dashboard/users" && "admin" !== role) {
+  if (["/dashboard/users", "/stats/departments"].includes(path) && "admin" !== role) {
     // Only accessible by manager/admin, else redirect to dashboard
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

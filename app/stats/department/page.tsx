@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,36 +10,17 @@ import {
     Form,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Store, Plus, LucideIcon, Calendar, DollarSign, Boxes, TrendingUp } from 'lucide-react';
-import { DepartmentStatsSchema } from '@/types/type';
+import { Store, Plus, Calendar, DollarSign, Boxes, TrendingUp } from 'lucide-react';
+import { DepartmentStatsSchema, OptionsType } from '@/types/type';
 import { ComboBox } from '@/components/shared/combobox';
 import { DatePicker } from '@/components/shared/date-picker';
 import { useRouter } from 'next/navigation';
 import DepartmentStatsView from '@/components/stats/department-stats-view';
-
-// ---------------- Sample Options ----------------
-const stores = [
-    { id: 1, name: 'Freshmart A' },
-    { id: 2, name: 'Freshmart B' },
-    { id: 3, name: 'Freshmart C' },
-];
-
-const departmentsOptions = [
-    { id: 1, name: 'Produce' },
-    { id: 2, name: 'Dairy' },
-    { id: 3, name: 'Meat' },
-    { id: 4, name: 'Bakery' },
-    { id: 5, name: 'Grocery' },
-    { id: 6, name: 'Frozen' },
-    { id: 7, name: 'Beverages' },
-    { id: 8, name: 'Health & Beauty' },
-    { id: 9, name: 'Household' },
-    { id: 10, name: 'Floral' },
-];
+import { LabelWithIcon } from '@/components/shared/label-with-icon';
+import { getDepartments, getStoresForUser } from '@/db/db-calls';
 
 // 🧮 Example "last month" data (you'll replace with Supabase fetch later)
 const lastMonthData: Record<string, number> = {
@@ -61,7 +42,9 @@ export default function DepartmentStatsPage() {
     const [viewData, setViewData] = useState<
         { storeName: string; department: string; prevAmount: number, amount: number; change: number }[]
     >([]);
-    
+    const [storeOptions, setStoreOptions] = useState<OptionsType>([]);
+    const [departmentOptions, setDepartmentOptions] = useState<OptionsType>([]);
+
     const router = useRouter();
 
     const form = useForm<DepartmentStatsForm>({
@@ -110,20 +93,15 @@ export default function DepartmentStatsPage() {
         console.log('Submitted:', computed);
     };
 
-    function LabelWithIcon({
-        icon: Icon,
-        children,
-    }: {
-        icon: LucideIcon;
-        children: React.ReactNode;
-    }) {
-        return (
-            <FormLabel className='font-semibold text-base mb-2 flex items-center gap-2 text-primary'>
-                <Icon className='w-5 h-5 text-primary flex-shrink-0' />
-                {children}
-            </FormLabel>
-        );
-    }
+    useEffect(() => {
+        (async () => {
+            const storesForUser = await getStoresForUser();
+            if (storesForUser?.stores) setStoreOptions(storesForUser.stores);
+
+            const departmentsData = await getDepartments();
+            if (departmentsData?.departments) setDepartmentOptions(departmentsData.departments);
+        })();
+    }, []);
 
     return (
         <div className="p-6 bg-card text-card-foreground flex flex-col gap-8 rounded-xl border py-6 shadow-sm max-w-5xl mx-auto">
@@ -137,7 +115,7 @@ export default function DepartmentStatsPage() {
                             <FormItem className='flex flex-col'>
                                 <LabelWithIcon icon={Store}>Store Name</LabelWithIcon>
                                 <ComboBox
-                                    options={stores}
+                                    options={storeOptions}
                                     selectedValue={field.value}
                                     setValue={(value: string) => form.setValue(field.name, value)}
                                     placeholder='Select a store'
@@ -181,7 +159,7 @@ export default function DepartmentStatsPage() {
                                             <FormItem className="flex flex-col flex-1">
                                                 <LabelWithIcon icon={Boxes}>Department</LabelWithIcon>
                                                 <ComboBox
-                                                    options={departmentsOptions}
+                                                    options={departmentOptions}
                                                     selectedValue={field.value}
                                                     setValue={(value: string) => form.setValue(field.name, value)}
                                                     placeholder="Select a department"

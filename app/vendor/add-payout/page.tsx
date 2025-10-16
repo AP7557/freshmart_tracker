@@ -13,7 +13,6 @@ import {
   Form,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { DatePicker } from '@/components/shared/date-picker';
@@ -34,10 +33,10 @@ import {
   FileText,
   CheckCircle,
   Calendar,
-  LucideIcon,
 } from 'lucide-react';
 import { FormSchema, OptionsType, TodaysPayoutsType } from '@/types/type';
 import ConfirmPayout from '@/components/vendor/confirm-payout';
+import { LabelWithIcon } from '@/components/shared/label-with-icon';
 
 export default function AddPayoutForm() {
   const [loading, setLoading] = useState(false);
@@ -122,21 +121,6 @@ export default function AddPayoutForm() {
       }
     })();
   }, [storeName]);
-
-  function LabelWithIcon({
-    icon: Icon,
-    children,
-  }: {
-    icon: LucideIcon;
-    children: React.ReactNode;
-  }) {
-    return (
-      <FormLabel className='font-semibold text-base mb-2 flex items-center gap-2 text-primary'>
-        <Icon className='w-5 h-5 text-primary flex-shrink-0' />
-        {children}
-      </FormLabel>
-    );
-  }
 
   return (
     <div className='p-6 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm max-w-5xl mx-auto'>

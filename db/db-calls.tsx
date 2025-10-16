@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { format } from 'date-fns';
-import { AllPayoutsType, FuturePaymentsType, OptionsType } from '../types/type';
+import { OptionsType } from '../types/type';
 
 type PayoutsType = {
   invoice_number: string;
@@ -191,6 +190,19 @@ export const getTypes = async () => {
   return { types: data };
 };
 
+export const getDepartments = async () => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.from('departments').select('*');
+
+  if (error) {
+    console.error('Error Getting Departments', error);
+    return;
+  }
+
+  return { departments: data };
+};
+
 export const getPayoutsToPost = async (
   storeOptions: OptionsType,
   storeName: string
@@ -215,8 +227,7 @@ export const getPayoutsToPost = async (
     )
     .eq('store_id', storeId)
     .or(
-      `date_to_withdraw.gte.${
-        new Date().toISOString().split('T')[0]
+      `date_to_withdraw.gte.${new Date().toISOString().split('T')[0]
       },and(check_number.not.is.null,is_check_deposited.eq.false)`
     );
 
