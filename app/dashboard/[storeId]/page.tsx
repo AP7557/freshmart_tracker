@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getStorePayoutDetails } from '@/db/db-calls';
 import { Skeleton } from '@/components/ui/skeleton';
-import { StorePayoutTable } from '@/components/vendor/store-all-payout-table';
+import { StorePayoutTable } from '@/components/dashboard/store-all-payout-table';
 import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
 import { Check, Calendar, Building } from 'lucide-react';
 
@@ -86,8 +86,8 @@ export default function StoreDetailPage() {
                       {payout.check_number
                         ? `Check # ${payout.check_number}`
                         : `ACH: ${new Date(
-                            payout.date_to_withdraw!
-                          ).toLocaleDateString()}`}
+                          payout.date_to_withdraw!
+                        ).toLocaleDateString()}`}
                     </span>
                   </div>
                 </div>

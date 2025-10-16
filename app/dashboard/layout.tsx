@@ -1,6 +1,6 @@
 'use client';
 
-import LatestUpdatesDialog from '@/components/vendor/latest-updates';
+import LatestUpdatesDialog from '@/components/dashboard/latest-updates';
 import { getUserRole } from '@/db/db-calls';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';

@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { ComboBox } from '@/components/vendor/combobox';
+import { ComboBox } from '@/components/shared/combobox';
 import { MonthYearPicker } from '@/components/stats/month-year-picker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Store, Plus, LucideIcon, Calendar, DollarSign, Building, Boxes } from 'lucide-react';
@@ -16,47 +16,9 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { DatePicker } from '@/components/vendor/date-picker';
+import { DatePicker } from '@/components/shared/date-picker';
 import { Input } from '@/components/ui/input';
-
-// ---------------- Zod Schema ----------------
-const DepartmentStatsSchema = z.object({
-    storeName: z.string().min(1, "Store is required"),
-    monthYear: z.date(),
-    departments: z
-        .array(
-            z
-                .object({
-                    department: z.string(),
-                    amount: z
-                        .number()
-                        .optional()
-                        .refine(
-                            (val) =>
-                                val === undefined ||
-                                (/^\d+(\.\d{1,2})?$/.test(String(val)) && val >= 0),
-                            "Amount must be a non-negative number with up to 2 decimal places"
-                        ),
-                })
-                .refine(
-                    (data) =>
-                        // If department has value, amount must be filled (> 0)
-                        !data.department || (data.amount !== undefined && data.amount > 0),
-                    { message: "Amount is required when department is filled", path: ["amount"] }
-                )
-                .refine(
-                    (data) =>
-                        // If amount > 0, department must be filled
-                        !data.amount || data.department,
-                    { message: "Department is required when amount is filled", path: ["department"] }
-                )
-        )
-        .min(1, "At least one department required")
-        .refine(
-            (arr) => arr.some((d) => d.department || (d.amount && d.amount > 0)),
-            "At least one department entry must have valid data"
-        ),
-});
+import { DepartmentStatsSchema } from '@/types/type';
 
 type DepartmentStatsForm = z.infer<typeof DepartmentStatsSchema>;
 
@@ -101,7 +63,7 @@ export default function DepartmentStatsPage() {
         control: form.control,
     });
 
-    const handleAddRows = () => {
+    const handleAddMoreDepartmentRows = () => {
         append(
             Array.from({ length: 5 }, () => ({
                 department: '',
@@ -234,7 +196,7 @@ export default function DepartmentStatsPage() {
                             type="button"
                             variant="secondary"
                             className="flex items-center gap-2"
-                            onClick={handleAddRows}
+                            onClick={handleAddMoreDepartmentRows}
                         >
                             <Plus className='w-5 h-5 text-primary flex-shrink-0' /> Add 5 More
                         </Button>

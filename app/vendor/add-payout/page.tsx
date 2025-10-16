@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { ComboBox } from '@/components/vendor/combobox';
+import { ComboBox } from '@/components/shared/combobox';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { DatePicker } from '@/components/vendor/date-picker';
+import { DatePicker } from '@/components/shared/date-picker';
 import {
   addPayouts,
   getCompanies,

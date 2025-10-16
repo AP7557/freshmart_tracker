@@ -14,7 +14,7 @@ import {
   PostedPayoutsType,
   TodaysPayoutsType,
 } from '@/types/type';
-import { getTypeBadgeStyle } from './get-badge';
+import { getTypeBadgeStyle } from '../vendor/get-badge';
 
 export default function MobileTable({
   payouts,
