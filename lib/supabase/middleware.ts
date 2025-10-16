@@ -64,19 +64,16 @@ export async function updateSession(request: NextRequest) {
   const path = url.pathname;
 
   // Route-based role protection
-  if (["/vendor/dashboard", "/vendor/posted"].includes(path)) {
-    if (!["manager", "admin"].includes(role)) {
-      url.pathname = "/vendor/add-payout";
-      return NextResponse.redirect(url);
-    }
+  if ('/vendor/add-payout' !== path && !["manager", "admin"].includes(role)) {
+    url.pathname = "/vendor/add-payout";
+    return NextResponse.redirect(url);
   }
 
-  if (path === "/vendor/users") {
+
+  if (path === "/dashboard/users" && "admin" !== role) {
     // Only accessible by manager/admin, else redirect to dashboard
-    if ("admin" !== role) {
-      url.pathname = "/vendor/dashboard";
-      return NextResponse.redirect(url);
-    }
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

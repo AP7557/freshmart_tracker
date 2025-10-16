@@ -44,7 +44,7 @@ export default function DashboardPage() {
           : data.map((store) => (
               <Link
                 key={store.store_id}
-                href={`/vendor/dashboard/${store.store_id}`}
+                href={`/dashboard/${store.store_id}`}
               >
                 <Card className='transition-transform hover:scale-[1.015] hover:shadow-md hover:border-primary'>
                   <CardHeader className='pb-2 flex items-center gap-2'>
