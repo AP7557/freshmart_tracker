@@ -135,6 +135,30 @@ export const addPayouts = async (values: {
   return { data };
 };
 
+export const addDepartmentStats = async (values: {
+  storeName: string;
+  monthYear: Date;
+  departments: {
+    department: string;
+    amount: number;
+  }[]
+}) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc('insert_department_stats', {
+    p_store_name: values.storeName,
+    p_date: values.monthYear,
+    p_departments: values.departments,
+  });
+
+  if (error) {
+    console.error('Error Adding Payouts', error);
+    return;
+  }
+
+  return { data };
+};
+
 export const getStoresForUser = async () => {
   const supabase = createClient();
   const {

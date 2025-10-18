@@ -20,7 +20,7 @@ import { DatePicker } from '@/components/shared/date-picker';
 import { useRouter } from 'next/navigation';
 import DepartmentStatsView from '@/components/stats/department-stats-view';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
-import { getDepartments, getStoresForUser } from '@/db/db-calls';
+import { addDepartmentStats, getDepartments, getStoresForUser } from '@/db/db-calls';
 
 // 🧮 Example "last month" data (you'll replace with Supabase fetch later)
 const lastMonthData: Record<string, number> = {
@@ -39,19 +39,27 @@ const lastMonthData: Record<string, number> = {
 type DepartmentStatsForm = z.infer<typeof DepartmentStatsSchema>;
 
 export default function DepartmentStatsPage() {
+    const [loading, setLoading] = useState(false)
     const [viewData, setViewData] = useState<
-        { storeName: string; department: string; prevAmount: number, amount: number; change: number }[]
+        {
+            current_amount: number
+            department_name: string
+            percent_change: number
+            previous_amount: number
+            report_date: Date
+            store_name: string
+        }[]
     >([]);
     const [storeOptions, setStoreOptions] = useState<OptionsType>([]);
     const [departmentOptions, setDepartmentOptions] = useState<OptionsType>([]);
-
+    const todaysDate = new Date();
     const router = useRouter();
 
     const form = useForm<DepartmentStatsForm>({
         resolver: zodResolver(DepartmentStatsSchema),
         defaultValues: {
             storeName: '',
-            monthYear: new Date(),
+            monthYear: new Date(todaysDate.getFullYear(), todaysDate.getMonth(), 1),
             departments: Array.from({ length: 10 }, () => ({
                 department: '',
                 amount: 0,
@@ -75,10 +83,13 @@ export default function DepartmentStatsPage() {
         );
     };
 
-    const onSubmit = (values: DepartmentStatsForm) => {
+    const onSubmit = async (values: DepartmentStatsForm) => {
+        setLoading(true);
+
         const cleaned = values.departments.filter(
             (d) => d.department && d.amount > 0
         );
+        console.log()
 
         // Include last month amount in computed data
         const computed = cleaned.map((item) => {
@@ -87,10 +98,20 @@ export default function DepartmentStatsPage() {
             return { ...item, prevAmount, change, storeName: values.storeName };
         });
 
-        setViewData(computed);
-        router.refresh();
-        form.reset();
-        console.log('Submitted:', computed);
+
+        const departmentStatsData = await addDepartmentStats({
+            storeName: values.storeName,
+            monthYear: values.monthYear,
+            departments: cleaned
+        })
+
+        if (departmentStatsData?.data) {
+            router.refresh();
+            form.reset();
+            setViewData(departmentStatsData.data)
+        }
+
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -209,7 +230,9 @@ export default function DepartmentStatsPage() {
                             <Plus className='w-5 h-5 text-primary flex-shrink-0' /> Add 5 More
                         </Button>
 
-                        <Button type="submit" className="bg-primary text-primary-foreground">
+                        <Button type="submit"
+                            disabled={loading}
+                            className="bg-primary text-primary-foreground">
                             Submit Stats
                         </Button>
                     </div>
@@ -222,7 +245,7 @@ export default function DepartmentStatsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-lg text-primary">
                             <TrendingUp className="w-5 h-5 text-primary" />
-                            Department Stats Overview For {viewData[0].storeName}
+                            Department Stats Overview For {viewData[0].store_name}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
