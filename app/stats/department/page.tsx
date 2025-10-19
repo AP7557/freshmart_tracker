@@ -22,20 +22,6 @@ import DepartmentStatsView from '@/components/stats/department-stats-view';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
 import { addDepartmentStats, getDepartments, getStoresForUser } from '@/db/db-calls';
 
-// 🧮 Example "last month" data (you'll replace with Supabase fetch later)
-const lastMonthData: Record<string, number> = {
-    Produce: 12000,
-    Dairy: 8000,
-    Meat: 10000,
-    Bakery: 5000,
-    Grocery: 15000,
-    Frozen: 7000,
-    Beverages: 6000,
-    'Health & Beauty': 4000,
-    Household: 5500,
-    Floral: 2000,
-};
-
 type DepartmentStatsForm = z.infer<typeof DepartmentStatsSchema>;
 
 export default function DepartmentStatsPage() {
@@ -89,15 +75,6 @@ export default function DepartmentStatsPage() {
         const cleaned = values.departments.filter(
             (d) => d.department && d.amount > 0
         );
-        console.log()
-
-        // Include last month amount in computed data
-        const computed = cleaned.map((item) => {
-            const prevAmount = lastMonthData[item.department] ?? 0;
-            const change = prevAmount === 0 ? 0 : ((item.amount - prevAmount) / prevAmount) * 100;
-            return { ...item, prevAmount, change, storeName: values.storeName };
-        });
-
 
         const departmentStatsData = await addDepartmentStats({
             storeName: values.storeName,

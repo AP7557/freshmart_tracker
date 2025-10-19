@@ -89,6 +89,7 @@ export function DepartmentHeatmap({ data }: DepartmentHeatmapProps) {
         return `hsl(${hue}, 70%, 50%)`;
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const renderScatterShape = (props: any) => {
         const size = 10;
         return (
