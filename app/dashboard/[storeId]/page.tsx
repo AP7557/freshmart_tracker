@@ -7,7 +7,7 @@ import { getDepartmentStatsForHeatMap, getStorePayoutDetails } from '@/db/db-cal
 import { Skeleton } from '@/components/ui/skeleton';
 import { StorePayoutTable } from '@/components/dashboard/store-all-payout-table';
 import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
-import { Check, Calendar, Building } from 'lucide-react';
+import { Check, Calendar, Building, Activity } from 'lucide-react';
 import { DepartmentHeatmap } from '@/components/dashboard/department-stats-heatmap';
 
 export default function StoreDetailPage() {
@@ -26,7 +26,6 @@ export default function StoreDetailPage() {
       if (data) setDetails(data);
 
       const departmentStatsData = await getDepartmentStatsForHeatMap(Number(storeId))
-      console.log(departmentStatsData)
       if (departmentStatsData) setDepartmentStats(departmentStatsData)
     })();
   }, [storeId]);
@@ -108,17 +107,27 @@ export default function StoreDetailPage() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardHeader>
-          <CardTitle className='text-lg font-semibold text-primary'>
-            All Payouts
+          <CardTitle className="text-lg font-semibold text-primary">
+            Department Trend Heatmap
           </CardTitle>
         </CardHeader>
-        <CardContent className='text-sm text-foreground'>
-          <DepartmentHeatmap data={departmentStats} />
+        <CardContent className="flex flex-col items-center justify-center text-sm text-foreground h-48">
+          {departmentStats.length !== 0 ? (
+            <DepartmentHeatmap data={departmentStats} />
+          ) : (
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <Activity className="h-12 w-12 text-muted-foreground" />
+              <span className="text-center text-foreground">
+                Not enough data. Please add stats for at least one month.
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+
       {/* All Payouts Table */}
       <Card>
         <CardHeader>
