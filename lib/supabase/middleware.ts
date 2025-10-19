@@ -64,14 +64,12 @@ export async function updateSession(request: NextRequest) {
   const path = url.pathname;
 
   // Route-based role protection
-  if ('/vendor/add-payout' !== path && !["manager", "admin"].includes(role)) {
+  if (role === "user" && '/vendor/add-payout' !== path) {
     url.pathname = "/vendor/add-payout";
     return NextResponse.redirect(url);
   }
 
-
-  if (["/dashboard/users", "/stats/departments"].includes(path) && "admin" !== role) {
-    // Only accessible by manager/admin, else redirect to dashboard
+  if (role === "manager" && ["/dashboard/users", "/stats/department"].includes(path)) {
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
