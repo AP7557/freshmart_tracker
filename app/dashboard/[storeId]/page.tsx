@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getStorePayoutDetails } from '@/db/db-calls';
+import { getDepartmentStatsForHeatMap, getStorePayoutDetails } from '@/db/db-calls';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StorePayoutTable } from '@/components/dashboard/store-all-payout-table';
 import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
 import { Check, Calendar, Building } from 'lucide-react';
+import { DepartmentHeatmap } from '@/components/dashboard/department-stats-heatmap';
 
 export default function StoreDetailPage() {
   const { storeId } = useParams();
@@ -17,15 +18,20 @@ export default function StoreDetailPage() {
     companyTotals: Record<string, number>;
     futurePayments: FuturePaymentsType;
   } | null>(null);
+  const [departmentStats, setDepartmentStats] = useState<{ amount: number; month: string; department_name: string }[] | null>(null);
 
   useEffect(() => {
     (async () => {
       const data = await getStorePayoutDetails(Number(storeId));
       if (data) setDetails(data);
+
+      const departmentStatsData = await getDepartmentStatsForHeatMap(Number(storeId))
+      console.log(departmentStatsData)
+      if (departmentStatsData) setDepartmentStats(departmentStatsData)
     })();
   }, [storeId]);
 
-  if (!details)
+  if (!details || !departmentStats)
     return <Skeleton className='h-32 w-full rounded-xl animate-pulse' />;
 
   return (
@@ -103,6 +109,16 @@ export default function StoreDetailPage() {
         </Card>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-lg font-semibold text-primary'>
+            All Payouts
+          </CardTitle>
+        </CardHeader>
+        <CardContent className='text-sm text-foreground'>
+          <DepartmentHeatmap data={departmentStats} />
+        </CardContent>
+      </Card>
       {/* All Payouts Table */}
       <Card>
         <CardHeader>

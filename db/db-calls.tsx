@@ -188,6 +188,35 @@ export const getStoresForUser = async () => {
   return { stores };
 };
 
+export const getDepartmentStatsForHeatMap = async (storeId: number) => {
+  const supabase = createClient();
+
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  oneYearAgo.setMonth(0, 1); // Start from Jan of last year
+
+  const { data, error } = await supabase
+    .from('department_stats')
+    .select(`
+      amount,
+      date,
+      departments(name)
+    `)
+    .eq('store_id', storeId)
+    .gte('date', oneYearAgo.toISOString().split('T')[0])
+    .order('date', { ascending: true });
+  if (error) {
+    console.error('Error fetching department trends:', error);
+    throw error;
+  }
+
+  return (data as unknown as { amount: number; date: string; departments: { name: string } }[]).map((d) => ({
+    amount: Number(d.amount),
+    month: d.date,
+    department_name: d.departments.name,
+  })) ?? [];
+}
+
 export const getCompanies = async () => {
   const supabase = createClient();
 
