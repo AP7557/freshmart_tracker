@@ -113,7 +113,7 @@ export default function StoreDetailPage() {
             Department Trend Heatmap
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center text-sm text-foreground h-48">
+        <CardContent className="flex flex-col items-center justify-center text-sm text-foreground">
           {departmentStats.length !== 0 ? (
             <DepartmentHeatmap data={departmentStats} />
           ) : (
