@@ -1,40 +1,28 @@
 'use client';
 
-import { getUserRole } from '@/db/db-calls';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
-import {
-  IoClose,
-  IoAddCircleOutline,
-  IoCheckmarkDoneOutline,
-} from 'react-icons/io5';
+import { IoClose } from 'react-icons/io5';
+import { BsBoxes } from 'react-icons/bs';
 
-export default function VendorLayout({
+export default function StatsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const userRole = await getUserRole();
-      if (userRole?.data) setRole(userRole.data[0].role);
-    })();
-  }, []);
 
   return (
     <div className='min-h-svh flex flex-col'>
       <header className='w-full border-b border-border bg-primary-foreground shadow px-6 py-4'>
         <div className='flex items-center justify-between'>
           <Link
-            href='/dashboard'
+            href='/portal/dashboard'
             className='text-xl font-bold flex items-center gap-2'
           >
             <HiOutlineViewGrid className='w-5 h-5 flex-shrink-0' />
-            Vendor Payouts
+            Store Stats
           </Link>
           {/* Mobile menu button */}
           <button
@@ -52,33 +40,22 @@ export default function VendorLayout({
 
         {/* Nav links - hidden on mobile unless menu is open */}
         <nav
-          className={`flex-col justify-end gap-4 mt-4 md:mt-0 md:flex md:flex-row md:gap-6 ${menuOpen ? 'flex' : 'hidden'
-            } md:flex`}
+          className={`flex-col justify-end gap-4 mt-4 md:mt-0 md:flex md:flex-row md:gap-6 ${
+            menuOpen ? 'flex' : 'hidden'
+          } md:flex`}
         >
           <Link
-            href='/vendor/add-payout'
+            href='/portal/stats/department'
             className='flex items-center gap-1'
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            <IoAddCircleOutline className='w-5 h-5 flex-shrink-0' />
-            Add Payout
+            <BsBoxes className='w-5 h-5 flex-shrink-0' />
+            Department
           </Link>
-          {role && ['manager', 'admin'].includes(role) && (
-            <Link
-              href='/vendor/posted'
-              className='flex items-center gap-1'
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              <IoCheckmarkDoneOutline className='w-5 h-5 flex-shrink-0' />
-              Verify Checks/ACH
-            </Link>
-          )}
         </nav>
       </header>
 
-      <main className='flex-1 p-6 place-content-center'>
-        {children}
-      </main>
+      <main className='flex-1 p-6 place-content-center'>{children}</main>
     </div>
   );
 }
