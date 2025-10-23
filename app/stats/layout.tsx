@@ -8,7 +8,7 @@ import {
 } from 'react-icons/io5';
 import { BsBoxes } from "react-icons/bs";
 
-export default function VendorLayout({
+export default function StatsLayout({
     children,
 }: {
     children: React.ReactNode;

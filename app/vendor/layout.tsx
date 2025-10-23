@@ -1,29 +1,23 @@
 'use client';
 
-import { getUserRole } from '@/db/db-calls';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
 import {
   IoClose,
   IoAddCircleOutline,
   IoCheckmarkDoneOutline,
 } from 'react-icons/io5';
+import { useGlobalData } from '../GlobalDataProvider';
 
 export default function VendorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [role, setRole] = useState<string | null>(null);
+  const { userRole } = useGlobalData();
 
-  useEffect(() => {
-    (async () => {
-      const userRole = await getUserRole();
-      if (userRole?.data) setRole(userRole.data[0].role);
-    })();
-  }, []);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className='min-h-svh flex flex-col'>
@@ -52,8 +46,9 @@ export default function VendorLayout({
 
         {/* Nav links - hidden on mobile unless menu is open */}
         <nav
-          className={`flex-col justify-end gap-4 mt-4 md:mt-0 md:flex md:flex-row md:gap-6 ${menuOpen ? 'flex' : 'hidden'
-            } md:flex`}
+          className={`flex-col justify-end gap-4 mt-4 md:mt-0 md:flex md:flex-row md:gap-6 ${
+            menuOpen ? 'flex' : 'hidden'
+          } md:flex`}
         >
           <Link
             href='/vendor/add-payout'
@@ -63,7 +58,7 @@ export default function VendorLayout({
             <IoAddCircleOutline className='w-5 h-5 flex-shrink-0' />
             Add Payout
           </Link>
-          {role && ['manager', 'admin'].includes(role) && (
+          {userRole && ['manager', 'admin'].includes(userRole) && (
             <Link
               href='/vendor/posted'
               className='flex items-center gap-1'
@@ -76,9 +71,7 @@ export default function VendorLayout({
         </nav>
       </header>
 
-      <main className='flex-1 p-6 place-content-center'>
-        {children}
-      </main>
+      <main className='flex-1 p-6 place-content-center'>{children}</main>
     </div>
   );
 }

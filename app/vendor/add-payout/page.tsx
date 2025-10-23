@@ -9,21 +9,8 @@ import { ComboBox } from '@/components/shared/combobox';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { DatePicker } from '@/components/shared/date-picker';
-import {
-  addPayouts,
-  getCompanies,
-  getStoresForUser,
-  getTypes,
-  getTodaysPayouts,
-  getUserRole,
-} from '@/db/db-calls';
 import { TodaysPayouts } from '@/components/vendor/todays-payout';
 import {
   Store,
@@ -34,21 +21,21 @@ import {
   CheckCircle,
   Calendar,
 } from 'lucide-react';
-import { FormSchema, OptionsType, TodaysPayoutsType } from '@/types/type';
+import { FormSchema, TodaysPayoutsType } from '@/types/type';
 import ConfirmPayout from '@/components/vendor/confirm-payout';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
+import { useGlobalData } from '@/app/GlobalDataProvider';
+import { addPayout, getTodaysPayoutsCached } from '@/lib/api/payouts';
 
 export default function AddPayoutForm() {
+  const router = useRouter();
+  const { userRole, storeOptions, companyOptions, typeOptions } =
+    useGlobalData();
+
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const [storeOptions, setStoreOptions] = useState<OptionsType>([]);
-  const [companyOptions, setCompanyOptions] = useState<OptionsType>([]);
-  const [typeOptions, setTypeOptions] = useState<OptionsType>([]);
   const [todaysPayouts, setTodaysPayouts] = useState<TodaysPayoutsType[]>([]);
-  const [userRole, setUserRole] = useState<string>('');
-
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -81,8 +68,21 @@ export default function AddPayoutForm() {
 
   const handleConfirmSubmit = async (values: z.infer<typeof FormSchema>) => {
     setLoading(true);
+    const storeId =
+      storeOptions.find((s) => s.name === values.storeName)?.id || 0;
 
-    const payoutsData = await addPayouts(values);
+    const storeExists = storeOptions.some((s) => s.name === values.storeName);
+    const companyExists = companyOptions.some(
+      (c) => c.name === values.companyName
+    );
+    const shouldInvalidateInitialData = !storeExists || !companyExists;
+    
+    const payoutsData = await addPayout(
+      values,
+      storeId,
+      shouldInvalidateInitialData
+    );
+
     if (payoutsData?.data) {
       router.refresh();
       form.reset();
@@ -96,27 +96,11 @@ export default function AddPayoutForm() {
 
   useEffect(() => {
     (async () => {
-      const storesForUser = await getStoresForUser();
-      if (storesForUser?.stores) setStoreOptions(storesForUser.stores);
-      if (storesForUser?.stores.length === 1) {
-        form.setValue('storeName', storesForUser.stores[0].name);
-      }
-
-      const companiesData = await getCompanies();
-      if (companiesData?.companies) setCompanyOptions(companiesData.companies);
-
-      const typesData = await getTypes();
-      if (typesData?.types) setTypeOptions(typesData.types);
-
-      const userRole = await getUserRole();
-      if (userRole?.data) setUserRole(userRole.data[0].role);
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
       if (storeName) {
-        const todaysPayout = await getTodaysPayouts(storeOptions, storeName);
+        const todaysPayout = await getTodaysPayoutsCached(
+          storeOptions,
+          storeName
+        );
         if (todaysPayout?.payoutData) setTodaysPayouts(todaysPayout.payoutData);
       }
     })();
