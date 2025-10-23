@@ -25,10 +25,10 @@ export function AuthButton() {
     // Check current session
     const getSession = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      setUserEmail(session?.user?.email ?? null);
+      setUserEmail(user?.email ?? null);
     };
 
     getSession();

@@ -2,21 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  getPayoutsToPost,
-  getStoresForUser,
-  updatePayouts,
-} from '@/db/db-calls';
 import { ComboBox } from '@/components/shared/combobox';
 import SwipeList from '@/components/vendor/swipe-card';
 import { Input } from '@/components/ui/input';
-import { OptionsType, PostedPayoutsType } from '@/types/type';
+import { PostedPayoutsType } from '@/types/type';
 import { Banknote, BanknoteArrowDown, Store } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import DesktopTable from '@/components/shared/desktop-table';
+import { useRouter } from 'next/navigation';
+import { useGlobalData } from '@/app/portal/GlobalDataProvider';
+import { getPayoutsToPostCached, updatePayout } from '@/lib/api/payouts';
 
 export default function PostedPage() {
-  const [storeOptions, setStoreOptions] = useState<OptionsType>([]);
+  const router = useRouter();
+  const { storeOptions } = useGlobalData();
+
   const [selectedStore, setSelectedStore] = useState<string>('');
   const [payouts, setPayouts] = useState<PostedPayoutsType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -24,22 +24,15 @@ export default function PostedPage() {
 
   useEffect(() => {
     (async () => {
-      const storesForUser = await getStoresForUser();
-      if (storesForUser?.stores) setStoreOptions(storesForUser.stores);
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
       if (selectedStore) {
         setLoading(true);
+        const storeId = storeOptions.find((s) => s.name === selectedStore)?.id;
+        if (storeId) {
+          const payoutsToPost = await getPayoutsToPostCached(storeId);
 
-        const payoutsToPost = await getPayoutsToPost(
-          storeOptions,
-          selectedStore
-        );
-        if (payoutsToPost?.payoutData) {
-          setPayouts(payoutsToPost.payoutData);
+          if (payoutsToPost?.payoutData) {
+            setPayouts(payoutsToPost.payoutData);
+          }
         }
 
         setLoading(false);
@@ -48,10 +41,16 @@ export default function PostedPage() {
   }, [selectedStore, storeOptions]);
 
   const markCheckDeposited = async (payoutId: number) => {
-    const { error } = await updatePayouts(payoutId);
-    if (!error) {
-      setPayouts((prev) => prev.filter((p) => p.id !== payoutId));
-    }
+    const storeId = storeOptions.find((s) => s.name === selectedStore)?.id || 0;
+
+    await updatePayout(payoutId, storeId)
+      .then(() => {
+        router.refresh(); // refreshes server-side cached data
+        setPayouts((prev) => prev.filter((p) => p.id !== payoutId));
+      })
+      .catch((error) => {
+        console.error('Error at updating payout', error);
+      });
   };
 
   const totalPending = payouts.reduce((sum, p) => sum + p.amount, 0);
@@ -97,6 +96,7 @@ export default function PostedPage() {
                     )
                   }
                   min={0}
+                  onWheel={(e) => e.currentTarget.blur()} // prevents scroll from changing number
                 />
               </div>
               <div className='flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 md:mt-0'>
@@ -118,8 +118,8 @@ export default function PostedPage() {
                   <p className='text-lg font-semibold text-[hsl(var(--primary))]'>
                     {bankBalance
                       ? `$${remainingBalance
-                        .toFixed(2)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+                          .toFixed(2)
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
                       : '—'}
                   </p>
                 </div>

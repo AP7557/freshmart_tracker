@@ -59,10 +59,7 @@ export function ComboBox({
 
   if (isDesktop) {
     return (
-      <Popover
-        open={open}
-        onOpenChange={setOpen}
-      >
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant='secondary'
@@ -86,10 +83,7 @@ export function ComboBox({
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button
           variant='secondary'

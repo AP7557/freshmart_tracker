@@ -36,23 +36,15 @@ export function MultiSelectComboBox({
 
   const buttonContent = (
     <>
-      {selectedValue.length
-        ? `${selectedValue.length} selected`
-        : 'None Selected'}
+      {selectedValue.length ? `${selectedValue.length} selected` : placeholder}
       <ChevronsUpDown className='ml-2 text-primary opacity-70' />
     </>
   );
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button
-          variant='secondary'
-          className='text-foreground w-full'
-        >
+        <Button variant='secondary' className='text-foreground w-full'>
           {buttonContent}
         </Button>
       </DrawerTrigger>
@@ -88,10 +80,7 @@ function StatusList({
 }) {
   return (
     <Command>
-      <CommandInput
-        placeholder={placeholder}
-        className='h-9 p-3'
-      />
+      <CommandInput placeholder={placeholder} className='h-9 p-3' />
       <CommandList className='m-2'>
         <CommandEmpty>
           <span className='text-muted-foreground'>No results found.</span>

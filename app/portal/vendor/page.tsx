@@ -3,11 +3,11 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function StatsPage() {
+export default function VendorHome() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/stats/department');
+    router.replace('/portal/vendor/add-payout');
   }, [router]);
 
   return null; // Nothing needs to render since user is redirected

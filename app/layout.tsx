@@ -26,16 +26,13 @@ const geistSans = Geist({
 });
 
 // ✅ Root Layout
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang='en'
-      suppressHydrationWarning
-    >
+    <html lang='en' suppressHydrationWarning>
       <body
         className={`${geistSans.className} antialiased bg-background text-foreground`}
       >
@@ -47,10 +44,7 @@ export default function RootLayout({
           <div className='min-h-svh flex flex-col'>
             <header className='w-full border-b border-border bg-primary text-primary-foreground'>
               <div className='max-w-5xl mx-auto flex items-center justify-between px-6 py-3'>
-                <Link
-                  href='/'
-                  className='flex items-center gap-3'
-                >
+                <Link href='/' className='flex items-center gap-3'>
                   <Image
                     src='/fm-logo.jpeg'
                     alt='Freshmart Logo'
