@@ -7,8 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { ComboBox } from '@/components/shared/combobox';
 import { User, Users, Store, LayoutGrid } from 'lucide-react';
 import { MultiSelectComboBox } from '@/components/dashboard/combobox-multiselect';
-import { getAllUsers, updateUserRole, updateUserStores } from '@/lib/api/users';
-import { useGlobalData } from '@/app/GlobalDataProvider';
+import {
+  getAllUsersAndStores,
+  updateUserRole,
+  updateUserStores,
+} from '@/lib/api/users';
+import { useGlobalData } from '@/app/portal/GlobalDataProvider';
+import { OptionsType } from '@/types/type';
 
 interface UserType {
   id: string;
@@ -19,14 +24,17 @@ interface UserType {
 }
 
 export default function ManageUsersPage() {
-  const { storeOptions } = useGlobalData();
   const [users, setUsers] = useState<UserType[]>([]);
+  const [storeOptions, setStoreOptions] = useState<OptionsType>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const allUsers = await getAllUsers();
-      if (allUsers?.usersData) setUsers(allUsers.usersData);
+      const allUsers = await getAllUsersAndStores();
+      if (allUsers?.usersData) {
+        setUsers(allUsers.usersData);
+        setStoreOptions(allUsers.allStoresData);
+      }
 
       setLoading(false);
     })();

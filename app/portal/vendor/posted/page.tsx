@@ -10,7 +10,7 @@ import { Banknote, BanknoteArrowDown, Store } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import DesktopTable from '@/components/shared/desktop-table';
 import { useRouter } from 'next/navigation';
-import { useGlobalData } from '@/app/GlobalDataProvider';
+import { useGlobalData } from '@/app/portal/GlobalDataProvider';
 import { getPayoutsToPostCached, updatePayout } from '@/lib/api/payouts';
 
 export default function PostedPage() {
@@ -43,7 +43,7 @@ export default function PostedPage() {
 
   const markCheckDeposited = async (payoutId: number) => {
     const storeId = storeOptions.find((s) => s.name === selectedStore)?.id || 0;
-    
+
     await updatePayout(payoutId, storeId)
       .then(() => {
         router.refresh(); // refreshes server-side cached data

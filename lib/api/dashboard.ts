@@ -1,27 +1,37 @@
-import { unstable_cache } from 'next/cache';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 import { supabaseServiceClient } from '../supabase/server-service-client';
+import { unstable_cache } from 'next/cache';
 
-export const getDashboardData = unstable_cache(
-  async (userId: string) => {
-    const { data, error } = await supabaseServiceClient.rpc(
-      'get_dashboard_totals',
-      {
-        p_user_id: userId,
-      }
-    );
-    if (error) throw new Error('Error fetching dashboard totals');
-    return {
-      lastFetched: new Date().toLocaleTimeString(), // store timestamp in cache
-      data,
-    };
-  },
-  ['dashboard-data'], // cache key base
-  { revalidate: 60 * 60, tags: ['dashboard-data'] }
-);
+export const getDashboardData = async () => {
+  const supabase = await createServerClient();
 
-export const getStorePayoutDetails = (storeId: number) =>
-  unstable_cache(
-    async () => {
+  // ❗ Get the user FIRST (outside cache)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('No authenticated user found');
+
+  const cachedData = unstable_cache(
+    async (userId: string) => {
+      const { data, error } = await supabaseServiceClient.rpc(
+        'get_dashboard_totals',
+        {
+          p_user_id: userId,
+        }
+      );
+      if (error) throw new Error('Error fetching dashboard totals');
+
+      return data;
+    },
+    ['dashboard-data'], // cache key base
+    { revalidate: 60 * 60, tags: ['dashboard-data'] }
+  )(user.id);
+  return cachedData;
+};
+
+export const getStorePayoutDetails = (storeId: number) => {
+  const cachedData = unstable_cache(
+    async (storeId: number) => {
       const { data, error } = await supabaseServiceClient.rpc(
         'get_store_payout_details',
         {
@@ -32,11 +42,11 @@ export const getStorePayoutDetails = (storeId: number) =>
 
       let result = data as any;
       if (typeof result === 'string') result = JSON.parse(result);
-      return {
-        lastFetched: new Date().toLocaleTimeString(), // store timestamp in cache
-        result,
-      };
+
+      return result;
     },
     [`store-payouts-detail-${storeId}`], // unique static tag per store
     { revalidate: 60 * 60, tags: [`store-payouts-detail-${storeId}`] }
-  )();
+  )(storeId);
+  return cachedData;
+};

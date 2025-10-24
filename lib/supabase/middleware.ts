@@ -1,11 +1,10 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
-
 
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
@@ -19,17 +18,17 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
+            request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(name, value, options)
           );
         },
       },
-    },
+    }
   );
 
   // Do not run code between createServerClient and
@@ -41,37 +40,68 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth";
+  const url = request.nextUrl.clone();
+  const path = url.pathname;
+
+  if (!user && !path.startsWith('/auth') && path !== '/') {
+    url.pathname = '/auth';
     return NextResponse.redirect(url);
   }
 
   const { data: userRecord } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user?.sub)
+    .from('users')
+    .select('role')
+    .eq('id', user?.sub)
     .single();
 
   const role = userRecord?.role;
 
-  const url = request.nextUrl.clone();
-  const path = url.pathname;
+  // Define role-based access patterns
+  const roleAccess = {
+    user: {
+      allowedPrefixes: ['/portal/vendor/add-payout'],
+    },
+    manager: {
+      blockedPrefixes: ['/portal/admin', '/portal/stats'],
+    },
+    admin: {
+      allowedPrefixes: ['/portal'], // admins can access everything
+    },
+  };
 
-  // Route-based role protection
-  if (role === "user" && '/vendor/add-payout' !== path) {
-    url.pathname = "/vendor/add-payout";
-    return NextResponse.redirect(url);
+  if (role === 'user') {
+    if (
+      !roleAccess.user.allowedPrefixes.some((prefix) => path.startsWith(prefix))
+    ) {
+      url.pathname = '/portal/vendor/add-payout';
+      return NextResponse.redirect(url);
+    }
+  }
+  if (role === 'manager') {
+    if (
+      roleAccess.manager.blockedPrefixes.some((prefix) =>
+        path.startsWith(prefix)
+      )
+    ) {
+      url.pathname = '/portal/dashboard';
+      return NextResponse.redirect(url);
+    }
   }
 
-  if (role === "manager" && ["/dashboard/users", "/stats/department"].includes(path)) {
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+  if (path.startsWith('/portal/dashboard/')) {
+    const storeId = Number(path.split('/')[3]);
+    if (!isNaN(storeId)) {
+      const { data: allowedStores } = await supabase
+        .from('user_stores')
+        .select('store_id')
+        .eq('user_id', user?.sub);
+
+      const storeIds = (allowedStores ?? []).map((s) => s.store_id);
+      if (!storeIds.includes(storeId)) {
+        url.pathname = '/portal/dashboard';
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

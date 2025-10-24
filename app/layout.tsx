@@ -5,8 +5,6 @@ import './globals.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AuthButton } from '@/components/auth/auth-button';
-import { getInitialDashboardData } from '@/lib/api/lookups';
-import { GlobalDataProvider } from './GlobalDataProvider';
 
 // ✅ Custom Site Metadata
 const defaultUrl = process.env.VERCEL_URL
@@ -33,14 +31,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const {
-    userRole,
-    storeOptions,
-    companyOptions,
-    typeOptions,
-    departmentOptions,
-  } = await getInitialDashboardData();
-
   return (
     <html lang='en' suppressHydrationWarning>
       <body
@@ -51,45 +41,35 @@ export default async function RootLayout({
           defaultTheme='dark'
           disableTransitionOnChange
         >
-          <GlobalDataProvider
-            value={{
-              userRole,
-              storeOptions,
-              companyOptions,
-              typeOptions,
-              departmentOptions,
-            }}
-          >
-            <div className='min-h-svh flex flex-col'>
-              <header className='w-full border-b border-border bg-primary text-primary-foreground'>
-                <div className='max-w-5xl mx-auto flex items-center justify-between px-6 py-3'>
-                  <Link href='/' className='flex items-center gap-3'>
-                    <Image
-                      src='/fm-logo.jpeg'
-                      alt='Freshmart Logo'
-                      width={36}
-                      height={36}
-                      className='rounded-full flex-shrink-0'
-                    />
-                    <span className='text-xl font-bold hidden  lg:block'>
-                      Freshmart
-                    </span>
-                  </Link>
+          <div className='min-h-svh flex flex-col'>
+            <header className='w-full border-b border-border bg-primary text-primary-foreground'>
+              <div className='max-w-5xl mx-auto flex items-center justify-between px-6 py-3'>
+                <Link href='/' className='flex items-center gap-3'>
+                  <Image
+                    src='/fm-logo.jpeg'
+                    alt='Freshmart Logo'
+                    width={36}
+                    height={36}
+                    className='rounded-full flex-shrink-0'
+                  />
+                  <span className='text-xl font-bold hidden  lg:block'>
+                    Freshmart
+                  </span>
+                </Link>
 
-                  <AuthButton />
-                </div>
-              </header>
-              <main className='flex-1 place-content-center'>{children}</main>
-              <footer className='w-full border-t border-border bg-background text-muted-foreground text-xs'>
-                <div className='max-w-5xl mx-auto flex flex-col md:flex-row justify-center px-6 py-8 gap-4'>
-                  <p>
-                    &copy; {new Date().getFullYear()} Freshmart. All rights
-                    reserved.
-                  </p>
-                </div>
-              </footer>
-            </div>
-          </GlobalDataProvider>
+                <AuthButton />
+              </div>
+            </header>
+            <main className='flex-1 place-content-center'>{children}</main>
+            <footer className='w-full border-t border-border bg-background text-muted-foreground text-xs'>
+              <div className='max-w-5xl mx-auto flex flex-col md:flex-row justify-center px-6 py-8 gap-4'>
+                <p>
+                  &copy; {new Date().getFullYear()} Freshmart. All rights
+                  reserved.
+                </p>
+              </div>
+            </footer>
+          </div>
         </ThemeProvider>
       </body>
     </html>

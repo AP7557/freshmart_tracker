@@ -24,7 +24,7 @@ import {
 import { FormSchema, TodaysPayoutsType } from '@/types/type';
 import ConfirmPayout from '@/components/vendor/confirm-payout';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
-import { useGlobalData } from '@/app/GlobalDataProvider';
+import { useGlobalData } from '@/app/portal/GlobalDataProvider';
 import { addPayout, getTodaysPayoutsCached } from '@/lib/api/payouts';
 
 export default function AddPayoutForm() {
@@ -75,8 +75,11 @@ export default function AddPayoutForm() {
     const companyExists = companyOptions.some(
       (c) => c.name === values.companyName
     );
-    const shouldInvalidateInitialData = !storeExists || !companyExists;
-    
+    const shouldInvalidateInitialData = {
+      storeExists,
+      companyExists,
+    };
+
     const payoutsData = await addPayout(
       values,
       storeId,
@@ -87,7 +90,13 @@ export default function AddPayoutForm() {
       router.refresh();
       form.reset();
       form.setValue('storeName', values.storeName);
-      setTodaysPayouts((prev) => [payoutsData.data[0], ...prev]);
+      console.log(shouldInvalidateInitialData);
+
+      const filteredPayouts = todaysPayouts.filter(
+        (value) => value.store_name === values.storeName
+      );
+
+      setTodaysPayouts([payoutsData.data[0], ...filteredPayouts]);
     }
 
     setLoading(false);

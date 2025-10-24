@@ -1,6 +1,5 @@
 'use client';
 
-import { useGlobalData } from '../GlobalDataProvider';
 import LatestUpdatesDialog from '@/components/dashboard/latest-updates';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -8,6 +7,7 @@ import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
 import { IoClose, IoPeopleOutline } from 'react-icons/io5';
 import { GiPayMoney } from 'react-icons/gi';
 import { MdQueryStats } from 'react-icons/md';
+import { useGlobalData } from '../GlobalDataProvider';
 
 export default function DashboardLayout({
   children,
@@ -28,7 +28,7 @@ export default function DashboardLayout({
       <header className='w-full border-b border-border bg-primary-foreground shadow px-6 py-4'>
         <div className='flex items-center justify-between'>
           <Link
-            href='/dashboard'
+            href='/portal/dashboard'
             className='text-xl font-bold flex items-center gap-2'
           >
             <HiOutlineViewGrid className='w-5 h-5 flex-shrink-0' />
@@ -53,7 +53,7 @@ export default function DashboardLayout({
           } md:flex`}
         >
           <Link
-            href='/vendor'
+            href='/portal/vendor'
             className='flex items-center gap-1'
             onClick={() => setMenuOpen(false)}
           >
@@ -63,7 +63,7 @@ export default function DashboardLayout({
           {userRole === 'admin' && (
             <>
               <Link
-                href='/stats'
+                href='/portal/stats'
                 className='flex items-center gap-1'
                 onClick={() => setMenuOpen(false)}
               >
@@ -71,7 +71,7 @@ export default function DashboardLayout({
                 Store Stats
               </Link>
               <Link
-                href='/dashboard/users'
+                href='/portal/admin/users'
                 className='flex items-center gap-1'
                 onClick={() => setMenuOpen(false)}
               >

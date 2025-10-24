@@ -12,16 +12,23 @@ type GetAllUsersType = {
   user_stores: { stores: { id: number; name: string } }[];
 };
 
-export const getAllUsers = unstable_cache(
+export const getAllUsersAndStores = unstable_cache(
   async () => {
-    const { data, error } = await supabaseServiceClient.from('users').select(`
-    id, user_name, user_email, role,
-    user_stores ( stores ( id, name ) )
-  `);
+    const [usersResult, storesResult] = await Promise.all([
+      supabaseServiceClient.from('users').select(`
+        id, user_name, user_email, role,
+        user_stores ( stores ( id, name ) )
+      `),
+      supabaseServiceClient.from('stores').select('*'),
+    ]);
 
-    if (error) throw new Error('Error fetching users');
+    const { data: userData, error: userError } = usersResult;
+    const { data: storeData, error: storeError } = storesResult;
 
-    const users = (data as unknown as GetAllUsersType[])?.map((u) => ({
+    if (userError) throw new Error('Error fetching users');
+    if (storeError) throw new Error('Error fetching stores');
+
+    const users = (userData as unknown as GetAllUsersType[]).map((u) => ({
       id: u.id,
       name: u.user_name,
       role: u.role,
@@ -30,12 +37,12 @@ export const getAllUsers = unstable_cache(
     }));
 
     return {
-      lastFetched: new Date().toLocaleTimeString(), // store timestamp in cache
       usersData: users,
+      allStoresData: storeData,
     };
   },
-  ['all-users'], // unique static tag per store
-  { revalidate: 60 * 60 }
+  ['users-and-stores'], // cache key
+  { revalidate: 60 * 60, tags: ['users-and-stores'] }
 );
 
 export async function updateUserRole(userId: string, newRole: string) {
@@ -46,7 +53,9 @@ export async function updateUserRole(userId: string, newRole: string) {
     .eq('id', userId);
   if (error) throw new Error('Error updating user role');
 
-  revalidateTag('initial-dashboard-data');
+  revalidateTag('global-options');
+  revalidateTag('users-and-stores');
+  revalidateTag('dashboard-data');
 }
 
 export async function updateUserStores(
@@ -67,5 +76,7 @@ export async function updateUserStores(
       .insert({ user_id: userId, store_id: storeId });
   }
 
-  revalidateTag('initial-dashboard-data');
+  revalidateTag('global-options');
+  revalidateTag('users-and-stores');
+  revalidateTag('dashboard-data');
 }

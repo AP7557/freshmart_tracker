@@ -4,7 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { unstable_cache } from 'next/cache';
 import { OptionsType } from '@/types/type';
 
-export async function getInitialDashboardData() {
+export async function getGlobalOptions() {
   const supabase = await createServerClient();
 
   // ❗ Get the user FIRST (outside cache)
@@ -14,7 +14,7 @@ export async function getInitialDashboardData() {
   if (!user) throw new Error('No authenticated user found');
 
   // ✅ Cache only what depends on user ID
-  const cachedData = await unstable_cache(
+  const cachedData = unstable_cache(
     async (userId: string) => {
       const [
         { data },
@@ -38,7 +38,6 @@ export async function getInitialDashboardData() {
       );
 
       return {
-        lastFetched: new Date().toLocaleTimeString(), // store timestamp in cache
         userRole: data ? data[0].role : 'user',
         storeOptions: userStores,
         companyOptions: companies ?? [],
@@ -46,8 +45,8 @@ export async function getInitialDashboardData() {
         departmentOptions: departments ?? [],
       };
     },
-    ['initial-dashboard-data'], // base cache key
-    { revalidate: 60 * 60, tags: ['initial-dashboard-data'] }
+    ['global-options'],
+    { revalidate: 60 * 60, tags: ['global-options'] }
   )(user.id); // Pass user.id to cache key
   return cachedData;
 }

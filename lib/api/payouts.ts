@@ -36,17 +36,19 @@ export async function addPayout(
     dateToWithdraw?: Date;
   },
   storeId: number,
-  shouldInvalidateInitialData: boolean
+  shouldInvalidateInitialData: { storeExists: boolean; companyExists: boolean }
 ) {
   const supabase = await createServerClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  console.log('PAYOut', JSON.stringify(user));
 
   const { data, error } = await supabase.rpc('insert_payout', {
     p_company_name: values.companyName,
     p_store_name: values.storeName,
-    p_user_email: session?.user?.email ?? null,
+    p_user_email: user?.email ?? null,
     p_type_name: values.type,
     p_amount: values.amount,
     p_invoice_number: values.invoiceNumber,
@@ -56,14 +58,21 @@ export async function addPayout(
 
   if (error) throw new Error('Error adding payout: ' + error.message);
 
-  revalidateTag('dashboard');
-  revalidateTag('payouts');
+  revalidateTag('dashboard-data');
   revalidateTag(`store-payouts-detail-${storeId}`);
-  if (shouldInvalidateInitialData) {
-    revalidateTag('initial-dashboard-data');
+  revalidateTag('todays-payouts');
+  revalidateTag('payouts-to-post');
+  if (
+    !shouldInvalidateInitialData.storeExists ||
+    !shouldInvalidateInitialData.companyExists
+  ) {
+    revalidateTag('global-options');
+  }
+  if (!shouldInvalidateInitialData.storeExists) {
+    revalidateTag('users-and-stores');
   }
 
-  return data;
+  return { data };
 }
 
 // ---------- UPDATE PAYOUT ----------
@@ -76,19 +85,22 @@ export async function updatePayout(payoutId: number, storeId: number) {
   if (error) throw new Error('Error updating payout');
 
   revalidateTag('dashboard-data');
-  revalidateTag('payouts');
   revalidateTag(`store-payouts-detail-${storeId}`);
+  revalidateTag('payouts-to-post');
 }
 
 // ---------- GET TODAY'S PAYOUTS ----------
 export const getTodaysPayoutsCached = unstable_cache(
   async (storeOptions: OptionsType, storeName: string) => {
     const storeId = storeOptions.find((s) => s.name === storeName)?.id;
+    if (!storeId) {
+      return;
+    }
 
     const now = new Date();
     const start = new Date(now.setHours(0, 0, 0, 0));
     const end = new Date(now.setHours(23, 59, 59, 999));
-
+    console.log('getTodaysPayoutsCached', storeId, storeName);
     const { data, error } = await supabaseServiceClient
       .from('payouts')
       .select(
@@ -117,13 +129,10 @@ export const getTodaysPayoutsCached = unstable_cache(
       })
     );
 
-    return {
-      lastFetched: new Date().toLocaleTimeString(), // store timestamp in cache
-      payoutData,
-    };
+    return { payoutData };
   },
   ['todays-payouts'], // base cache key
-  { revalidate: false, tags: ['payouts'] } // revalidate only when tag 'payouts' is revalidated
+  { revalidate: false, tags: ['todays-payouts'] } // revalidate only when tag 'payouts' is revalidated
 );
 
 // ---------- GET PAYOUTS TO POST ----------
@@ -185,11 +194,8 @@ export const getPayoutsToPostCached = unstable_cache(
         created_at: p.created_at,
       })
     );
-    return {
-      lastFetched: new Date().toLocaleTimeString(), // store timestamp in cache
-      payoutData,
-    };
+    return { payoutData };
   },
   ['payouts-to-post'],
-  { revalidate: false, tags: ['payouts'] }
+  { revalidate: false, tags: ['payouts-to-post'] }
 );

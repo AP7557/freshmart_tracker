@@ -5,18 +5,15 @@ import { useState } from 'react';
 import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
 import {
   IoClose,
-  IoAddCircleOutline,
   IoCheckmarkDoneOutline,
 } from 'react-icons/io5';
-import { useGlobalData } from '../GlobalDataProvider';
+import { MdCached } from 'react-icons/md';
 
-export default function VendorLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { userRole } = useGlobalData();
-
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -24,11 +21,11 @@ export default function VendorLayout({
       <header className='w-full border-b border-border bg-primary-foreground shadow px-6 py-4'>
         <div className='flex items-center justify-between'>
           <Link
-            href='/dashboard'
+            href='/portal/dashboard'
             className='text-xl font-bold flex items-center gap-2'
           >
             <HiOutlineViewGrid className='w-5 h-5 flex-shrink-0' />
-            Vendor Payouts
+            Admin
           </Link>
           {/* Mobile menu button */}
           <button
@@ -51,23 +48,22 @@ export default function VendorLayout({
           } md:flex`}
         >
           <Link
-            href='/vendor/add-payout'
+            href='/portal/admin/cache'
             className='flex items-center gap-1'
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            <IoAddCircleOutline className='w-5 h-5 flex-shrink-0' />
-            Add Payout
+            <MdCached className='w-5 h-5 flex-shrink-0' />
+            Cache Reload
           </Link>
-          {userRole && ['manager', 'admin'].includes(userRole) && (
-            <Link
-              href='/vendor/posted'
-              className='flex items-center gap-1'
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              <IoCheckmarkDoneOutline className='w-5 h-5 flex-shrink-0' />
-              Verify Checks/ACH
-            </Link>
-          )}
+
+          <Link
+            href='/portal/admin/users'
+            className='flex items-center gap-1'
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <IoCheckmarkDoneOutline className='w-5 h-5 flex-shrink-0' />
+            Manage Users
+          </Link>
         </nav>
       </header>
 

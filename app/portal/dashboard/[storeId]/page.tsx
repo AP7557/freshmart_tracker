@@ -1,21 +1,23 @@
-'use client';
-
+import { getStorePayoutDetails } from '@/lib/api/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StorePayoutTable } from '@/components/dashboard/store-all-payout-table';
 import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
 import { Check, Calendar, Building, Activity } from 'lucide-react';
 
-export default function StoreDetailPageClient({
-  initialDetails,
+export default async function StoreDetailPage({
+  params,
 }: {
-  initialDetails: {
+  params: Promise<{ storeId: string }>;
+}) {
+  const storeId = (await params).storeId; // ✅ await it
+  const initialDetails: {
     store_name: string;
     all_payouts: AllPayoutsType[];
     company_totals: Record<string, number>;
     future_payments: FuturePaymentsType;
-  } | null;
-}) {
+  } | null = await getStorePayoutDetails(Number(storeId));
+
   if (!initialDetails)
     return <Skeleton className='h-32 w-full rounded-xl animate-pulse' />;
 
