@@ -187,7 +187,7 @@ export default function DepartmentStatsPage() {
           {storeName && (
             <div className='space-y-4'>
               {fields.map((row, index) => (
-                <div key={row.id} className='flex gap-4'>
+                <div key={row.id} className='flex flex-col sm:flex-row gap-4'>
                   {/* Department Field */}
                   <FormField
                     control={form.control}
@@ -214,7 +214,7 @@ export default function DepartmentStatsPage() {
                     control={form.control}
                     name={`departments.${index}.amount`}
                     render={({ field }) => (
-                      <FormItem className='flex flex-col flex-1'>
+                      <FormItem className='flex flex-col flex-1 items-end'>
                         <LabelWithIcon icon={DollarSign}>Amount</LabelWithIcon>
                         <Input
                           {...field}
@@ -241,6 +241,7 @@ export default function DepartmentStatsPage() {
               ))}
             </div>
           )}
+
           {/* Add Rows + Submit */}
           <div className='flex justify-between items-center mt-6'>
             <Button

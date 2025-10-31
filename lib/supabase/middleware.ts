@@ -54,7 +54,7 @@ export async function updateSession(request: NextRequest) {
     .eq('id', user?.sub)
     .single();
 
-  const role = userRecord?.role;
+  let role = userRecord?.role;
 
   // Define role-based access patterns
   const roleAccess = {
@@ -87,19 +87,20 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
   }
+  if (role === 'manager' || role === 'admin') {
+    if (path.startsWith('/portal/dashboard/')) {
+      const storeId = Number(path.split('/')[3]);
+      if (!isNaN(storeId)) {
+        const { data: allowedStores } = await supabase
+          .from('user_stores')
+          .select('store_id')
+          .eq('user_id', user?.sub);
 
-  if (path.startsWith('/portal/dashboard/')) {
-    const storeId = Number(path.split('/')[3]);
-    if (!isNaN(storeId)) {
-      const { data: allowedStores } = await supabase
-        .from('user_stores')
-        .select('store_id')
-        .eq('user_id', user?.sub);
-
-      const storeIds = (allowedStores ?? []).map((s) => s.store_id);
-      if (!storeIds.includes(storeId)) {
-        url.pathname = '/portal/dashboard';
-        return NextResponse.redirect(url);
+        const storeIds = (allowedStores ?? []).map((s) => s.store_id);
+        if (!storeIds.includes(storeId)) {
+          url.pathname = '/portal/dashboard';
+          return NextResponse.redirect(url);
+        }
       }
     }
   }

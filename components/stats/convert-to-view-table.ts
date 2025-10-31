@@ -16,20 +16,19 @@ type DeptChangeView = {
 export const getDeptPercentChanges = (data: DeptStat[]): DeptChangeView[] => {
   if (!data?.length) return [];
 
-  // Ensure date objects
+  // Normalize dates
   const formatted = data.map((d) => ({
     ...d,
     date: new Date(d.date),
   }));
 
-  // Identify unique months (sorted latest → oldest)
+  // Identify unique months (latest → oldest)
   const months = Array.from(
     new Set(formatted.map((d) => d.date.toISOString().slice(0, 7)))
   ).sort((a, b) => (a < b ? 1 : -1)); // e.g. ['2025-09', '2025-08']
 
-  if (months.length < 2) return [];
-
-  const [currentMonth, previousMonth] = months;
+  const currentMonth = months[0];
+  const previousMonth = months[1] ?? null;
 
   // Group by department for each month
   const currentMap = new Map<string, number>();
@@ -42,7 +41,7 @@ export const getDeptPercentChanges = (data: DeptStat[]): DeptChangeView[] => {
         d.department_name,
         (currentMap.get(d.department_name) ?? 0) + d.amount
       );
-    } else if (monthKey === previousMonth) {
+    } else if (previousMonth && monthKey === previousMonth) {
       previousMap.set(
         d.department_name,
         (previousMap.get(d.department_name) ?? 0) + d.amount
@@ -50,18 +49,14 @@ export const getDeptPercentChanges = (data: DeptStat[]): DeptChangeView[] => {
     }
   });
 
-  // Merge & compute percent change
+  // Combine & compute percent change
   const allDepartments = new Set([...currentMap.keys(), ...previousMap.keys()]);
 
   return Array.from(allDepartments).map((name) => {
     const current = currentMap.get(name) ?? 0;
     const previous = previousMap.get(name) ?? 0;
     const percent_change =
-      previous === 0
-        ? current === 0
-          ? 0
-          : 100
-        : ((current - previous) / previous) * 100;
+      previous === 0 ? 0 : ((current - previous) / previous) * 100;
 
     return {
       department_name: name,

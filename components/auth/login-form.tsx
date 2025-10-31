@@ -109,6 +109,7 @@ export function LoginForm({
             <div className='grid gap-6'>
               <div className='flex flex-col gap-4'>
                 <Button
+                  type='button'
                   variant='secondary'
                   onClick={handleGoogleLogin}
                   className='w-full flex items-center justify-center gap-2'
@@ -125,10 +126,7 @@ export function LoginForm({
               <div className='grid gap-6'>
                 {mode === 'signup' && (
                   <div className='grid gap-3 relative'>
-                    <Label
-                      htmlFor='name'
-                      className='flex items-center gap-1'
-                    >
+                    <Label htmlFor='name' className='flex items-center gap-1'>
                       <User className='w-5 h-5 flex-shrink-0' />
                       Name
                     </Label>
@@ -144,10 +142,7 @@ export function LoginForm({
                   </div>
                 )}
                 <div className='grid gap-3 relative'>
-                  <Label
-                    htmlFor='email'
-                    className='flex items-center gap-1'
-                  >
+                  <Label htmlFor='email' className='flex items-center gap-1'>
                     <Mail className='w-5 h-5 flex-shrink-0' />
                     Email
                   </Label>
