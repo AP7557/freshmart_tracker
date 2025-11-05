@@ -54,7 +54,7 @@ export async function updateSession(request: NextRequest) {
     .eq('id', user?.sub)
     .single();
 
-  let role = userRecord?.role;
+  const role = userRecord?.role;
 
   // Define role-based access patterns
   const roleAccess = {

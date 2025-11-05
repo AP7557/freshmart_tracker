@@ -4,7 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { OptionsType } from '@/types/type';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import { supabaseServiceClient } from '../supabase/server-service-client';
-import { endOfToday, startOfDay, startOfToday } from 'date-fns';
+import { endOfToday, startOfToday } from 'date-fns';
 
 type PayoutsType = {
   invoice_number: string;
