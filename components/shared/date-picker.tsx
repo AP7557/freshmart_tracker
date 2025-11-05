@@ -1,5 +1,5 @@
 'use client';
-import { format } from 'date-fns';
+import { addMonths, format, subYears } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ export function DatePicker({
   setValue,
   shouldBeDisabled = true,
   formatType = 'PPP',
-  styles
+  styles,
 }: {
   placeholder: string;
   selectedValue: Date;
@@ -29,18 +29,12 @@ export function DatePicker({
   const [open, setOpen] = useState(false);
 
   const now = new Date();
-  const startMonth3YrFromNow = new Date(now.getFullYear() - 3, now.getMonth() + 5);
-  const endMonth5MtFromNow = new Date(now.getFullYear(), now.getMonth() + 5);
+  const startMonth3YrFromNow = subYears(now, 5);
+  const endMonth5MtFromNow = addMonths(now, 5);
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-    >
-      <PopoverTrigger
-        asChild
-        className='w-full'
-      >
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild className='w-full'>
         <Button
           variant='secondary'
           className={cn(
@@ -56,10 +50,7 @@ export function DatePicker({
           <CalendarIcon className='ml-auto h-4 w-4 text-primary opacity-70' />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className='w-auto p-0'
-        align='start'
-      >
+      <PopoverContent className='w-auto p-0' align='start'>
         <Calendar
           mode='single'
           selected={selectedValue}
@@ -68,16 +59,17 @@ export function DatePicker({
             setValue(date as Date);
             setOpen(false);
           }}
-
           onMonthChange={(monthDate) => {
-            const newDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+            const newDate = new Date(
+              monthDate.getFullYear(),
+              monthDate.getMonth(),
+              1
+            );
             setValue(newDate);
             setOpen(false);
           }}
-
           startMonth={startMonth3YrFromNow}
           endMonth={endMonth5MtFromNow}
-
           disabled={(date) => {
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Strip time

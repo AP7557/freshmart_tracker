@@ -7,13 +7,7 @@ import MobileTable from '../shared/mobile-table';
 import { AllPayoutsType, OptionsType } from '@/types/type';
 import { Button } from '../ui/button';
 import DesktopTable from '../shared/desktop-table';
-
-function toLocalYMD(date: Date) {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
+import { format } from 'date-fns';
 
 export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
   const [companyFilter, setCompanyFilter] = useState('');
@@ -26,9 +20,9 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
   const filtered = useMemo(() => {
     return payouts.filter((payout) => {
       const payoutDate = new Date(payout.created_at);
-      const payoutYMD = toLocalYMD(payoutDate);
-      const startYMD = startDate ? toLocalYMD(startDate) : null;
-      const endYMD = endDate ? toLocalYMD(endDate) : null;
+      const payoutYMD = format(payoutDate, 'yyyy-MM-dd');
+      const startYMD = startDate ? format(startDate, 'yyyy-MM-dd') : null;
+      const endYMD = endDate ? format(endDate, 'yyyy-MM-dd') : null;
 
       setCurrentPage(1); // Reset to page 1 on filter change
 

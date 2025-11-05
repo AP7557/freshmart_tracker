@@ -3,6 +3,7 @@
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import { supabaseServiceClient } from '../supabase/server-service-client';
+import { subMonths } from 'date-fns';
 
 type DepartmentStats = {
   amount: number;
@@ -42,8 +43,7 @@ export const getLastTwoMonthsDepartmentStats = async (storeId: number) => {
   const cacheKey = `last-two-months-department-stats-${storeId}`;
   const cachedData = unstable_cache(
     async (storeId: number) => {
-      const startOfTwoMonthsAgo = new Date();
-      startOfTwoMonthsAgo.setMonth(startOfTwoMonthsAgo.getMonth() - 2);
+      const startOfTwoMonthsAgo = subMonths(new Date(), 2);
       startOfTwoMonthsAgo.setDate(1);
 
       const { data, error } = await supabaseServiceClient
@@ -71,7 +71,6 @@ export const getLastTwoMonthsDepartmentStats = async (storeId: number) => {
           department_name: d.departments.name,
         };
       });
-
 
       return { data: formattedData };
     },

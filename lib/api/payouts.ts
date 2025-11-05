@@ -4,6 +4,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server';
 import { OptionsType } from '@/types/type';
 import { revalidateTag, unstable_cache } from 'next/cache';
 import { supabaseServiceClient } from '../supabase/server-service-client';
+import { endOfToday, startOfDay, startOfToday } from 'date-fns';
 
 type PayoutsType = {
   invoice_number: string;
@@ -98,10 +99,6 @@ export const getTodaysPayoutsCached = async (
   const cacheKey = `todays-payouts-${storeId}`;
   const cachedData = unstable_cache(
     async (storeId: number) => {
-      const now = new Date();
-      const start = new Date(now.setHours(0, 0, 0, 0));
-      const end = new Date(now.setHours(23, 59, 59, 999));
-
       const { data, error } = await supabaseServiceClient
         .from('payouts')
         .select(
@@ -113,8 +110,8 @@ export const getTodaysPayoutsCached = async (
       `
         )
         .eq('store_id', storeId)
-        .gte('created_at', start.toISOString())
-        .lte('created_at', end.toISOString());
+        .gte('created_at', startOfToday().toISOString())
+        .lte('created_at', endOfToday().toISOString());
 
       if (error) throw new Error("Error fetching today's payouts");
 
@@ -130,7 +127,6 @@ export const getTodaysPayoutsCached = async (
         type_name: p.type.name,
         store_name: storeName,
       }));
-
 
       return { payoutData };
     },
@@ -187,20 +183,19 @@ export const getPayoutsToPostCached = async (storeId: number) => {
         return 0;
       });
 
-      const payoutData = (sortedPayouts as unknown as GetPayoutsToPostType[]).map(
-        (p) => ({
-          id: p.id,
-          invoice_number: p.invoice_number,
-          amount: p.amount,
-          check_number: p.check_number,
-          date_to_withdraw: p.date_to_withdraw,
-          is_check_deposited: p.is_check_deposited,
-          company_name: p.company.name,
-          type_name: p.type.name,
-          created_at: p.created_at,
-        })
-      );
-
+      const payoutData = (
+        sortedPayouts as unknown as GetPayoutsToPostType[]
+      ).map((p) => ({
+        id: p.id,
+        invoice_number: p.invoice_number,
+        amount: p.amount,
+        check_number: p.check_number,
+        date_to_withdraw: p.date_to_withdraw,
+        is_check_deposited: p.is_check_deposited,
+        company_name: p.company.name,
+        type_name: p.type.name,
+        created_at: p.created_at,
+      }));
 
       return { payoutData };
     },
