@@ -15,6 +15,7 @@ import {
   TodaysPayoutsType,
 } from '@/types/type';
 import { getTypeBadgeStyle } from './get-badge';
+import { formatMoney } from '@/lib/utils/format-number';
 
 export default function MobileTable({
   payouts,
@@ -60,7 +61,7 @@ export default function MobileTable({
                 className={'font-semibold flex items-center gap-1 text-primary'}
               >
                 <DollarSign className='w-5 h-5 flex-shrink-0' />
-                {payout.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                {formatMoney(payout.amount)}
               </span>
             </div>
 

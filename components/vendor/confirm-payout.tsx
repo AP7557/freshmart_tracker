@@ -64,10 +64,7 @@ export default function ConfirmPayout({
   }, [confirmOpen]);
 
   return (
-    <Dialog
-      open={confirmOpen}
-      onOpenChange={setConfirmOpen}
-    >
+    <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
       <DialogContent className='max-w-md rounded-xl border border-primary bg-card shadow-lg p-6'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-primary'>
@@ -110,7 +107,7 @@ export default function ConfirmPayout({
           {values.dateToWithdraw && (
             <p className='flex items-center gap-2'>
               <Calendar className='w-5 h-5 text-primary' />
-              <strong>Date to Withdraw:</strong>{' '}
+              <strong>Date to Withdraw:</strong>
               {values.dateToWithdraw.toDateString()}
             </p>
           )}
@@ -136,10 +133,7 @@ export default function ConfirmPayout({
 
             {!canSubmit && (
               <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
-                <Progress
-                  value={progressPercent}
-                  className='w-8 h-8'
-                />
+                <Progress value={progressPercent} className='w-8 h-8' />
               </div>
             )}
           </div>

@@ -36,14 +36,13 @@ export const getAllUsersAndStores = unstable_cache(
       stores: u.user_stores.map((us) => us.stores),
     }));
 
-
     return {
       usersData: users,
       allStoresData: storeData,
     };
   },
   ['users-and-stores'], // cache key
-  { revalidate: 60 * 60, tags: ['users-and-stores'] }
+  { revalidate: 60 * 60, tags: ['users-and-stores'] } // 1 hr
 );
 
 export const updateUserRole = async (userId: string, newRole: string) => {

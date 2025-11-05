@@ -47,7 +47,7 @@ export const getGlobalOptions = async () => {
       };
     },
     [cacheKey],
-    { revalidate: 60 * 60, tags: [cacheKey] }
+    { revalidate: 60 * 60, tags: [cacheKey] } // 1 hr
   )(user.id); // Pass user.id to cache key
   return cachedData;
 };

@@ -76,6 +76,7 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
             selectedValue={companyFilter}
             placeholder='Filter by Company'
             setValue={setCompanyFilter}
+            canAddNewValues={false}
           />
           <ComboBox
             options={typeOptions}
@@ -89,7 +90,6 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
                 selectedValue={startDate as Date}
                 setValue={setStartDate}
                 placeholder='From'
-                shouldBeDisabled={false}
               />
             </div>
             <div className='w-full'>
@@ -97,7 +97,6 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
                 selectedValue={endDate as Date}
                 setValue={setEndDate}
                 placeholder='To'
-                shouldBeDisabled={false}
               />
             </div>
           </div>

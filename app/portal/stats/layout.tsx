@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { BsBoxes } from 'react-icons/bs';
+import { FaCashRegister } from 'react-icons/fa';
 
 export default function StatsLayout({
   children,
@@ -15,7 +16,7 @@ export default function StatsLayout({
 
   return (
     <div className='min-h-svh flex flex-col'>
-      <header className='w-full border-b border-border bg-primary-foreground shadow px-6 py-4'>
+      <header className='w-full border-b border-border bg-primary-foreground shadow px-6 py-4 print:hidden'>
         <div className='flex items-center justify-between'>
           <Link
             href='/portal/dashboard'
@@ -44,6 +45,14 @@ export default function StatsLayout({
             menuOpen ? 'flex' : 'hidden'
           } md:flex`}
         >
+          <Link
+            href='/portal/stats/register'
+            className='flex items-center gap-1'
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <FaCashRegister className='w-5 h-5 flex-shrink-0' />
+            Register
+          </Link>
           <Link
             href='/portal/stats/department'
             className='flex items-center gap-1'

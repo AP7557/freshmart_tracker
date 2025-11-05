@@ -15,19 +15,18 @@ export function DatePicker({
   placeholder,
   selectedValue,
   setValue,
-  shouldBeDisabled = true,
+  shouldBeDisabled,
   formatType = 'PPP',
   styles,
 }: {
   placeholder: string;
   selectedValue: Date;
   setValue: (value: Date) => void;
-  shouldBeDisabled?: boolean;
+  shouldBeDisabled?: (date: Date) => boolean;
   formatType?: string;
   styles?: object;
 }) {
   const [open, setOpen] = useState(false);
-
   const now = new Date();
   const startMonth3YrFromNow = subYears(now, 5);
   const endMonth5MtFromNow = addMonths(now, 5);
@@ -66,15 +65,10 @@ export function DatePicker({
               1
             );
             setValue(newDate);
-            setOpen(false);
           }}
           startMonth={startMonth3YrFromNow}
           endMonth={endMonth5MtFromNow}
-          disabled={(date) => {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Strip time
-            return shouldBeDisabled && date < today;
-          }}
+          disabled={shouldBeDisabled}
           captionLayout='dropdown'
           styles={styles}
         />

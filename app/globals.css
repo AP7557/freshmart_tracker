@@ -75,3 +75,11 @@
     -webkit-text-fill-color: theme('colors.foreground') !important;
   }
 }
+
+@media print {
+  .weekly-print-container,
+  .weekly-print-container * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

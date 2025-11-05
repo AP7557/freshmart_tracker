@@ -76,7 +76,7 @@ export const getLastTwoMonthsDepartmentStats = async (storeId: number) => {
     },
     [cacheKey],
     {
-      revalidate: 60 * 1440,
+      revalidate: 60 * 1440, //1 day
       tags: [cacheKey, `store-specific-data-${storeId}`],
     }
   )(storeId);

@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PostedPayoutsType } from '@/types/type';
 import { getTypeBadgeStyle } from '../shared/get-badge';
+import { formatMoney } from '@/lib/utils/format-number';
 
 export default function SwipeList({
   payout,
@@ -86,7 +87,7 @@ export default function SwipeList({
               </Badge>
               <span className='font-semibold flex items-center gap-1 text-primary'>
                 <DollarSign className='w-5 h-5 flex-shrink-0' />
-                {payout.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                {formatMoney(payout.amount)}
               </span>
             </div>
 

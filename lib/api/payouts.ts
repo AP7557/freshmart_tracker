@@ -132,9 +132,9 @@ export const getTodaysPayoutsCached = async (
     },
     [cacheKey], // base cache key
     {
-      revalidate: false,
+      revalidate: 60 * 720, // 12 hrs
       tags: [cacheKey, `store-specific-data-${storeId}`],
-    } // revalidate only when tag 'payouts' is revalidated
+    }
   );
 
   return cachedData(storeId);

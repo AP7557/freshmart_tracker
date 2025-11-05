@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet, Banknote, DollarSign, Store } from 'lucide-react';
 import { getDashboardData } from '@/lib/api/dashboard';
+import { formatMoney } from '@/lib/utils/format-number';
 
 export default async function DashboardPage() {
   const dashboardData = await getDashboardData();
@@ -44,9 +45,7 @@ export default async function DashboardPage() {
                       </div>
                       <span className='font-semibold text-primary flex items-center gap-1'>
                         <DollarSign className='w-5 h-5 flex-shrink-0' />
-                        {store.total_invoice_left
-                          .toFixed(2)
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        {formatMoney(store.total_invoice_left)}
                       </span>
                     </div>
 
@@ -57,9 +56,7 @@ export default async function DashboardPage() {
                       </div>
                       <span className='font-semibold text-primary flex items-center gap-1'>
                         <DollarSign className='w-5 h-5 flex-shrink-0' />
-                        {store.total_posted_left
-                          .toFixed(2)
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        {formatMoney(store.total_posted_left)}
                       </span>
                     </div>
                   </CardContent>

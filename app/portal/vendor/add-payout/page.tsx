@@ -274,6 +274,11 @@ export default function AddPayoutForm() {
                         placeholder='Select a date'
                         selectedValue={field.value ?? new Date()}
                         setValue={(value: Date) => field.onChange(value)}
+                        shouldBeDisabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0); // Strip time
+                          return date < today;
+                        }}
                       />
                       <FormMessage className='text-red-500 mt-1 text-sm' />
                     </FormItem>

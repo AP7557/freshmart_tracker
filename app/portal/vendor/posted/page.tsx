@@ -12,6 +12,7 @@ import DesktopTable from '@/components/shared/desktop-table';
 import { useRouter } from 'next/navigation';
 import { useGlobalData } from '@/app/portal/GlobalDataProvider';
 import { getPayoutsToPostCached, updatePayout } from '@/lib/api/payouts';
+import { formatMoney } from '@/lib/utils/format-number';
 
 export default function PostedPage() {
   const router = useRouter();
@@ -105,10 +106,7 @@ export default function PostedPage() {
                     Total Pending Payouts
                   </p>
                   <p className='text-lg font-semibold text-red-500'>
-                    $
-                    {totalPending
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    ${formatMoney(totalPending)}
                   </p>
                 </div>
                 <div className='bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-md p-4 shadow-sm text-center'>
@@ -116,11 +114,7 @@ export default function PostedPage() {
                     Remaining Balance
                   </p>
                   <p className='text-lg font-semibold text-[hsl(var(--primary))]'>
-                    {bankBalance
-                      ? `$${remainingBalance
-                          .toFixed(2)
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
-                      : '—'}
+                    {bankBalance ? `$${formatMoney(remainingBalance)}` : '—'}
                   </p>
                 </div>
               </div>

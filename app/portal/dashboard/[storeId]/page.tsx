@@ -8,6 +8,7 @@ import { StorePayoutTable } from '@/components/dashboard/store-all-payout-table'
 import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
 import { Check, Calendar, Building, Activity } from 'lucide-react';
 import { DepartmentComparisonChart } from '@/components/dashboard/department-stats-comparison-chart';
+import { formatMoney } from '@/lib/utils/format-number';
 
 export default async function StoreDetailPage({
   params,
@@ -54,7 +55,7 @@ export default async function StoreDetailPage({
                     <span>{company}</span>
                   </div>
                   <span className='font-semibold text-primary'>
-                    ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    ${formatMoney(amount)}
                   </span>
                 </div>
               )
@@ -93,10 +94,7 @@ export default async function StoreDetailPage({
                   </div>
                 </div>
                 <span className='font-semibold text-primary'>
-                  $
-                  {payout.amount
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  ${formatMoney(payout.amount)}
                 </span>
               </div>
             ))}

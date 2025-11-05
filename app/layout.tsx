@@ -42,7 +42,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <div className='min-h-svh flex flex-col'>
-            <header className='w-full border-b border-border bg-primary text-primary-foreground'>
+            <header className='w-full border-b border-border bg-primary text-primary-foreground print:hidden'>
               <div className='max-w-5xl mx-auto flex items-center justify-between px-6 py-3'>
                 <Link href='/' className='flex items-center gap-3'>
                   <Image
@@ -61,7 +61,7 @@ export default async function RootLayout({
               </div>
             </header>
             <main className='flex-1 place-content-center'>{children}</main>
-            <footer className='w-full border-t border-border bg-background text-muted-foreground text-xs'>
+            <footer className='w-full border-t border-border bg-background text-muted-foreground text-xs print:hidden'>
               <div className='max-w-5xl mx-auto flex flex-col md:flex-row justify-center px-6 py-8 gap-4'>
                 <p>
                   &copy; {new Date().getFullYear()} Freshmart. All rights

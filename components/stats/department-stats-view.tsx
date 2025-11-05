@@ -10,6 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Boxes, DollarSign } from 'lucide-react';
 import { getChangeBadgeGradient, getChangeIcon } from '../shared/get-badge';
+import { formatMoney } from '@/lib/utils/format-number';
 
 export default function DepartmentStatsView({
   viewData,
@@ -76,16 +77,10 @@ export default function DepartmentStatsView({
                   {item.department_name}
                 </TableCell>
                 <TableCell className='border border-border px-3 py-2 text-right font-semibold text-primary'>
-                  $
-                  {item.previous_amount
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  ${formatMoney(item.previous_amount)}
                 </TableCell>
                 <TableCell className='border border-border px-3 py-2 text-right font-semibold text-primary'>
-                  $
-                  {item.current_amount
-                    .toFixed(2)
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  ${formatMoney(item.current_amount)}
                 </TableCell>
                 <TableCell
                   className={cn(
@@ -130,9 +125,7 @@ export default function DepartmentStatsView({
                     }
                   >
                     <DollarSign className='w-5 h-5 flex-shrink-0' />
-                    {item.previous_amount
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    {formatMoney(item.previous_amount)}
                   </span>
                 </div>
                 <div className='flex flex-col gap-2 items-end'>
@@ -143,9 +136,7 @@ export default function DepartmentStatsView({
                     }
                   >
                     <DollarSign className='w-5 h-5 flex-shrink-0' />
-                    {item.current_amount
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    {formatMoney(item.current_amount)}
                   </span>
                 </div>
               </div>

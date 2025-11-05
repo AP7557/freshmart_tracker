@@ -25,7 +25,7 @@ export const getDashboardData = async () => {
       return data;
     },
     [cacheKey], // cache key base
-    { revalidate: 60 * 60, tags: [cacheKey] }
+    { revalidate: 60 * 60, tags: [cacheKey] } // 1 hr
   )(user.id);
 
   return cachedData;
@@ -50,7 +50,7 @@ export const getStorePayoutDetails = async (storeId: number) => {
     },
     [cacheKey], // unique static tag per store
     {
-      revalidate: 60 * 60,
+      revalidate: 60 * 60, // 1 hr
       tags: [cacheKey, `store-specific-data-${storeId}`],
     }
   )(storeId);
@@ -100,7 +100,7 @@ export const getDepartmentStatsForHeatMap = async (storeId: number) => {
     },
     [cacheKey],
     {
-      revalidate: 60 * 1440,
+      revalidate: 60 * 1440, // 1 day
       tags: [cacheKey, `store-specific-data-${storeId}`],
     }
   )(storeId);
