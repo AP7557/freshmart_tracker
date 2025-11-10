@@ -66,6 +66,24 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
   const companyOptions: OptionsType = Object.values(companies);
   const typeOptions: OptionsType = Object.values(types);
 
+  const totals = useMemo(() => {
+    if (!companyFilter) {
+      return { invoice: 0, payment: 0 };
+    }
+
+    return filtered.reduce(
+      (acc, p) => {
+        if (p.type_name.toLowerCase() === 'invoice') {
+          acc.invoice += Number(p.amount);
+        } else {
+          acc.payment += Number(p.amount);
+        }
+        return acc;
+      },
+      { invoice: 0, payment: 0 }
+    );
+  }, [filtered, companyFilter]);
+
   return (
     <div className='space-y-4'>
       {/* Filters */}
@@ -116,6 +134,23 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
           </div>
         </div>
       </div>
+
+      {companyFilter && (
+        <div className='flex justify-evenly gap-4 bg-muted/20 p-4 rounded-lg shadow-sm border border-border/50'>
+          <div className=''>
+            <span className='text-muted-foreground'>Total Invoice: </span>
+            <span className='text-blue-500 font-semibold'>
+              ${totals.invoice.toLocaleString()}
+            </span>
+          </div>
+          <div className=''>
+            <span className='text-muted-foreground'>Total Payment: </span>
+            <span className='text-green-500 font-semibold'>
+              ${totals.payment.toLocaleString()}
+            </span>
+          </div>
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <p className='text-muted-foreground text-sm text-center py-6 italic'>
