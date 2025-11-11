@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 import { Badge } from '../ui/badge';
-import { format } from 'date-fns';
 import {
   Building,
   Tag,
@@ -16,6 +15,7 @@ import {
 } from '@/types/type';
 import { getTypeBadgeStyle } from './get-badge';
 import { formatMoney } from '@/lib/utils/format-number';
+import { formatUtcAsEst } from '@/lib/utils/date-format';
 
 export default function MobileTable({
   payouts,
@@ -36,10 +36,7 @@ export default function MobileTable({
             {(payout as AllPayoutsType).created_at && (
               <div className='flex items-center gap-2 font-semibold text-foreground mb-2 justify-end'>
                 <Calendar className='w-5 h-5 flex-shrink-0' />
-                {format(
-                  new Date((payout as AllPayoutsType).created_at),
-                  'yyyy-MM-dd'
-                )}
+                {formatUtcAsEst((payout as AllPayoutsType).created_at)}
               </div>
             )}
             <p className='flex items-center gap-2 font-semibold text-foreground mb-2'>
@@ -88,7 +85,7 @@ export default function MobileTable({
                   <span>
                     <span className='font-semibold'>Date to Withdraw:</span>{' '}
                     {payout.date_to_withdraw
-                      ? format(new Date(payout.date_to_withdraw), 'MM/dd/yyyy')
+                      ? formatUtcAsEst(payout.date_to_withdraw)
                       : '--'}
                   </span>
                 </div>

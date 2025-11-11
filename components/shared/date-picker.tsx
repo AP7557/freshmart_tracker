@@ -1,5 +1,5 @@
 'use client';
-import { addMonths, format, subYears } from 'date-fns';
+import { addMonths, subYears } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -10,13 +10,13 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useState } from 'react';
+import { convertEstDateToUtc, formatUtcAsEst } from '@/lib/utils/date-format';
 
 export function DatePicker({
   placeholder,
   selectedValue,
   setValue,
   shouldBeDisabled,
-  formatType = 'PPP',
   styles,
 }: {
   placeholder: string;
@@ -42,7 +42,7 @@ export function DatePicker({
           )}
         >
           {selectedValue ? (
-            format(selectedValue, formatType)
+            formatUtcAsEst(selectedValue)
           ) : (
             <span>{placeholder}</span>
           )}
@@ -55,7 +55,8 @@ export function DatePicker({
           selected={selectedValue}
           month={selectedValue} // set the current month view
           onSelect={(date) => {
-            setValue(date as Date);
+            const utcDate = convertEstDateToUtc(date as Date);
+            setValue(utcDate); // form now stores UTC
             setOpen(false);
           }}
           onMonthChange={(monthDate) => {

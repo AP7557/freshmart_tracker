@@ -177,7 +177,6 @@ export default function DepartmentStatsPage() {
                   styles={{
                     month_grid: { display: 'none' },
                   }}
-                  formatType='MMMM yyyy'
                 />
                 <FormMessage className='text-red-500 mt-1 text-sm' />
               </FormItem>

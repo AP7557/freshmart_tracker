@@ -23,6 +23,7 @@ import z from 'zod';
 import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { Progress } from '../ui/progress';
 import { FormSchema } from '@/types/type';
+import { formatUtcAsEst } from '@/lib/utils/date-format';
 
 export default function ConfirmPayout({
   confirmOpen,
@@ -108,7 +109,7 @@ export default function ConfirmPayout({
             <p className='flex items-center gap-2'>
               <Calendar className='w-5 h-5 text-primary' />
               <strong>Date to Withdraw:</strong>
-              {values.dateToWithdraw.toDateString()}
+              {formatUtcAsEst(values.dateToWithdraw)}
             </p>
           )}
         </div>

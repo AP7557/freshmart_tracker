@@ -8,7 +8,6 @@ import {
 } from '../ui/table';
 import { cn } from '@/lib/utils';
 import { Badge } from '../ui/badge';
-import { format } from 'date-fns';
 import { Button } from '../ui/button';
 import {
   AllPayoutsType,
@@ -17,6 +16,7 @@ import {
 } from '@/types/type';
 import { getTypeBadgeStyle } from './get-badge';
 import { formatMoney } from '@/lib/utils/format-number';
+import { formatUtcAsEst } from '@/lib/utils/date-format';
 
 export default function DesktopTable({
   payouts,
@@ -69,10 +69,7 @@ export default function DesktopTable({
             >
               {(payout as AllPayoutsType).created_at && (
                 <TableCell className='border border-border px-3 py-2'>
-                  {format(
-                    new Date((payout as AllPayoutsType).created_at),
-                    'yyyy-MM-dd'
-                  )}
+                  {formatUtcAsEst((payout as AllPayoutsType).created_at)}
                 </TableCell>
               )}
               <TableCell className='border border-border px-3 py-2 font-medium text-wrap'>
@@ -100,7 +97,7 @@ export default function DesktopTable({
               </TableCell>
               <TableCell className='border border-border px-3 py-2'>
                 {payout.date_to_withdraw
-                  ? format(new Date(payout.date_to_withdraw), 'yyyy-MM-dd')
+                  ? formatUtcAsEst(payout.date_to_withdraw)
                   : '--'}
               </TableCell>
               {isActionable && (
@@ -125,9 +122,8 @@ export default function DesktopTable({
                           'text-sm text-muted-foreground mt-1 text-wrap'
                         }
                       >
-                        {`Note: This ACH payout will be marked posted after ${format(
-                          new Date(payout.date_to_withdraw),
-                          'yyyy-MM-dd'
+                        {`Note: This ACH payout will be marked posted after ${formatUtcAsEst(
+                          payout.date_to_withdraw
                         )}`}
                       </div>
                     )}

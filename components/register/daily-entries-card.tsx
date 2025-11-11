@@ -103,7 +103,6 @@ export default function DailyEntriesCard({
               <DatePicker
                 placeholder='Select date'
                 selectedValue={field.value}
-                formatType='M/dd/yyyy'
                 setValue={(value: Date) => field.onChange(value)}
                 shouldBeDisabled={isDateDisabled}
               />

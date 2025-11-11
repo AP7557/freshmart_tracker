@@ -9,6 +9,7 @@ import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
 import { Check, Calendar, Building, Activity } from 'lucide-react';
 import { DepartmentComparisonChart } from '@/components/dashboard/department-stats-comparison-chart';
 import { formatMoney } from '@/lib/utils/format-number';
+import { formatUtcAsEst } from '@/lib/utils/date-format';
 
 export default async function StoreDetailPage({
   params,
@@ -87,9 +88,7 @@ export default async function StoreDetailPage({
                     <span>
                       {payout.check_number
                         ? `Check # ${payout.check_number}`
-                        : `ACH: ${new Date(
-                            payout.date_to_withdraw!
-                          ).toLocaleDateString()}`}
+                        : `ACH: ${formatUtcAsEst(payout.date_to_withdraw!)}`}
                     </span>
                   </div>
                 </div>

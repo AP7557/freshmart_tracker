@@ -7,7 +7,7 @@ import MobileTable from '../shared/mobile-table';
 import { AllPayoutsType, OptionsType } from '@/types/type';
 import { Button } from '../ui/button';
 import DesktopTable from '../shared/desktop-table';
-import { format } from 'date-fns';
+import { endOfDay } from 'date-fns';
 
 export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
   const [companyFilter, setCompanyFilter] = useState('');
@@ -18,20 +18,19 @@ export function StorePayoutTable({ payouts }: { payouts: AllPayoutsType[] }) {
   const itemsPerPage = 10;
 
   const filtered = useMemo(() => {
-    return payouts.filter((payout) => {
-      const payoutDate = new Date(payout.created_at);
-      const payoutYMD = format(payoutDate, 'yyyy-MM-dd');
-      const startYMD = startDate ? format(startDate, 'yyyy-MM-dd') : null;
-      const endYMD = endDate ? format(endDate, 'yyyy-MM-dd') : null;
+    return payouts.filter((p) => {
+      const payoutDate = new Date(p.created_at); // UTC
+      const afterStart = startDate ? payoutDate >= startDate : true;
+      const beforeEnd = endDate ? payoutDate <= endOfDay(endDate) : true;
+
+      const companyMatch = companyFilter
+        ? p.company_name === companyFilter
+        : true;
+      const typeMatch = typeFilter ? p.type_name === typeFilter : true;
 
       setCurrentPage(1); // Reset to page 1 on filter change
 
-      return (
-        (!companyFilter || payout.company_name === companyFilter) &&
-        (!typeFilter || payout.type_name === typeFilter) &&
-        (!startYMD || payoutYMD >= startYMD) &&
-        (!endYMD || payoutYMD <= endYMD)
-      );
+      return afterStart && beforeEnd && companyMatch && typeMatch;
     });
   }, [payouts, companyFilter, typeFilter, startDate, endDate]);
 
