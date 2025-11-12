@@ -106,3 +106,35 @@ export const getDepartmentStatsForHeatMap = async (storeId: number) => {
   )(storeId);
   return cachedData;
 };
+
+export async function getRegisterWeeklyOverview(storeId: number) {
+  const { data, error } = await supabaseServiceClient.rpc(
+    'get_register_weekly_overview',
+    {
+      store: storeId,
+    }
+  );
+
+  if (error) throw error;
+
+  return (
+    (
+      data as unknown as {
+        week_start: string;
+        week_end: string;
+        total_business: number;
+        total_payment_payout: number;
+      }[]
+    ).map((d) => {
+      const startWeek = d.week_start.split('-');
+      const endWeek = d.week_end.split('-');
+      return {
+        week: `${startWeek[1]}/${startWeek[2]}/${startWeek[0].slice(-2)} ‑
+          ${endWeek[1]}/${endWeek[2]}/${endWeek[0].slice(-2)}
+        `,
+        business: d.total_business,
+        payout: d.total_payment_payout,
+      };
+    }) ?? []
+  );
+}

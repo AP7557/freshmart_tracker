@@ -7,8 +7,8 @@ import { Calendar, DollarSign, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import {
-  FieldArrayWithId,
-  useFieldArray,
+  UseFieldArrayRemove,
+  UseFieldArrayUpdate,
   UseFormReturn,
 } from 'react-hook-form';
 import {
@@ -27,7 +27,8 @@ const isDateDisabled = (date: Date) => {
 
 export default function DailyEntriesCard({
   form,
-  field,
+  removeEntry,
+  updateEntry,
   index,
   setLoading,
   weekId,
@@ -35,7 +36,8 @@ export default function DailyEntriesCard({
   cashValue,
 }: {
   form: UseFormReturn<RegisterForm>;
-  field: FieldArrayWithId<RegisterForm>;
+  removeEntry: UseFieldArrayRemove;
+  updateEntry: UseFieldArrayUpdate<RegisterForm>;
   index: number;
   setLoading: Dispatch<SetStateAction<boolean>>;
   weekId: number;
@@ -43,12 +45,9 @@ export default function DailyEntriesCard({
   cashValue: number;
 }) {
   const dirty = form.formState.dirtyFields.entries?.[index];
+  const isNew = !form.getValues(`entries.${index}.entry_id`);
   const hasChanges = dirty && Object.values(dirty).some((v) => v);
 
-  const { update: updateEntry, remove: removeEntry } = useFieldArray({
-    control: form.control,
-    name: 'entries',
-  });
   const handleSaveEntry = async (values: RegisterForm, index: number) => {
     const currentEntryValues = values.entries[index];
     setLoading(true);
@@ -84,15 +83,14 @@ export default function DailyEntriesCard({
     const currentEntryValues = form.getValues(`entries.${index}`);
     setLoading(true);
     if (currentEntryValues.entry_id) {
-      await deleteDailyEntry(currentEntryValues.entry_id).then(() => {
-        removeEntry(index);
-      });
+      await deleteDailyEntry(currentEntryValues.entry_id);
     }
+    removeEntry(index);
     setLoading(false);
   };
 
   return (
-    <div key={field.id} className='p-4 sm:p-5 lg:p-6'>
+    <div className='p-4 sm:p-5 lg:p-6'>
       <div className='space-y-4 lg:space-y-0 flex flex-col lg:flex-row lg:gap-4 lg:items-end'>
         <FormField
           control={form.control}
@@ -204,7 +202,7 @@ export default function DailyEntriesCard({
               handleSaveEntry(values, index)
             )}
             type='submit'
-            disabled={loading || !hasChanges}
+            disabled={loading || (!hasChanges && !isNew)}
             className='flex-1 lg:flex-initial bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
           >
             {form.getValues(`entries.${index}.entry_id`) ? 'Update' : 'Add'}

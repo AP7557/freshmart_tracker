@@ -1,5 +1,6 @@
 import {
   getDepartmentStatsForHeatMap,
+  getRegisterWeeklyOverview,
   getStorePayoutDetails,
 } from '@/lib/api/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,8 @@ import { Check, Calendar, Building, Activity } from 'lucide-react';
 import { DepartmentComparisonChart } from '@/components/dashboard/department-stats-comparison-chart';
 import { formatMoney } from '@/lib/utils/format-number';
 import { formatUtcAsEst } from '@/lib/utils/date-format';
+import RegisterOverviewChart from '@/components/dashboard/register-chart';
+import Link from 'next/link';
 
 export default async function StoreDetailPage({
   params,
@@ -25,8 +28,9 @@ export default async function StoreDetailPage({
   } | null = await getStorePayoutDetails(Number(storeId));
 
   const departmentStats = await getDepartmentStatsForHeatMap(Number(storeId));
-
-  if (!initialDetails || !departmentStats)
+  const registerStats = await getRegisterWeeklyOverview(Number(storeId));
+  console.log(registerStats);
+  if (!initialDetails || !departmentStats || !registerStats)
     return <Skeleton className='h-32 w-full rounded-xl animate-pulse' />;
 
   return (
@@ -100,10 +104,32 @@ export default async function StoreDetailPage({
           </CardContent>
         </Card>
       </div>
+
       <Card>
         <CardHeader>
           <CardTitle className='text-lg font-semibold text-primary'>
-            Department Trend Heatmap
+            Register
+          </CardTitle>
+        </CardHeader>
+        <CardContent className='flex flex-col items-center justify-center text-sm text-foreground'>
+          {registerStats.length !== 0 ? (
+            <RegisterOverviewChart registerStats={registerStats} />
+          ) : (
+            <div className='flex flex-col items-center justify-center space-y-2'>
+              <Activity className='h-12 w-12 text-muted-foreground' />
+              <span className='text-center text-foreground'>
+                Not enough data. Please add stats for at least one week at
+              </span>
+              <Link href='/portal/stats/register'>Register Page</Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-lg font-semibold text-primary'>
+            Department Trend
           </CardTitle>
         </CardHeader>
         <CardContent className='flex flex-col items-center justify-center text-sm text-foreground'>

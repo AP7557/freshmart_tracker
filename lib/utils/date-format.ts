@@ -1,32 +1,23 @@
-import { startOfDay, endOfDay, addMinutes, format } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
+import { toZonedTime, fromZonedTime, formatInTimeZone } from 'date-fns-tz';
 
-// EST offset
-const EST_OFFSET_MINUTES = -5 * 60; // -5 hours
+const timeZone = 'America/New_York';
 
 export function getUtcRangeFromEST(date: Date) {
-  // start/end of EST day
-  const estStart = startOfDay(date);
-  const estEnd = endOfDay(date);
+  // 1. Interpret the input date in NY time
+  const estDate = toZonedTime(date, timeZone);
 
-  // Shift EST → UTC
-  const startUtc = addMinutes(estStart, -EST_OFFSET_MINUTES);
-  const endUtc = addMinutes(estEnd, -EST_OFFSET_MINUTES);
+  // 2. Get start and end of that day in NY local time
+  const estStart = startOfDay(estDate);
+  const estEnd = endOfDay(estDate);
+
+  // 3. Convert NY local → UTC (DST-safe)
+  const startUtc = fromZonedTime(estStart, timeZone);
+  const endUtc = fromZonedTime(estEnd, timeZone);
 
   return { startUtc, endUtc };
 }
 
 export function formatUtcAsEst(utcDate: string | Date) {
-  const date = new Date(utcDate);
-  const estDate = date.toLocaleDateString('en-US', {
-    timeZone: 'America/New_York',
-  });
-
-  return format(new Date(estDate), 'yyyy-MM-dd');
-}
-
-// Convert an EST date to UTC midnight
-export function convertEstDateToUtc(estDate: Date) {
-  const estStart = startOfDay(estDate);
-  const utcDate = addMinutes(estStart, -EST_OFFSET_MINUTES);
-  return utcDate;
+  return formatInTimeZone(new Date(utcDate), timeZone, 'yyyy-MM-dd');
 }

@@ -37,7 +37,7 @@ export const getOrCreateWeekEntry = async (storeId: number) => {
 };
 
 export const createRegisterWeekWithNoPB = async (
-  pdLastWeek: string,
+  pdLastWeek: number,
   storeId: number
 ) => {
   const { weekStart, weekEnd } = getCurrentWeek();

@@ -14,6 +14,7 @@ import { MultiSelectComboBox } from './combobox-multiselect';
 import DepartmentStatsView from '../stats/department-stats-view';
 import { ComboBox } from '../shared/combobox';
 import { Button } from '../ui/button';
+import { formatMoney } from '@/lib/utils/format-number';
 
 interface DepartmentComparisonProps {
   departmentStats: {
@@ -209,7 +210,7 @@ export function DepartmentComparisonChart({
                     className='flex gap-3'
                   >
                     <div className='flex-wrap'>{name}:</div>
-                    <div>{value}</div>
+                    <div>${formatMoney(Number(value))}</div>
                   </div>
                 )}
               />

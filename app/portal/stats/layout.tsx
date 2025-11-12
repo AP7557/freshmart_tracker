@@ -6,12 +6,15 @@ import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { BsBoxes } from 'react-icons/bs';
 import { FaCashRegister } from 'react-icons/fa';
+import { useGlobalData } from '../GlobalDataProvider';
 
 export default function StatsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { userRole } = useGlobalData();
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -53,14 +56,16 @@ export default function StatsLayout({
             <FaCashRegister className='w-5 h-5 flex-shrink-0' />
             Register
           </Link>
-          <Link
-            href='/portal/stats/department'
-            className='flex items-center gap-1'
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <BsBoxes className='w-5 h-5 flex-shrink-0' />
-            Department
-          </Link>
+          {userRole === 'admin' && (
+            <Link
+              href='/portal/stats/department'
+              className='flex items-center gap-1'
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <BsBoxes className='w-5 h-5 flex-shrink-0' />
+              Department
+            </Link>
+          )}
         </nav>
       </header>
 

@@ -25,6 +25,8 @@ export default function DailyEntries({
 
   const {
     fields: entryFields,
+    update: updateEntry,
+    remove: removeEntry,
     append: appendEntry,
     replace: replaceEntry,
   } = useFieldArray({
@@ -174,7 +176,8 @@ export default function DailyEntries({
                             <div className='border-t bg-muted/20'>
                               <DailyEntriesCard
                                 form={form}
-                                field={field}
+                                removeEntry={removeEntry}
+                                updateEntry={updateEntry}
                                 index={index}
                                 loading={loading}
                                 setLoading={setLoading}
@@ -191,7 +194,8 @@ export default function DailyEntries({
                     <div className='hidden lg:block'>
                       <DailyEntriesCard
                         form={form}
-                        field={field}
+                        removeEntry={removeEntry}
+                        updateEntry={updateEntry}
                         index={index}
                         loading={loading}
                         setLoading={setLoading}

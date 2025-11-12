@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useState } from 'react';
-import { convertEstDateToUtc, formatUtcAsEst } from '@/lib/utils/date-format';
+import { formatUtcAsEst } from '@/lib/utils/date-format';
 
 export function DatePicker({
   placeholder,
@@ -55,8 +55,7 @@ export function DatePicker({
           selected={selectedValue}
           month={selectedValue} // set the current month view
           onSelect={(date) => {
-            const utcDate = convertEstDateToUtc(date as Date);
-            setValue(utcDate); // form now stores UTC
+            setValue(date as Date); // form now stores UTC
             setOpen(false);
           }}
           onMonthChange={(monthDate) => {

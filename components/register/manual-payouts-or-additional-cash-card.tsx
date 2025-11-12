@@ -6,8 +6,8 @@ import { DollarSign, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import {
-  FieldArrayWithId,
-  useFieldArray,
+  UseFieldArrayRemove,
+  UseFieldArrayUpdate,
   UseFormReturn,
 } from 'react-hook-form';
 import {
@@ -18,7 +18,8 @@ import {
 
 export default function ManualPayoutsOrAdditionalCashCard({
   form,
-  field,
+  removePayoutOrAdditionalCash,
+  updatePayoutOrAdditionalCash,
   index,
   setLoading,
   weekId,
@@ -29,7 +30,8 @@ export default function ManualPayoutsOrAdditionalCashCard({
   rpcName,
 }: {
   form: UseFormReturn<RegisterForm>;
-  field: FieldArrayWithId<RegisterForm>;
+  removePayoutOrAdditionalCash: UseFieldArrayRemove;
+  updatePayoutOrAdditionalCash: UseFieldArrayUpdate<RegisterForm>;
   index: number;
   setLoading: Dispatch<SetStateAction<boolean>>;
   weekId: number;
@@ -40,15 +42,8 @@ export default function ManualPayoutsOrAdditionalCashCard({
   rpcName: string;
 }) {
   const dirty = form.formState.dirtyFields[name]?.[index];
+  const isNew = !form.getValues(`${name}.${index}.id`);
   const hasChanges = dirty && Object.values(dirty).some((v) => v);
-
-  const {
-    remove: removePayoutOrAdditionalCash,
-    update: updatePayoutOrAdditionalCash,
-  } = useFieldArray({
-    control: form.control,
-    name,
-  });
 
   const handleSavePayoutOrAdditionalCash = async (
     values: RegisterForm,
@@ -87,17 +82,14 @@ export default function ManualPayoutsOrAdditionalCashCard({
     const currentValues = form.getValues(`${name}.${index}`);
     setLoading(true);
     if (currentValues.id) {
-      await deleteWeeklyPayoutOrAdditionalCash(currentValues.id, dbName).then(
-        () => {
-          removePayoutOrAdditionalCash(index);
-        }
-      );
+      await deleteWeeklyPayoutOrAdditionalCash(currentValues.id, dbName);
     }
+    removePayoutOrAdditionalCash(index);
     setLoading(false);
   };
 
   return (
-    <div key={field.id} className='p-4'>
+    <div className='p-4'>
       <div className='space-y-4'>
         <FormField
           control={form.control}
@@ -142,7 +134,7 @@ export default function ManualPayoutsOrAdditionalCashCard({
             onClick={form.handleSubmit((values: RegisterForm) =>
               handleSavePayoutOrAdditionalCash(values, index)
             )}
-            disabled={loading || !hasChanges}
+            disabled={loading || (!hasChanges && !isNew)}
             className='flex-1 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
           >
             {form.getValues(`${name}.${index}.id`) ? 'Update' : 'Add'}

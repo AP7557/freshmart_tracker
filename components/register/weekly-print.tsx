@@ -17,7 +17,7 @@ export default function WeeklyPrint({
   initialPb,
 }: {
   form: UseFormReturn<RegisterForm>;
-  initialPb: string;
+  initialPb: number;
 }) {
   const [totals, setTotals] = useState({
     totalEntries: {

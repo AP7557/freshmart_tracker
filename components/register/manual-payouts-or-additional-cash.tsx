@@ -34,6 +34,8 @@ export default function ManualPayoutsOrAdditionalCash({
     fields: PayoutOrAdditionalCashFields,
     append: appendPayoutOrAdditionalCash,
     replace: replacePayoutOrAdditionalCash,
+    remove: removePayoutOrAdditionalCash,
+    update: updatePayoutOrAdditionalCash,
   } = useFieldArray({
     control: form.control,
     name,
@@ -138,7 +140,12 @@ export default function ManualPayoutsOrAdditionalCash({
                             <div className='border-t bg-muted/20'>
                               <ManualPayoutsOrAdditionalCashCard
                                 form={form}
-                                field={field}
+                                removePayoutOrAdditionalCash={
+                                  removePayoutOrAdditionalCash
+                                }
+                                updatePayoutOrAdditionalCash={
+                                  updatePayoutOrAdditionalCash
+                                }
                                 index={index}
                                 loading={loading}
                                 setLoading={setLoading}
@@ -158,7 +165,12 @@ export default function ManualPayoutsOrAdditionalCash({
                     <div className='hidden lg:block'>
                       <ManualPayoutsOrAdditionalCashCard
                         form={form}
-                        field={field}
+                        removePayoutOrAdditionalCash={
+                          removePayoutOrAdditionalCash
+                        }
+                        updatePayoutOrAdditionalCash={
+                          updatePayoutOrAdditionalCash
+                        }
                         index={index}
                         loading={loading}
                         setLoading={setLoading}

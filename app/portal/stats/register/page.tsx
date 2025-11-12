@@ -70,7 +70,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const { weekStart, weekEnd } = getCurrentWeek();
   const [showInitialPbDialog, setShowInitialPbDialog] = useState(false);
-  const [initialPb, setInitialPb] = useState('');
+  const [initialPb, setInitialPb] = useState<number>(0);
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerFormSchema),
@@ -94,10 +94,11 @@ export default function RegisterPage() {
           const data = await getOrCreateWeekEntry(storeId);
           if (data) {
             if (data[0].needs_pb) {
+              setInitialPb(0);
               setShowInitialPbDialog(true);
             } else {
-              setInitialPb(data[0].pb_last_week);
-              form.setValue('weekId', data[0].id);
+              setInitialPb(data[0].last_pb);
+              form.setValue('weekId', data[0].week_id);
             }
           }
 
@@ -208,22 +209,13 @@ export default function RegisterPage() {
                   type='number'
                   placeholder='0.00'
                   value={initialPb}
-                  onChange={(e) => setInitialPb(e.target.value)}
+                  onChange={(e) => setInitialPb(Number(e.target.value))}
                   className='focus:ring-2 focus:ring-primary'
                   step='0.01'
                 />
               </div>
             </div>
             <DialogFooter className='gap-2 sm:gap-0'>
-              <Button
-                variant='outline'
-                onClick={() => {
-                  setShowInitialPbDialog(false);
-                }}
-                className='sm:mr-2'
-              >
-                Cancel
-              </Button>
               <Button
                 onClick={async () => {
                   const storeId = storeOptions.find(

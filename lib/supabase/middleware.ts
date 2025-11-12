@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
       allowedPrefixes: ['/portal/vendor/add-payout'],
     },
     manager: {
-      blockedPrefixes: ['/portal/admin', '/portal/stats'],
+      blockedPrefixes: ['/portal/admin', '/portal/stats/department'],
     },
     admin: {
       allowedPrefixes: ['/portal'], // admins can access everything

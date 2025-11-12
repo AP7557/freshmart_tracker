@@ -28,7 +28,7 @@ export default function WeeklySummary({
   initialPb,
 }: {
   form: UseFormReturn<RegisterForm>;
-  initialPb: string;
+  initialPb: number;
 }) {
   const [totals, setTotals] = useState({
     totalEntries: {

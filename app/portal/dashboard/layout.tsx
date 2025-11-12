@@ -60,25 +60,23 @@ export default function DashboardLayout({
             <GiPayMoney className='w-5 h-5 flex-shrink-0' />
             Vendor Payout
           </Link>
+          <Link
+            href='/portal/stats'
+            className='flex items-center gap-1'
+            onClick={() => setMenuOpen(false)}
+          >
+            <MdQueryStats className='w-5 h-5 flex-shrink-0' />
+            Store Stats
+          </Link>
           {userRole === 'admin' && (
-            <>
-              <Link
-                href='/portal/stats'
-                className='flex items-center gap-1'
-                onClick={() => setMenuOpen(false)}
-              >
-                <MdQueryStats className='w-5 h-5 flex-shrink-0' />
-                Store Stats
-              </Link>
-              <Link
-                href='/portal/admin/users'
-                className='flex items-center gap-1'
-                onClick={() => setMenuOpen(false)}
-              >
-                <IoPeopleOutline className='w-5 h-5 flex-shrink-0' />
-                Manage Users
-              </Link>
-            </>
+            <Link
+              href='/portal/admin/users'
+              className='flex items-center gap-1'
+              onClick={() => setMenuOpen(false)}
+            >
+              <IoPeopleOutline className='w-5 h-5 flex-shrink-0' />
+              Manage Users
+            </Link>
           )}
         </nav>
       </header>
