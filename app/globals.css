@@ -77,8 +77,25 @@
 }
 
 @media print {
-  .weekly-print-container,
-  .weekly-print-container * {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Only the outer container inherits body background & color */
+  .weekly-print-container {
+    color: black; /* default text for normal text, headings, etc */
+    background: white; /* page background */
+  }
+
+  /* Allow tables, rows, cells to keep their Tailwind colors */
+  .weekly-print-container table,
+  .weekly-print-container th,
+  .weekly-print-container td {
+    color: black;
+    background: initial;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }

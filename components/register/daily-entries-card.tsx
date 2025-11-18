@@ -76,6 +76,11 @@ export default function DailyEntriesCard({
         });
       }
     }
+
+    const sortedEntries = values.entries.sort((a, b) =>
+      a.entry_date > b.entry_date ? 1 : -1
+    );
+    form.setValue('entries', sortedEntries);
     setLoading(false);
   };
 
@@ -214,7 +219,7 @@ export default function DailyEntriesCard({
             variant='destructive'
             disabled={loading}
           >
-            <Trash2 className='h-4 w-4' />
+            <Trash2 className='w-5 h-5' />
           </Button>
         </div>
       </div>

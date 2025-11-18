@@ -46,7 +46,7 @@ export function DatePicker({
           ) : (
             <span>{placeholder}</span>
           )}
-          <CalendarIcon className='ml-auto h-4 w-4 text-primary opacity-70' />
+          <CalendarIcon className='ml-auto w-5 h-5 text-primary opacity-70' />
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-auto p-0' align='start'>

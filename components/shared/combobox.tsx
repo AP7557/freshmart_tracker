@@ -144,7 +144,7 @@ function StatusList({
                 setOpen(false);
               }}
             >
-              <Plus className='mr-2 h-4 w-4 text-primary' /> Add{' '}
+              <Plus className='mr-2 w-5 h-5 text-primary' /> Add{' '}
               <span className='text-primary'>&quot;{search}&quot;</span>{' '}
               {placeholder.split(' ')[2]}
             </Button>

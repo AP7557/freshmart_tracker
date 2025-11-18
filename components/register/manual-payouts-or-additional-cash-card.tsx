@@ -2,16 +2,11 @@ import React, { Dispatch, SetStateAction } from 'react';
 import { FormField, FormItem, FormMessage } from '../ui/form';
 import { LabelWithIcon } from '../shared/label-with-icon';
 import { Input } from '../ui/input';
-import { DollarSign, Trash2 } from 'lucide-react';
+import { Briefcase, DollarSign, Trash2,  } from 'lucide-react';
 import { Button } from '../ui/button';
 import { RegisterForm } from '@/app/portal/stats/register/page';
+import { UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
 import {
-  UseFieldArrayRemove,
-  UseFieldArrayUpdate,
-  UseFormReturn,
-} from 'react-hook-form';
-import {
-  addWeeklyPayoutOrAdditionalCash,
   deleteWeeklyPayoutOrAdditionalCash,
   updateWeeklyPayoutOrAdditionalCash,
 } from '@/lib/api/register';
@@ -19,33 +14,27 @@ import {
 export default function ManualPayoutsOrAdditionalCashCard({
   form,
   removePayoutOrAdditionalCash,
-  updatePayoutOrAdditionalCash,
   index,
   setLoading,
-  weekId,
   loading,
   name,
   title,
   dbName,
-  rpcName,
 }: {
   form: UseFormReturn<RegisterForm>;
   removePayoutOrAdditionalCash: UseFieldArrayRemove;
-  updatePayoutOrAdditionalCash: UseFieldArrayUpdate<RegisterForm>;
   index: number;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  weekId: number;
   loading: boolean;
   name: 'payouts' | 'additionalCash';
   title: string;
   dbName: string;
-  rpcName: string;
 }) {
   const dirty = form.formState.dirtyFields[name]?.[index];
   const isNew = !form.getValues(`${name}.${index}.id`);
   const hasChanges = dirty && Object.values(dirty).some((v) => v);
 
-  const handleSavePayoutOrAdditionalCash = async (
+  const handleUpdatePayoutOrAdditionalCash = async (
     values: RegisterForm,
     index: number
   ) => {
@@ -59,21 +48,6 @@ export default function ManualPayoutsOrAdditionalCashCard({
         },
         dbName
       );
-    } else {
-      const data = await addWeeklyPayoutOrAdditionalCash(
-        {
-          ...currentValues,
-          weekId,
-        },
-        rpcName
-      );
-
-      if (data) {
-        updatePayoutOrAdditionalCash(index, {
-          ...currentValues,
-          id: data,
-        });
-      }
     }
     setLoading(false);
   };
@@ -96,7 +70,7 @@ export default function ManualPayoutsOrAdditionalCashCard({
           name={`${name}.${index}.name`}
           render={({ field }) => (
             <FormItem className='space-y-2'>
-              <LabelWithIcon icon={DollarSign}>Name</LabelWithIcon>
+              <LabelWithIcon icon={Briefcase}>Name</LabelWithIcon>
               <Input
                 {...field}
                 placeholder={`Enter ${title.toLowerCase()} name`}
@@ -128,17 +102,19 @@ export default function ManualPayoutsOrAdditionalCashCard({
             </FormItem>
           )}
         />
-        <div className='flex items-end gap-2'>
-          <Button
-            type='button'
-            onClick={form.handleSubmit((values: RegisterForm) =>
-              handleSavePayoutOrAdditionalCash(values, index)
-            )}
-            disabled={loading || (!hasChanges && !isNew)}
-            className='flex-1 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
-          >
-            {form.getValues(`${name}.${index}.id`) ? 'Update' : 'Add'}
-          </Button>
+        <div className='flex justify-end items-end gap-2'>
+          {form.getValues(`${name}.${index}.id`) && (
+            <Button
+              type='button'
+              onClick={form.handleSubmit((values: RegisterForm) =>
+                handleUpdatePayoutOrAdditionalCash(values, index)
+              )}
+              disabled={loading || (!hasChanges && !isNew)}
+              className='flex-1 bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
+            >
+              Update
+            </Button>
+          )}
           <Button
             type='button'
             onClick={() => handleDeletePayoutOrAdditionalCash(index)}
@@ -146,7 +122,7 @@ export default function ManualPayoutsOrAdditionalCashCard({
             variant='destructive'
             disabled={loading}
           >
-            <Trash2 className='h-4 w-4' />
+            <Trash2 className='w-5 h-5' />
           </Button>
         </div>
       </div>

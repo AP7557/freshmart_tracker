@@ -13,7 +13,10 @@ import { Button } from '../ui/button';
 import { formatMoney } from '@/lib/utils/format-number';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import { UseFormReturn } from 'react-hook-form';
-import { updateWeeklySummary } from '@/lib/api/register';
+import {
+  addWeeklyPayoutOrAdditionalCash,
+  updateWeeklySummary,
+} from '@/lib/api/register';
 
 export type TotalEntries = {
   business: number;
@@ -98,6 +101,38 @@ export default function WeeklySummary({
   const handleSaveAndPrint = async () => {
     setLoading(true);
     const weekId = form.getValues('weekId');
+    const payouts = form.getValues('payouts');
+    const additionalCash = form.getValues('additionalCash');
+
+    const payoutInserts = payouts
+      .filter((p) => !p.id)
+      .map((p) => ({
+        week_id: weekId,
+        name: p.name,
+        amount: p.amount,
+      }));
+
+    const additionalCashInserts = additionalCash
+      .filter((p) => !p.id)
+      .map((p) => ({
+        week_id: weekId,
+        name: p.name,
+        amount: p.amount,
+      }));
+
+    if (payoutInserts.length > 0) {
+      await addWeeklyPayoutOrAdditionalCash(
+        payoutInserts,
+        'insert_weekly_payouts'
+      );
+    }
+    if (additionalCashInserts.length > 0) {
+      await addWeeklyPayoutOrAdditionalCash(
+        additionalCashInserts,
+        'insert_weekly_additional_cash'
+      );
+    }
+    
     await updateWeeklySummary(weekId, totals)
       .then(() => {
         window.print();
@@ -136,7 +171,7 @@ export default function WeeklySummary({
               <TableRow className='border-b border-border/50'>
                 <TableCell className='font-medium'>PB Last Week</TableCell>
                 <TableCell className='text-right font-medium'>
-                  ${formatMoney(totals.pbLastWeek)}
+                  ${formatMoney(totals.pbLastWeek || initialPb)}
                 </TableCell>
               </TableRow>
               <TableRow>
@@ -214,7 +249,7 @@ export default function WeeklySummary({
           onClick={handleSaveAndPrint}
           disabled={loading}
         >
-          <Save className='mr-2 h-4 w-4' />
+          <Save className='mr-2 w-5 h-5' />
           Save Week & Print
         </Button>
       </CardContent>

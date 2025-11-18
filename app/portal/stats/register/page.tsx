@@ -90,11 +90,11 @@ export default function RegisterPage() {
         const storeId = storeOptions.find((s) => s.name === storeName)?.id;
         if (storeId) {
           setLoading(true);
+          setInitialPb(0);
 
           const data = await getOrCreateWeekEntry(storeId);
           if (data) {
             if (data[0].needs_pb) {
-              setInitialPb(0);
               setShowInitialPbDialog(true);
             } else {
               setInitialPb(data[0].last_pb);
@@ -117,7 +117,7 @@ export default function RegisterPage() {
             <Form {...form}>
               <Card>
                 <CardHeader className='flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md border w-fit self-end mr-3'>
-                  <Calendar className='h-4 w-4' />
+                  <Calendar className='w-5 h-5' />
                   <span className='font-medium'>
                     {weekStart} - {weekEnd}
                   </span>
@@ -166,7 +166,7 @@ export default function RegisterPage() {
                     form={form}
                     name={'payouts'}
                     title={'Payouts'}
-                    rpcName='insert_weekly_payout'
+                    rpcName='insert_weekly_payouts'
                     dbName='register_weekly_payouts'
                   />
                   <ManualPayoutsOrAdditionalCash
@@ -238,7 +238,7 @@ export default function RegisterPage() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    <Loader2 className='mr-2 w-5 h-5 animate-spin' />
                     Creating...
                   </>
                 ) : (

@@ -1,10 +1,19 @@
-import { Plus } from 'lucide-react';
+import { Plus, SaveAll } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '../ui/card';
 import { Button } from '../ui/button';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { RegisterForm } from '@/app/portal/stats/register/page';
-import { getWeeklyPayoutOrAdditionalCash } from '@/lib/api/register';
+import {
+  addWeeklyPayoutOrAdditionalCash,
+  getWeeklyPayoutOrAdditionalCash,
+} from '@/lib/api/register';
 import {
   Accordion,
   AccordionContent,
@@ -48,6 +57,42 @@ export default function ManualPayoutsOrAdditionalCash({
     });
   };
 
+  const handleSavePayoutOrAdditionalCash = async (values: RegisterForm) => {
+    const currentValues = values[name];
+
+    const payoutOrAdditionalCashInserts = currentValues
+      .filter((p) => !p.id)
+      .map((p) => ({
+        week_id: weekId,
+        name: p.name,
+        amount: p.amount,
+      }));
+
+    if (payoutOrAdditionalCashInserts.length > 0) {
+      setLoading(true);
+
+      const data = await addWeeklyPayoutOrAdditionalCash(
+        payoutOrAdditionalCashInserts,
+        rpcName
+      );
+
+      if (data) {
+        let i = 0;
+        currentValues.forEach((p, idx) => {
+          if (!p.id) {
+            updatePayoutOrAdditionalCash(idx, {
+              ...p,
+              id: data[i],
+            });
+            i++;
+          }
+        });
+      }
+
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!weekId) return;
     (async () => {
@@ -75,20 +120,9 @@ export default function ManualPayoutsOrAdditionalCash({
   return (
     <Card className='border-border/50'>
       <CardHeader className='pb-4'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-          <CardTitle className='text-lg font-semibold text-primary'>
-            {title}
-          </CardTitle>
-          <Button
-            type='button'
-            onClick={handleAddPayoutOrAdditionalCash}
-            disabled={loading}
-            className='bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
-          >
-            <Plus className='mr-2 h-4 w-4' />
-            Add {title}
-          </Button>
-        </div>
+        <CardTitle className='text-lg font-semibold text-primary'>
+          {title}
+        </CardTitle>
       </CardHeader>
       {!loading && (
         <CardContent>
@@ -143,16 +177,11 @@ export default function ManualPayoutsOrAdditionalCash({
                                 removePayoutOrAdditionalCash={
                                   removePayoutOrAdditionalCash
                                 }
-                                updatePayoutOrAdditionalCash={
-                                  updatePayoutOrAdditionalCash
-                                }
                                 index={index}
                                 loading={loading}
                                 setLoading={setLoading}
-                                weekId={weekId}
                                 dbName={dbName}
                                 name={name}
-                                rpcName={rpcName}
                                 title={title}
                               />
                             </div>
@@ -168,16 +197,11 @@ export default function ManualPayoutsOrAdditionalCash({
                         removePayoutOrAdditionalCash={
                           removePayoutOrAdditionalCash
                         }
-                        updatePayoutOrAdditionalCash={
-                          updatePayoutOrAdditionalCash
-                        }
                         index={index}
                         loading={loading}
                         setLoading={setLoading}
-                        weekId={weekId}
                         dbName={dbName}
                         name={name}
-                        rpcName={rpcName}
                         title={title}
                       />
                     </div>
@@ -188,6 +212,30 @@ export default function ManualPayoutsOrAdditionalCash({
           )}
         </CardContent>
       )}
+      <CardFooter className='flex justify-between'>
+        <Button
+          type='button'
+          onClick={handleAddPayoutOrAdditionalCash}
+          disabled={loading}
+          className='bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
+        >
+          <Plus className='mr-2 w-5 h-5' />
+          Add {title}
+        </Button>
+        {PayoutOrAdditionalCashFields.length > 0 && (
+          <Button
+            type='button'
+            onClick={form.handleSubmit((values: RegisterForm) =>
+              handleSavePayoutOrAdditionalCash(values)
+            )}
+            disabled={loading}
+            className='bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
+          >
+            <SaveAll className='w-5 h-5' />
+            Save {title}
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   );
 }

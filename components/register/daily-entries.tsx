@@ -1,6 +1,12 @@
 import { Plus } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from '../ui/card';
 import { Button } from '../ui/button';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { RegisterForm } from '@/app/portal/stats/register/page';
@@ -88,25 +94,9 @@ export default function DailyEntries({
   return (
     <Card className='border-border/50'>
       <CardHeader className='pb-4'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-          <div>
-            <CardTitle className='text-lg font-semibold text-primary'>
-              Daily Entries
-            </CardTitle>
-            <p className='mt-1 text-sm text-muted-foreground'>
-              Track daily business transactions and cash flow
-            </p>
-          </div>
-          <Button
-            type='button'
-            onClick={handleAddEntry}
-            disabled={loading}
-            className='bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
-          >
-            <Plus className='mr-2 h-4 w-4' />
-            Add Entry
-          </Button>
-        </div>
+        <CardTitle className='text-lg font-semibold text-primary'>
+          Daily Entries
+        </CardTitle>
       </CardHeader>
       {!loading && (
         <CardContent>
@@ -210,6 +200,17 @@ export default function DailyEntries({
           )}
         </CardContent>
       )}
+      <CardFooter className='flex justify-end'>
+        <Button
+          type='button'
+          onClick={handleAddEntry}
+          disabled={loading}
+          className='bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'
+        >
+          <Plus className='mr-2 w-5 h-5' />
+          Add Entry
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

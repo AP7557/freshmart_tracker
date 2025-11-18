@@ -99,12 +99,12 @@ export default function WeeklyPrint({
       {/* Daily entries table */}
       <Table className='w-full border-collapse border border-neutral-300'>
         <TableHeader>
-          <TableRow className='bg-gray-100'>
+          <TableRow className='bg-green-300'>
             {['Date', 'Business', 'Payout', 'Cash', 'Card', 'Over/Short'].map(
               (col) => (
                 <TableHead
                   key={col}
-                  className='px-2 py-1 font-bold border text-black bg-green-300 border-neutral-300'
+                  className='px-2 py-1 font-bold border text-black border-neutral-300'
                 >
                   {col}
                 </TableHead>

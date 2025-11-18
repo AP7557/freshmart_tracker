@@ -70,7 +70,8 @@ export const getDailyEntries = async (weekId: number) => {
   const { data, error } = await supabase
     .from('register_daily_entries')
     .select('*')
-    .eq('register_week_id', weekId);
+    .eq('register_week_id', weekId)
+    .order('entry_date', { ascending: true }); // sorts by date ascending
 
   if (error) {
     console.error('Error Getting daily entry:', error);
@@ -159,19 +160,17 @@ export const getWeeklyPayoutOrAdditionalCash = async (
 };
 
 export const addWeeklyPayoutOrAdditionalCash = async (
-  values: RegisterForm['payouts'][0] & { weekId: number },
-  dbName: string
+  values: { week_id: number; name: string; amount: number }[],
+  rpcName: string
 ) => {
   const supabase = await createServerClient();
 
-  const { data, error } = await supabase.rpc(dbName, {
-    p_register_week_id: values.weekId,
-    p_name: values.name,
-    p_amount: values.amount,
+  const { data, error } = await supabase.rpc(rpcName, {
+    p_items: values,
   });
 
   if (error) {
-    console.error('Error adding weekly payout:', error);
+    console.error(`Error adding weekly :`, error);
     return null;
   }
 
