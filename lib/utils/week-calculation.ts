@@ -1,31 +1,18 @@
-/**
- * Get the ISO date string (YYYY-MM-DD) in New York time
- */
-function toNYDateString(date: Date) {
-  return date.toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-}
+export function getCurrentWeekUTC(): { weekStart: string; weekEnd: string } {
+  const nowUTC = new Date();
 
-/**
- * Get current week boundaries (Monday-Sunday) in New York time
- */
-export function getCurrentWeek(): { weekStart: string; weekEnd: string } {
-  const now = new Date();
+  const day = nowUTC.getUTCDay(); // 0=Sun..6=Sat
+  const diff = nowUTC.getUTCDate() - day + (day === 0 ? -6 : 1); // Monday calc
 
-  // Calculate Monday
-  const d = new Date(now);
-  const day = d.getDay(); // 0=Sun, 1=Mon, ...
-  const weekShift = day === 1 ? -7 : 0; // your original logic
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1) + weekShift;
-  const monday = new Date(d.setDate(diff));
-  monday.setHours(0, 0, 0, 0);
+  const monday = new Date(
+    Date.UTC(nowUTC.getUTCFullYear(), nowUTC.getUTCMonth(), diff)
+  );
 
-  // Calculate Sunday
   const sunday = new Date(monday);
-  sunday.setDate(sunday.getDate() + 6);
-  sunday.setHours(23, 59, 59, 999);
+  sunday.setUTCDate(sunday.getUTCDate() + 6);
 
   return {
-    weekStart: toNYDateString(monday), // "YYYY-MM-DD"
-    weekEnd: toNYDateString(sunday), // "YYYY-MM-DD"
+    weekStart: monday.toISOString().slice(0, 10),
+    weekEnd: sunday.toISOString().slice(0, 10),
   };
 }

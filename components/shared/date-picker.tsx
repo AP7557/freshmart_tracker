@@ -28,7 +28,7 @@ export function DatePicker({
 }) {
   const [open, setOpen] = useState(false);
   const now = new Date();
-  const startMonth3YrFromNow = subYears(now, 5);
+  const startMonth3YrFromNow = subYears(now, 3);
   const endMonth5MtFromNow = addMonths(now, 5);
 
   return (

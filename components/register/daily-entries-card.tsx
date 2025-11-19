@@ -17,12 +17,12 @@ import {
   updateDailyEntry,
 } from '@/lib/api/register';
 import { formatMoney } from '@/lib/utils/format-number';
-import { getCurrentWeek } from '@/lib/utils/week-calculation';
+import { getCurrentWeekUTC } from '@/lib/utils/week-calculation';
 
 const isDateDisabled = (date: Date) => {
-  const { weekStart, weekEnd } = getCurrentWeek();
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  return d < new Date(weekStart) || d > new Date(weekEnd);
+  const { weekStart, weekEnd } = getCurrentWeekUTC();
+  const dString = date.toISOString().slice(0, 10);
+  return dString < weekStart || dString > weekEnd;
 };
 
 export default function DailyEntriesCard({

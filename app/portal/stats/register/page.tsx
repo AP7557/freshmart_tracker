@@ -11,7 +11,7 @@ import { Store, Calendar } from 'lucide-react';
 import { ComboBox } from '@/components/shared/combobox';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
 import { useGlobalData } from '../../GlobalDataProvider';
-import { getCurrentWeek } from '@/lib/utils/week-calculation';
+import { getCurrentWeekUTC } from '@/lib/utils/week-calculation';
 
 import DailyEntries from '@/components/register/daily-entries';
 import WeeklySummary from '@/components/register/weekly-summary';
@@ -68,7 +68,7 @@ export type RegisterForm = z.infer<typeof registerFormSchema>;
 export default function RegisterPage() {
   const { storeOptions } = useGlobalData();
   const [loading, setLoading] = useState(false);
-  const { weekStart, weekEnd } = getCurrentWeek();
+  const { weekStart, weekEnd } = getCurrentWeekUTC();
   const [showInitialPbDialog, setShowInitialPbDialog] = useState(false);
   const [initialPb, setInitialPb] = useState<number>(0);
 
