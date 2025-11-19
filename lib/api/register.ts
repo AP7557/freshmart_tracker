@@ -21,6 +21,7 @@ type TotalsSummary = {
 export const getOrCreateWeekEntry = async (storeId: number) => {
   const { weekStart, weekEnd } = getCurrentWeek();
   const supabase = await createServerClient();
+  console.log('NY weekStart:', weekStart, 'NY weekEnd:', weekEnd);
 
   const { data, error } = await supabase.rpc('insert_register_week', {
     p_store_id: storeId,
