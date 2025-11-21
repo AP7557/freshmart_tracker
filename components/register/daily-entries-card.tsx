@@ -51,36 +51,56 @@ export default function DailyEntriesCard({
   const handleSaveEntry = async (values: RegisterForm, index: number) => {
     const currentEntryValues = values.entries[index];
     setLoading(true);
-    if (currentEntryValues.entry_id) {
-      const data = await updateDailyEntry({
-        ...currentEntryValues,
-      });
 
-      if (data) {
-        updateEntry(index, {
-          ...currentEntryValues,
-          cash: data[0].cash,
-        });
-      }
-    } else {
+    let savedData;
+
+    // Update case
+    if (currentEntryValues.entry_id) {
+      const data = await updateDailyEntry({ ...currentEntryValues });
+      savedData = data?.[0];
+    }
+    // Add case
+    else {
       const data = await addDailyEntry({
         ...currentEntryValues,
         weekId,
       });
-
-      if (data) {
-        updateEntry(index, {
-          ...currentEntryValues,
-          entry_id: data[0].entry_id,
-          cash: data[0].calculated_cash,
-        });
-      }
+      savedData = data?.[0];
     }
 
-    const sortedEntries = values.entries.sort((a, b) =>
+    if (!savedData) {
+      setLoading(false);
+      return;
+    }
+
+    // 1️⃣ Sort all entries
+    const sortedEntries = [...values.entries].sort((a, b) =>
       a.entry_date > b.entry_date ? 1 : -1
     );
+
+    // 2️⃣ Find which one matches this entry
+    const updatedIndex = sortedEntries.findIndex((e) => {
+      if (currentEntryValues.entry_id) {
+        return e.entry_id === currentEntryValues.entry_id;
+      }
+      return (
+        e.entry_date === currentEntryValues.entry_date && !e.entry_id // the new entry with no ID
+      );
+    });
+
+    // 3️⃣ Apply updated data to the sorted entry
+    sortedEntries[updatedIndex] = {
+      ...currentEntryValues,
+      entry_id: savedData.entry_id,
+      cash: savedData.calculated_cash ?? savedData.cash,
+    };
+
+    // 4️⃣ Save sorted + updated entries
     form.setValue('entries', sortedEntries);
+
+    // 5️⃣ Mark fields as clean
+    form.trigger(`entries.${updatedIndex}`);
+
     setLoading(false);
   };
 

@@ -29,7 +29,7 @@ export default async function StoreDetailPage({
 
   const departmentStats = await getDepartmentStatsForHeatMap(Number(storeId));
   const registerStats = await getRegisterWeeklyOverview(Number(storeId));
-  console.log(registerStats);
+
   if (!initialDetails || !departmentStats || !registerStats)
     return <Skeleton className='h-32 w-full rounded-xl animate-pulse' />;
 
