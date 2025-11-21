@@ -6,11 +6,7 @@ import { Input } from '../ui/input';
 import { Calendar, DollarSign, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { RegisterForm } from '@/app/portal/stats/register/page';
-import {
-  UseFieldArrayRemove,
-  UseFieldArrayUpdate,
-  UseFormReturn,
-} from 'react-hook-form';
+import { UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
 import {
   addDailyEntry,
   deleteDailyEntry,
