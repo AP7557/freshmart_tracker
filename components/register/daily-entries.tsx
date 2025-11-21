@@ -31,7 +31,6 @@ export default function DailyEntries({
 
   const {
     fields: entryFields,
-    update: updateEntry,
     remove: removeEntry,
     append: appendEntry,
     replace: replaceEntry,
@@ -167,7 +166,6 @@ export default function DailyEntries({
                               <DailyEntriesCard
                                 form={form}
                                 removeEntry={removeEntry}
-                                updateEntry={updateEntry}
                                 index={index}
                                 loading={loading}
                                 setLoading={setLoading}
@@ -185,7 +183,6 @@ export default function DailyEntries({
                       <DailyEntriesCard
                         form={form}
                         removeEntry={removeEntry}
-                        updateEntry={updateEntry}
                         index={index}
                         loading={loading}
                         setLoading={setLoading}

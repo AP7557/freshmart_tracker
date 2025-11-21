@@ -28,7 +28,6 @@ const isDateDisabled = (date: Date) => {
 export default function DailyEntriesCard({
   form,
   removeEntry,
-  updateEntry,
   index,
   setLoading,
   weekId,
@@ -37,7 +36,6 @@ export default function DailyEntriesCard({
 }: {
   form: UseFormReturn<RegisterForm>;
   removeEntry: UseFieldArrayRemove;
-  updateEntry: UseFieldArrayUpdate<RegisterForm>;
   index: number;
   setLoading: Dispatch<SetStateAction<boolean>>;
   weekId: number;
