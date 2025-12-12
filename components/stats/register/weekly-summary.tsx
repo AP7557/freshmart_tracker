@@ -1,6 +1,6 @@
 import { Save } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '../../ui/card';
 import {
   Table,
   TableHeader,
@@ -8,8 +8,8 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from '../ui/table';
-import { Button } from '../ui/button';
+} from '../../ui/table';
+import { Button } from '../../ui/button';
 import { formatMoney } from '@/lib/utils/format-number';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import { UseFormReturn } from 'react-hook-form';

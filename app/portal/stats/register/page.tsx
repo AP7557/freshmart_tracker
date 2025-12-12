@@ -11,10 +11,10 @@ import { Store, Calendar } from 'lucide-react';
 import { ComboBox } from '@/components/shared/combobox';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
 import { useGlobalData } from '../../GlobalDataProvider';
-import { getCurrentWeekUTC } from '@/lib/utils/week-calculation';
+import { getCurrentWeekDateUTC } from '@/lib/utils/week-calculation';
 
-import DailyEntries from '@/components/register/daily-entries';
-import WeeklySummary from '@/components/register/weekly-summary';
+import DailyEntries from '@/components/stats/register/daily-entries';
+import WeeklySummary from '@/components/stats/register/weekly-summary';
 import {
   Dialog,
   DialogContent,
@@ -30,9 +30,9 @@ import {
   createRegisterWeekWithNoPB,
   getOrCreateWeekEntry,
 } from '@/lib/api/register';
-import ManualPayoutsOrAdditionalCash from '@/components/register/manual-payouts-or-additional-cash';
+import ManualPayoutsOrAdditionalCash from '@/components/stats/register/manual-payouts-or-additional-cash';
 import { Loader2 } from 'lucide-react';
-import WeeklyPrint from '@/components/register/weekly-print';
+import WeeklyPrint from '@/components/stats/register/weekly-print';
 
 const numericField = z
   .number('This field is required')
@@ -68,7 +68,7 @@ export type RegisterForm = z.infer<typeof registerFormSchema>;
 export default function RegisterPage() {
   const { storeOptions } = useGlobalData();
   const [loading, setLoading] = useState(false);
-  const { weekStart, weekEnd } = getCurrentWeekUTC();
+  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
   const [showInitialPbDialog, setShowInitialPbDialog] = useState(false);
   const [initialPb, setInitialPb] = useState<number>(0);
 

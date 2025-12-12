@@ -1,10 +1,10 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { FormField, FormItem, FormMessage } from '../ui/form';
-import { LabelWithIcon } from '../shared/label-with-icon';
-import { DatePicker } from '../shared/date-picker';
-import { Input } from '../ui/input';
+import { FormField, FormItem, FormMessage } from '../../ui/form';
+import { LabelWithIcon } from '../../shared/label-with-icon';
+import { DatePicker } from '../../shared/date-picker';
+import { Input } from '../../ui/input';
 import { Calendar, DollarSign, Trash2 } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import { UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
 import {
@@ -13,10 +13,10 @@ import {
   updateDailyEntry,
 } from '@/lib/api/register';
 import { formatMoney } from '@/lib/utils/format-number';
-import { getCurrentWeekUTC } from '@/lib/utils/week-calculation';
+import { getCurrentWeekDateUTC } from '@/lib/utils/week-calculation';
 
 const isDateDisabled = (date: Date) => {
-  const { weekStart, weekEnd } = getCurrentWeekUTC();
+  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
   const dString = date.toISOString().slice(0, 10);
   return dString < weekStart || dString > weekEnd;
 };

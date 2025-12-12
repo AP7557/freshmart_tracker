@@ -10,7 +10,7 @@ import { AllPayoutsType, FuturePaymentsType } from '@/types/type';
 import { Check, Calendar, Building, Activity } from 'lucide-react';
 import { DepartmentComparisonChart } from '@/components/dashboard/department-stats-comparison-chart';
 import { formatMoney } from '@/lib/utils/format-number';
-import { formatUtcAsEst } from '@/lib/utils/date-format';
+import { formatUtcAsEstDate } from '@/lib/utils/date-format';
 import RegisterOverviewChart from '@/components/dashboard/register-chart';
 import Link from 'next/link';
 
@@ -92,7 +92,9 @@ export default async function StoreDetailPage({
                     <span>
                       {payout.check_number
                         ? `Check # ${payout.check_number}`
-                        : `ACH: ${formatUtcAsEst(payout.date_to_withdraw!)}`}
+                        : `ACH: ${formatUtcAsEstDate(
+                            payout.date_to_withdraw!
+                          )}`}
                     </span>
                   </div>
                 </div>

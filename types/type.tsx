@@ -35,6 +35,33 @@ export interface TodaysPayoutsType extends PayoutsType {
   store_name: string;
 }
 
+export type UserTimeLog = {
+  id: number;
+  finger_id: number;
+  store_id: number;
+  action: string;
+  timestamp_utc: string;
+  name: string;
+};
+
+type Shift = {
+  in: string;
+  out: string;
+  minutes: number;
+};
+
+type UserDay = {
+  date: string;
+  shifts: Shift[];
+};
+
+export type UserWeek = {
+  finger_id: number;
+  name: string;
+  totalMinutes: number;
+  days: Record<string, UserDay>;
+};
+
 export const FormSchema = z
   .object({
     storeName: z.string().nonempty('Store name is required'),
@@ -67,9 +94,8 @@ export const FormSchema = z
     }
   });
 
-
 export const DepartmentStatsSchema = z.object({
-  storeName: z.string().min(1, "Store is required"),
+  storeName: z.string().min(1, 'Store is required'),
   monthYear: z.date(),
   departments: z
     .array(
@@ -82,25 +108,31 @@ export const DepartmentStatsSchema = z.object({
               (val) =>
                 val === undefined ||
                 (/^\d+(\.\d{1,2})?$/.test(String(val)) && val >= 0),
-              "Amount must be a non-negative number with up to 2 decimal places"
+              'Amount must be a non-negative number with up to 2 decimal places'
             ),
         })
         .refine(
           (data) =>
             // If department has value, amount must be filled (> 0)
             !data.department || (data.amount !== undefined && data.amount > 0),
-          { message: "Amount is required when department is filled", path: ["amount"] }
+          {
+            message: 'Amount is required when department is filled',
+            path: ['amount'],
+          }
         )
         .refine(
           (data) =>
             // If amount > 0, department must be filled
             !data.amount || data.department,
-          { message: "Department is required when amount is filled", path: ["department"] }
+          {
+            message: 'Department is required when amount is filled',
+            path: ['department'],
+          }
         )
     )
-    .min(1, "At least one department required")
+    .min(1, 'At least one department required')
     .refine(
       (arr) => arr.some((d) => d.department || (d.amount && d.amount > 0)),
-      "At least one department entry must have valid data"
+      'At least one department entry must have valid data'
     ),
-}); 
+});
