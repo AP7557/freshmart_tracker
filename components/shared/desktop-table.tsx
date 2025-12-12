@@ -16,7 +16,7 @@ import {
 } from '@/types/type';
 import { getTypeBadgeStyle } from './get-badge';
 import { formatMoney } from '@/lib/utils/format-number';
-import { formatUtcAsEst } from '@/lib/utils/date-format';
+import { formatUtcAsEstDate } from '@/lib/utils/date-format';
 
 export default function DesktopTable({
   payouts,
@@ -69,7 +69,7 @@ export default function DesktopTable({
             >
               {(payout as AllPayoutsType).created_at && (
                 <TableCell className='border border-border px-3 py-2'>
-                  {formatUtcAsEst((payout as AllPayoutsType).created_at)}
+                  {formatUtcAsEstDate((payout as AllPayoutsType).created_at)}
                 </TableCell>
               )}
               <TableCell className='border border-border px-3 py-2 font-medium text-wrap'>
@@ -97,7 +97,7 @@ export default function DesktopTable({
               </TableCell>
               <TableCell className='border border-border px-3 py-2'>
                 {payout.date_to_withdraw
-                  ? formatUtcAsEst(payout.date_to_withdraw)
+                  ? formatUtcAsEstDate(payout.date_to_withdraw)
                   : '--'}
               </TableCell>
               {isActionable && (
@@ -122,7 +122,7 @@ export default function DesktopTable({
                           'text-sm text-muted-foreground mt-1 text-wrap'
                         }
                       >
-                        {`Note: This ACH payout will be marked posted after ${formatUtcAsEst(
+                        {`Note: This ACH payout will be marked posted after ${formatUtcAsEstDate(
                           payout.date_to_withdraw
                         )}`}
                       </div>
