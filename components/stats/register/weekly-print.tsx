@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table';
+} from '../../ui/table';
 import { UseFormReturn } from 'react-hook-form';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import { TotalEntries } from './weekly-summary';

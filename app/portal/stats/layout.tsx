@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { HiOutlineMenu, HiOutlineViewGrid } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { BsBoxes } from 'react-icons/bs';
-import { FaCashRegister } from 'react-icons/fa';
+import { FaBusinessTime, FaCashRegister } from 'react-icons/fa';
 import { useGlobalData } from '../GlobalDataProvider';
 
 export default function StatsLayout({
@@ -66,6 +66,14 @@ export default function StatsLayout({
               Department
             </Link>
           )}
+          <Link
+            href='/portal/stats/user-time-log'
+            className='flex items-center gap-1'
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <FaBusinessTime className='w-5 h-5 flex-shrink-0' />
+            Employee Time Log
+          </Link>
         </nav>
       </header>
 

@@ -18,6 +18,6 @@ export function getUtcRangeFromEST(date: Date) {
   return { startUtc, endUtc };
 }
 
-export function formatUtcAsEst(utcDate: string | Date) {
+export function formatUtcAsEstDate(utcDate: string | Date) {
   return formatInTimeZone(new Date(utcDate), timeZone, 'yyyy-MM-dd');
 }

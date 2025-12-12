@@ -15,7 +15,7 @@ import {
 } from '@/types/type';
 import { getTypeBadgeStyle } from './get-badge';
 import { formatMoney } from '@/lib/utils/format-number';
-import { formatUtcAsEst } from '@/lib/utils/date-format';
+import { formatUtcAsEstDate } from '@/lib/utils/date-format';
 
 export default function MobileTable({
   payouts,
@@ -36,7 +36,7 @@ export default function MobileTable({
             {(payout as AllPayoutsType).created_at && (
               <div className='flex items-center gap-2 font-semibold text-foreground mb-2 justify-end'>
                 <Calendar className='w-5 h-5 flex-shrink-0' />
-                {formatUtcAsEst((payout as AllPayoutsType).created_at)}
+                {formatUtcAsEstDate((payout as AllPayoutsType).created_at)}
               </div>
             )}
             <p className='flex items-center gap-2 font-semibold text-foreground mb-2'>
@@ -85,7 +85,7 @@ export default function MobileTable({
                   <span>
                     <span className='font-semibold'>Date to Withdraw:</span>{' '}
                     {payout.date_to_withdraw
-                      ? formatUtcAsEst(payout.date_to_withdraw)
+                      ? formatUtcAsEstDate(payout.date_to_withdraw)
                       : '--'}
                   </span>
                 </div>

@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { PostedPayoutsType } from '@/types/type';
 import { getTypeBadgeStyle } from '../shared/get-badge';
 import { formatMoney } from '@/lib/utils/format-number';
-import { formatUtcAsEst } from '@/lib/utils/date-format';
+import { formatUtcAsEstDate } from '@/lib/utils/date-format';
 
 export default function SwipeList({
   payout,
@@ -66,7 +66,7 @@ export default function SwipeList({
             {payout.created_at && (
               <div className='flex items-center gap-2 font-semibold text-foreground mb-2 justify-end'>
                 <Calendar className='w-5 h-5 flex-shrink-0' />
-                {formatUtcAsEst(payout.created_at)}
+                {formatUtcAsEstDate(payout.created_at)}
               </div>
             )}
             {/* Company */}

@@ -6,8 +6,8 @@ import {
   CardTitle,
   CardContent,
   CardFooter,
-} from '../ui/card';
-import { Button } from '../ui/button';
+} from '../../ui/card';
+import { Button } from '../../ui/button';
 import { useFieldArray, UseFormReturn } from 'react-hook-form';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 import {
@@ -19,7 +19,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '../ui/accordion';
+} from '../../ui/accordion';
 import ManualPayoutsOrAdditionalCashCard from './manual-payouts-or-additional-cash-card';
 import { formatMoney } from '@/lib/utils/format-number';
 

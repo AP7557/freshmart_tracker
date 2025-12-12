@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { useState } from 'react';
-import { formatUtcAsEst } from '@/lib/utils/date-format';
+import { formatUtcAsEstDate } from '@/lib/utils/date-format';
 
 export function DatePicker({
   placeholder,
@@ -42,7 +42,7 @@ export function DatePicker({
           )}
         >
           {selectedValue ? (
-            formatUtcAsEst(selectedValue)
+            formatUtcAsEstDate(selectedValue)
           ) : (
             <span>{placeholder}</span>
           )}

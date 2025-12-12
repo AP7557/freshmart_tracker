@@ -1,4 +1,7 @@
-export function getCurrentWeekUTC(): { weekStart: string; weekEnd: string } {
+export function getCurrentWeekDateUTC(): {
+  weekStart: string;
+  weekEnd: string;
+} {
   const nowUTC = new Date();
 
   const d = new Date(
