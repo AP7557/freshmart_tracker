@@ -14,8 +14,8 @@ export function getCurrentWeekUTC(): { weekStart: string; weekEnd: string } {
 
   const weekStart = new Date(thisMonday);
 
-  // Special rule: if today is Monday → go to last week
-  if (day === 1) {
+  // Special rule: if today is Monday/Tuesday → go to last week
+  if (day === 1 || day === 2) {
     weekStart.setUTCDate(thisMonday.getUTCDate() - 7);
   }
 

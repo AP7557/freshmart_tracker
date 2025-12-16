@@ -1,5 +1,6 @@
 import { getGlobalOptions } from '@/lib/api/lookups';
 import { GlobalDataProvider } from './GlobalDataProvider';
+import PortalHeader from './PortalHeader';
 
 export default async function PortalLayout({
   children,
@@ -20,5 +21,9 @@ export default async function PortalLayout({
     };
   }
 
-  return <GlobalDataProvider value={data}>{children}</GlobalDataProvider>;
+  return (
+    <GlobalDataProvider value={data}>
+      <PortalHeader>{children}</PortalHeader>
+    </GlobalDataProvider>
+  );
 }
