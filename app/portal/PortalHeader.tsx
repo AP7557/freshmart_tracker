@@ -17,6 +17,7 @@ import {
   MdQueryStats,
   MdPointOfSale,
   MdOutlineAccountTree,
+  MdWorkHistory,
 } from 'react-icons/md';
 import { useGlobalData } from './GlobalDataProvider';
 
@@ -174,6 +175,14 @@ export default function PortalHeader({
                           Departments
                         </Link>
                       )}
+                      <Link
+                        href='/portal/stats/user-time-log'
+                        className='flex items-center gap-1'
+                        onClick={() => setMenuOpen(!menuOpen)}
+                      >
+                        <MdWorkHistory className='w-5 h-5 flex-shrink-0' />
+                        Employee Time Log
+                      </Link>
                     </ul>
                   )}
                 </li>
