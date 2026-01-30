@@ -45,6 +45,21 @@ export function pairLogs(data: UserTimeLog[]) {
         }
       }
 
+      if (lastIn) {
+        result.push({
+          name: lastIn.name,
+          finger_id: lastIn.finger_id,
+          timeStampEst_In: toZonedTime(
+            lastIn.timestamp_utc + 'Z',
+            'America/New_York',
+          ),
+          timeStampEst_Out: toZonedTime(
+            lastIn.timestamp_utc + 'Z',
+            'America/New_York',
+          ),
+        });
+      }
+
       return result;
     });
 }
@@ -84,9 +99,12 @@ export function buildEmployeeWeeks(rawLogs: UserTimeLog[]) {
     );
 
     if (startTimestampEST in employees[pair.name].days) {
+      const inTime = pair.timeStampEst_In.toLocaleTimeString();
+      const outTime = pair.timeStampEst_Out?.toLocaleTimeString();
+
       employees[pair.name].days[startTimestampEST]?.shifts.push({
-        in: pair.timeStampEst_In.toLocaleTimeString(),
-        out: pair.timeStampEst_Out.toLocaleTimeString(),
+        in: inTime,
+        out: inTime !== outTime ? outTime : '—',
         minutes: Math.round(
           (pair.timeStampEst_Out.getTime() - pair.timeStampEst_In.getTime()) /
             60000
