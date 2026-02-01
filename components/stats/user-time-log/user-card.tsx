@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { User, Clock, DollarSign } from 'lucide-react';
@@ -10,6 +10,17 @@ export function UserCard({ user }: { user: UserWeek }) {
 
   const totalHours = user.totalMinutes / 60;
   const totalPay = (totalHours * rate).toFixed(2);
+
+  useEffect(() => {
+    const storedRate = localStorage.getItem(`${user.name}-rate`);
+    if (storedRate && storedRate != '0') {
+      setRate(Number(storedRate));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(`${user.name}-rate`, String(rate));
+  }, [rate]);
 
   return (
     <Card className='flex flex-col justify-between p-5 space-y-4 shadow-sm hover:shadow-md transition'>
@@ -48,7 +59,7 @@ export function UserCard({ user }: { user: UserWeek }) {
                 </div>
               ))}
             </div>
-          ) : null
+          ) : null,
         )}
       </div>
 
@@ -67,6 +78,7 @@ export function UserCard({ user }: { user: UserWeek }) {
             type='number'
             placeholder='$/hr'
             className='w-24'
+            value={rate !== 0 ? rate : ""}
             onChange={(e) => setRate(Number(e.target.value))}
           />
 
