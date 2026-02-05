@@ -9,9 +9,18 @@ export default async function DashboardPage() {
 
   return (
     <div className='p-6 space-y-6'>
-      <h1 className='text-3xl font-bold text-primary tracking-tight mb-4 flex items-center gap-2'>
-        <Store className='w-5 h-5 flex-shrink-0 text-primary' /> Store Dashboard
-      </h1>
+      {/* Page Header */}
+      <div className='space-y-1'>
+        <h1 className='text-2xl font-semibold tracking-tight text-primary'>
+          Store Dashboard
+        </h1>
+
+        <p className='text-sm text-muted-foreground'>
+          Overview of outstanding payouts and bank withdrawals by store
+        </p>
+      </div>
+
+      <div className='border-b pb-4' />
 
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
         {dashboardData.length === 0 ? (

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
-import { Store, Calendar } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { ComboBox } from '@/components/shared/combobox';
 import { LabelWithIcon } from '@/components/shared/label-with-icon';
 import { useGlobalData } from '../../GlobalDataProvider';
@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   createRegisterWeekWithNoPB,
   getOrCreateWeekEntry,
@@ -113,16 +113,39 @@ export default function RegisterPage() {
     <>
       <div className='min-h-screen bg-background print:hidden'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12'>
+          {/* Page Header */}
+          <div className='space-y-1'>
+            <h1 className='text-2xl font-semibold tracking-tight text-primary'>
+              Register
+            </h1>
+
+            {storeName ? (
+              <p className='text-sm text-muted-foreground'>
+                Enter daily register data for{' '}
+                <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
+                  {storeName}
+                </span>{' '}
+                for the week of{' '}
+                <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
+                  {weekStart}
+                </span>{' '}
+                to{' '}
+                <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
+                  {weekEnd}
+                </span>
+              </p>
+            ) : (
+              <p className='text-sm text-muted-foreground'>
+                Select a store to enter weekly register data
+              </p>
+            )}
+          </div>
+
+          <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b pb-4 mb-6' />
+
           <div className='space-y-6 sm:space-y-8'>
             <Form {...form}>
               <Card>
-                <CardHeader className='flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md border w-fit self-end mr-3'>
-                  <Calendar className='w-5 h-5' />
-                  <span className='font-medium'>
-                    {weekStart} - {weekEnd}
-                  </span>
-                </CardHeader>
-
                 <CardContent>
                   <FormField
                     control={form.control}

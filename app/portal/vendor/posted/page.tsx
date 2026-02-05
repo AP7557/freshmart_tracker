@@ -60,6 +60,28 @@ export default function PostedPage() {
 
   return (
     <div className='max-w-5xl mx-auto p-6 space-y-6'>
+      {/* Page Header */}
+      <div className='space-y-1'>
+        <h1 className='text-2xl font-semibold tracking-tight text-primary'>
+          Bank Withdrawals
+        </h1>
+
+        {selectedStore ? (
+          <p className='text-sm text-muted-foreground'>
+            Reviewing pending bank withdrawals for{' '}
+            <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
+              {selectedStore}
+            </span>
+          </p>
+        ) : (
+          <p className='text-sm text-muted-foreground'>
+            Select a store to review and post pending bank withdrawals
+          </p>
+        )}
+      </div>
+
+      <div className='border-b pb-4' />
+
       {/* Store Selector */}
       <Card>
         <CardHeader className='flex items-center gap-2 text-primary'>

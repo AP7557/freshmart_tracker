@@ -35,9 +35,21 @@ export default async function StoreDetailPage({
 
   return (
     <div className='max-w-5xl mx-auto p-6 space-y-6'>
-      <h1 className='text-3xl font-bold text-primary mb-6 text-center md:text-left'>
-        {initialDetails.store_name} - Store Details
-      </h1>
+      {/* Page Header */}
+      <div className='space-y-1'>
+        <h1 className='text-2xl font-semibold tracking-tight text-primary'>
+          Store Details
+        </h1>
+
+        <p className='text-sm text-muted-foreground'>
+          Viewing financial overview, payouts, and performance for{' '}
+          <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
+            {initialDetails.store_name}
+          </span>
+        </p>
+      </div>
+
+      <div className='border-b pb-4' />
 
       {/* Side by side cards on desktop */}
       <div className='flex flex-col md:flex-row md:gap-6'>

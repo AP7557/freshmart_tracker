@@ -118,133 +118,100 @@ export default function AddPayoutForm() {
   }, [storeName]);
 
   return (
-    <div className='p-6 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm max-w-5xl mx-auto'>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handlePreSubmit)}
-          className='space-y-6'
-          noValidate
-        >
-          <FormField
-            control={form.control}
-            name='storeName'
-            render={({ field }) => (
-              <FormItem className='flex flex-col'>
-                <LabelWithIcon icon={Store}>Store Name</LabelWithIcon>
-                <ComboBox
-                  options={storeOptions}
-                  selectedValue={field.value}
-                  setValue={(value: string) => form.setValue(field.name, value)}
-                  placeholder='Select a store'
-                  canAddNewValues={userRole === 'admin'}
-                />
-                <FormMessage className='text-red-500 mt-1 text-sm' />
-              </FormItem>
-            )}
-          />
-          {storeName && (
-            <>
-              <FormField
-                control={form.control}
-                name='companyName'
-                render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <LabelWithIcon icon={Briefcase}>Company</LabelWithIcon>
-                    <ComboBox
-                      options={companyOptions}
-                      selectedValue={field.value}
-                      setValue={(value: string) =>
-                        form.setValue(field.name, value)
-                      }
-                      placeholder='Select a company'
-                    />
-                    <FormMessage className='text-red-500 mt-1 text-sm' />
-                  </FormItem>
-                )}
-              />
+    <div className='max-w-5xl mx-auto p-6 space-y-6'>
+      {/* Page Header */}
+      <div className='space-y-1'>
+        <h1 className='text-2xl font-semibold tracking-tight text-primary'>
+          Add Payout
+        </h1>
 
-              <FormField
-                control={form.control}
-                name='type'
-                render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <LabelWithIcon icon={Tag}>Type</LabelWithIcon>
-                    <ComboBox
-                      options={typeOptions}
-                      selectedValue={field.value}
-                      setValue={(value: string) =>
-                        form.setValue(field.name, value)
-                      }
-                      canAddNewValues={false}
-                      placeholder='Select type'
-                    />
-                    <FormMessage className='text-red-500 mt-1 text-sm' />
-                  </FormItem>
-                )}
-              />
+        <p className='text-sm text-muted-foreground'>
+          Create and submit a new payout for a store, company, and payment type
+        </p>
+      </div>
 
-              <FormField
-                control={form.control}
-                name='amount'
-                render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <LabelWithIcon icon={DollarSign}>Amount</LabelWithIcon>
-                    <Input
-                      {...field}
-                      value={field.value === 0 ? '' : field.value}
-                      type='number'
-                      placeholder='Enter amount'
-                      className='text-base focus:ring-2 focus:ring-primary'
-                      step='0.01'
-                      onChange={(e) => {
-                        const el = e.target;
-                        // RHF's register has { valueAsNumber: true }; emulate that here:
-                        // empty -> undefined (so "required" can trigger)
-                        const next =
-                          el.value === '' ? undefined : el.valueAsNumber; // NaN if invalid
-                        field.onChange(Number.isNaN(next) ? undefined : next);
-                      }}
-                      onWheel={(e) => e.currentTarget.blur()} // prevents scroll from changing number
-                    />
-                    <FormMessage className='text-red-500 mt-1 text-sm' />
-                  </FormItem>
-                )}
-              />
+      <div className='border-b pb-4' />
 
-              <FormField
-                control={form.control}
-                name='invoiceNumber'
-                render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <LabelWithIcon icon={FileText}>
-                      Invoice Number
-                    </LabelWithIcon>
-                    <Input
-                      {...field}
-                      value={field.value ?? ''}
-                      placeholder='Enter invoice number'
-                      className='text-base focus:ring-2 focus:ring-primary'
-                    />
-                    <FormMessage className='text-red-500 mt-1 text-sm' />
-                  </FormItem>
-                )}
-              />
-
-              {type === 'Check Payment' && (
+      <div className='p-6 bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm max-w-5xl mx-auto'>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handlePreSubmit)}
+            className='space-y-6'
+            noValidate
+          >
+            <FormField
+              control={form.control}
+              name='storeName'
+              render={({ field }) => (
+                <FormItem className='flex flex-col'>
+                  <LabelWithIcon icon={Store}>Store Name</LabelWithIcon>
+                  <ComboBox
+                    options={storeOptions}
+                    selectedValue={field.value}
+                    setValue={(value: string) =>
+                      form.setValue(field.name, value)
+                    }
+                    placeholder='Select a store'
+                    canAddNewValues={userRole === 'admin'}
+                  />
+                  <FormMessage className='text-red-500 mt-1 text-sm' />
+                </FormItem>
+              )}
+            />
+            {storeName && (
+              <>
                 <FormField
                   control={form.control}
-                  name='checkNumber'
+                  name='companyName'
                   render={({ field }) => (
                     <FormItem className='flex flex-col'>
-                      <LabelWithIcon icon={CheckCircle}>
-                        Check Number
-                      </LabelWithIcon>
+                      <LabelWithIcon icon={Briefcase}>Company</LabelWithIcon>
+                      <ComboBox
+                        options={companyOptions}
+                        selectedValue={field.value}
+                        setValue={(value: string) =>
+                          form.setValue(field.name, value)
+                        }
+                        placeholder='Select a company'
+                      />
+                      <FormMessage className='text-red-500 mt-1 text-sm' />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='type'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-col'>
+                      <LabelWithIcon icon={Tag}>Type</LabelWithIcon>
+                      <ComboBox
+                        options={typeOptions}
+                        selectedValue={field.value}
+                        setValue={(value: string) =>
+                          form.setValue(field.name, value)
+                        }
+                        canAddNewValues={false}
+                        placeholder='Select type'
+                      />
+                      <FormMessage className='text-red-500 mt-1 text-sm' />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='amount'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-col'>
+                      <LabelWithIcon icon={DollarSign}>Amount</LabelWithIcon>
                       <Input
                         {...field}
-                        value={field.value ?? ''}
+                        value={field.value === 0 ? '' : field.value}
                         type='number'
-                        placeholder='Enter check number'
+                        placeholder='Enter amount'
                         className='text-base focus:ring-2 focus:ring-primary'
+                        step='0.01'
                         onChange={(e) => {
                           const el = e.target;
                           // RHF's register has { valueAsNumber: true }; emulate that here:
@@ -259,55 +226,107 @@ export default function AddPayoutForm() {
                     </FormItem>
                   )}
                 />
-              )}
 
-              {type === 'ACH Payment' && (
                 <FormField
                   control={form.control}
-                  name='dateToWithdraw'
+                  name='invoiceNumber'
                   render={({ field }) => (
                     <FormItem className='flex flex-col'>
-                      <LabelWithIcon icon={Calendar}>
-                        Date to Withdraw
+                      <LabelWithIcon icon={FileText}>
+                        Invoice Number
                       </LabelWithIcon>
-                      <DatePicker
-                        placeholder='Select a date'
-                        selectedValue={field.value ?? new Date()}
-                        setValue={(value: Date) => field.onChange(value)}
-                        shouldBeDisabled={(date) => {
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0); // Strip time
-                          return date < today;
-                        }}
+                      <Input
+                        {...field}
+                        value={field.value ?? ''}
+                        placeholder='Enter invoice number'
+                        className='text-base focus:ring-2 focus:ring-primary'
                       />
                       <FormMessage className='text-red-500 mt-1 text-sm' />
                     </FormItem>
                   )}
                 />
-              )}
 
-              <Button
-                type='submit'
-                disabled={loading}
-                className='w-full py-3 text-lg font-semibold'
-              >
-                {loading ? 'Saving...' : 'Submit Payout'}
-              </Button>
-            </>
-          )}
-        </form>
-      </Form>
+                {type === 'Check Payment' && (
+                  <FormField
+                    control={form.control}
+                    name='checkNumber'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <LabelWithIcon icon={CheckCircle}>
+                          Check Number
+                        </LabelWithIcon>
+                        <Input
+                          {...field}
+                          value={field.value ?? ''}
+                          type='number'
+                          placeholder='Enter check number'
+                          className='text-base focus:ring-2 focus:ring-primary'
+                          onChange={(e) => {
+                            const el = e.target;
+                            // RHF's register has { valueAsNumber: true }; emulate that here:
+                            // empty -> undefined (so "required" can trigger)
+                            const next =
+                              el.value === '' ? undefined : el.valueAsNumber; // NaN if invalid
+                            field.onChange(
+                              Number.isNaN(next) ? undefined : next,
+                            );
+                          }}
+                          onWheel={(e) => e.currentTarget.blur()} // prevents scroll from changing number
+                        />
+                        <FormMessage className='text-red-500 mt-1 text-sm' />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-      <ConfirmPayout
-        confirmOpen={confirmOpen}
-        setConfirmOpen={setConfirmOpen}
-        getFormValues={() => form.getValues()} // instead of pendingValues
-        handleConfirmSubmit={handleConfirmSubmit}
-        loading={loading}
-      />
+                {type === 'ACH Payment' && (
+                  <FormField
+                    control={form.control}
+                    name='dateToWithdraw'
+                    render={({ field }) => (
+                      <FormItem className='flex flex-col'>
+                        <LabelWithIcon icon={Calendar}>
+                          Date to Withdraw
+                        </LabelWithIcon>
+                        <DatePicker
+                          placeholder='Select a date'
+                          selectedValue={field.value ?? new Date()}
+                          setValue={(value: Date) => field.onChange(value)}
+                          shouldBeDisabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // Strip time
+                            return date < today;
+                          }}
+                        />
+                        <FormMessage className='text-red-500 mt-1 text-sm' />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-      <div className='mt-1'>
-        <TodaysPayouts todaysPayouts={todaysPayouts} />
+                <Button
+                  type='submit'
+                  disabled={loading}
+                  className='w-full py-3 text-lg font-semibold'
+                >
+                  {loading ? 'Saving...' : 'Submit Payout'}
+                </Button>
+              </>
+            )}
+          </form>
+        </Form>
+
+        <ConfirmPayout
+          confirmOpen={confirmOpen}
+          setConfirmOpen={setConfirmOpen}
+          getFormValues={() => form.getValues()} // instead of pendingValues
+          handleConfirmSubmit={handleConfirmSubmit}
+          loading={loading}
+        />
+
+        <div className='mt-1'>
+          <TodaysPayouts todaysPayouts={todaysPayouts} />
+        </div>
       </div>
     </div>
   );

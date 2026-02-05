@@ -116,7 +116,6 @@ export function buildEmployeeWeeks(rawLogs: UserTimeLog[]) {
           60000
       );
     }
-    console.log(employees[pair.name]);
   }
   return employees;
 }

@@ -131,7 +131,7 @@ export default function PortalHeader({
                 <li className='relative'>
                   <button
                     onClick={() => toggleSection('stats')}
-                    className='flex items-center gap-1 font-medium whitespace-nowrap'
+                    className='flex items-center gap-1 font-medium whitespace-nowrap '
                   >
                     <MdQueryStats className='w-5 h-5 flex-shrink-0' />
                     Store Stats

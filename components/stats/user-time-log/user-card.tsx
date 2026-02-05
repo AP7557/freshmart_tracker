@@ -5,7 +5,13 @@ import { User, Clock, DollarSign } from 'lucide-react';
 import { EST_WEEK_DAYS } from './pair-logs';
 import { UserWeek } from '@/types/type';
 
-export function UserCard({ user }: { user: UserWeek }) {
+export function UserCard({
+  user,
+  onPayChange,
+}: {
+  user: UserWeek;
+  onPayChange: (name: string, amount: number) => void;
+}) {
   const [rate, setRate] = useState(0);
 
   const totalHours = user.totalMinutes / 60;
@@ -16,11 +22,18 @@ export function UserCard({ user }: { user: UserWeek }) {
     if (storedRate && storedRate != '0') {
       setRate(Number(storedRate));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     localStorage.setItem(`${user.name}-rate`, String(rate));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rate]);
+
+  useEffect(() => {
+    onPayChange(`${user.name} Pay`, Number(totalPay));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalPay]);
 
   return (
     <Card className='flex flex-col justify-between p-5 space-y-4 shadow-sm hover:shadow-md transition'>
@@ -78,7 +91,7 @@ export function UserCard({ user }: { user: UserWeek }) {
             type='number'
             placeholder='$/hr'
             className='w-24'
-            value={rate !== 0 ? rate : ""}
+            value={rate !== 0 ? rate : ''}
             onChange={(e) => setRate(Number(e.target.value))}
           />
 
