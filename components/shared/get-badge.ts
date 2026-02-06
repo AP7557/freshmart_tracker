@@ -3,17 +3,25 @@ import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 export const getTypeBadgeStyle = (type: string) => {
   switch (type.toLowerCase()) {
     case 'invoice':
-      return 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white';
+      return 'bg-gradient-to-r from-slate-500 to-slate-600 text-white';
+
     case 'cash payment':
-      return 'bg-gradient-to-r from-green-500 to-emerald-500 text-white';
+      return 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white';
+
     case 'check payment':
-      return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white';
+      return 'bg-gradient-to-r from-orange-600 to-red-600 text-white';
+
+    case 'debit card payment':
+      return 'bg-gradient-to-r from-orange-500 to-orange-600 text-white';
+
     case 'ach payment':
-      return 'bg-gradient-to-r from-purple-500 to-pink-500 text-white';
+      return 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white';
+
     case 'credit':
-      return 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white';
+      return 'bg-gradient-to-r from-rose-500 to-rose-600 text-white';
+
     default:
-      return 'bg-gray-200 text-gray-800';
+      return 'bg-gradient-to-r from-slate-200 to-slate-300 text-gray-800';
   }
 };
 
