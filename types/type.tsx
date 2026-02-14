@@ -62,6 +62,12 @@ export type UserWeek = {
   days: Record<string, UserDay>;
 };
 
+export type DeviceStatus = {
+  pending_count: number;
+  last_seen: string;
+  status: string;
+}
+
 export const FormSchema = z
   .object({
     storeName: z.string().nonempty('Store name is required'),

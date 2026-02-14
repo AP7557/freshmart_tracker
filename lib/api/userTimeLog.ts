@@ -28,6 +28,27 @@ export async function getTimeLogsForWeek(storeId: number) {
 
   if (error) throw error;
 
-  console.log(data);
   return data; // Raw UTC logs
+}
+
+
+export async function getDeviceStatus(storeId: number) {
+  const supabase = await createServerClient();
+
+  const { data, error } = await supabase
+    .from('device_status')
+    .select('last_seen, pending_count')
+    .eq('store_id', storeId)
+    .single();
+
+  if (error) throw error;
+
+  const isOnline =
+    new Date(data.last_seen).getTime() >
+    Date.now() - 5 * 60 * 60 * 1000;
+
+  return {
+    ...data,
+    status: isOnline ? 'online' : 'offline',
+  };
 }
