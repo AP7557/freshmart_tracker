@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getCurrentWeekDateUTC } from '@/lib/utils/week-calculation';
+import { formatToEST } from '@/lib/utils/date-format';
 
 export default function UserLogPage() {
   const router = useRouter();
@@ -162,19 +163,39 @@ export default function UserLogPage() {
 
         {selectedStore && deviceStatus && (
           <CardContent className='flex items-center justify-between p-4'>
-            <div className='flex items-center gap-3'>
-              <div
-                className={`h-3 w-3 rounded-full ${
-                  deviceStatus.status === 'online'
-                    ? 'bg-green-500'
-                    : 'bg-red-500'
-                }`}
-              />
-              <span className='font-medium'>
-                {deviceStatus.status === 'online'
-                  ? 'Device Online'
-                  : 'Device Offline'}
-              </span>
+            <div className='flex flex-col gap-1'>
+              <div className='flex items-center gap-3'>
+                <div
+                  className={`h-3 w-3 rounded-full ${
+                    deviceStatus.status === 'online'
+                      ? 'bg-green-500'
+                      : 'bg-red-500'
+                  }`}
+                />
+                <span className='font-medium'>
+                  {deviceStatus.status === 'online'
+                    ? 'Device Online'
+                    : 'Device Offline'}
+                </span>
+              </div>
+
+              {deviceStatus.last_seen &&
+                (() => {
+                  const formatted = formatToEST(deviceStatus.last_seen);
+                  if (!formatted) return null;
+
+                  return (
+                    <span className='text-xs text-muted-foreground'>
+                      {deviceStatus.status === 'online'
+                        ? 'Last sync: '
+                        : 'Last seen: '}
+                      {formatted.relative}
+                      <span className='ml-1 opacity-70'>
+                        ({formatted.full})
+                      </span>
+                    </span>
+                  );
+                })()}
             </div>
 
             {(deviceStatus.status === 'offline' ||
