@@ -1,4 +1,3 @@
-import { getCurrentWeekDateUTC } from '@/lib/utils/week-calculation';
 import { UserTimeLog, UserWeek } from '@/types/type';
 import { addDays, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
@@ -65,9 +64,8 @@ export function pairLogs(data: UserTimeLog[]) {
 }
 
 // --- Build employee week with proper day assignment and overnight support ---
-export function buildEmployeeWeeks(rawLogs: UserTimeLog[]) {
+export function buildEmployeeWeeks(rawLogs: UserTimeLog[], weekStart: string) {
   const employees: Record<string, UserWeek> = {};
-  const { weekStart } = getCurrentWeekDateUTC();
   const pairs = pairLogs(rawLogs);
 
   for (const pair of pairs) {

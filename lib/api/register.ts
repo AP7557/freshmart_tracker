@@ -18,8 +18,7 @@ type TotalsSummary = {
   pbThisWeek: number;
 };
 
-export const getOrCreateWeekEntry = async (storeId: number) => {
-  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
+export const getOrCreateWeekEntry = async (storeId: number, weekStart: string, weekEnd: string) => {
   const supabase = await createServerClient();
 
   const { data, error } = await supabase.rpc('insert_register_week', {
@@ -38,7 +37,7 @@ export const getOrCreateWeekEntry = async (storeId: number) => {
 
 export const createRegisterWeekWithNoPB = async (
   pdLastWeek: number,
-  storeId: number
+  storeId: number,
 ) => {
   const { weekStart, weekEnd } = getCurrentWeekDateUTC();
   const supabase = await createServerClient();
@@ -82,7 +81,7 @@ export const getDailyEntries = async (weekId: number) => {
 };
 
 export const addDailyEntry = async (
-  values: RegisterForm['entries'][0] & { weekId: number }
+  values: RegisterForm['entries'][0] & { weekId: number },
 ) => {
   const supabase = await createServerClient();
 
@@ -142,7 +141,7 @@ export const deleteDailyEntry = async (id: number) => {
 
 export const getWeeklyPayoutOrAdditionalCash = async (
   weekId: number,
-  dbName: string
+  dbName: string,
 ) => {
   const supabase = await createServerClient();
 
@@ -161,7 +160,7 @@ export const getWeeklyPayoutOrAdditionalCash = async (
 
 export const addWeeklyPayoutOrAdditionalCash = async (
   values: { week_id: number; name: string; amount: number }[],
-  rpcName: string
+  rpcName: string,
 ) => {
   const supabase = await createServerClient();
 
@@ -179,7 +178,7 @@ export const addWeeklyPayoutOrAdditionalCash = async (
 
 export const updateWeeklyPayoutOrAdditionalCash = async (
   values: RegisterForm['payouts'][0],
-  dbName: string
+  dbName: string,
 ) => {
   const supabase = await createServerClient();
 
@@ -198,7 +197,7 @@ export const updateWeeklyPayoutOrAdditionalCash = async (
 
 export const deleteWeeklyPayoutOrAdditionalCash = async (
   id: number,
-  dbName: string
+  dbName: string,
 ) => {
   const supabase = await createServerClient();
 
@@ -212,7 +211,7 @@ export const deleteWeeklyPayoutOrAdditionalCash = async (
 
 export const updateWeeklySummary = async (
   id: number,
-  totals: TotalsSummary
+  totals: TotalsSummary,
 ) => {
   const supabase = await createServerClient();
 

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Store } from 'lucide-react';
 import { ComboBox } from '@/components/shared/combobox';
@@ -68,7 +69,10 @@ export type RegisterForm = z.infer<typeof registerFormSchema>;
 export default function RegisterPage() {
   const { storeOptions } = useGlobalData();
   const [loading, setLoading] = useState(false);
-  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
+  const [tab, setTab] = useState<'THIS_WEEK' | 'LAST_WEEK'>('THIS_WEEK');
+  const { weekStart, weekEnd } = getCurrentWeekDateUTC(
+    tab === 'THIS_WEEK' ? 0 : -7,
+  );
   const [showInitialPbDialog, setShowInitialPbDialog] = useState(false);
   const [initialPb, setInitialPb] = useState<number>(0);
 
@@ -76,6 +80,7 @@ export default function RegisterPage() {
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
       storeName: '',
+      weekId: undefined,
       entries: [],
       payouts: [],
       additionalCash: [],
@@ -86,28 +91,38 @@ export default function RegisterPage() {
 
   useEffect(() => {
     (async () => {
-      if (storeName) {
-        const storeId = storeOptions.find((s) => s.name === storeName)?.id;
-        if (storeId) {
-          setLoading(true);
-          setInitialPb(0);
+      if (!storeName) return;
 
-          const data = await getOrCreateWeekEntry(storeId);
-          if (data) {
-            if (data[0].needs_pb) {
-              setShowInitialPbDialog(true);
-            } else {
-              setInitialPb(data[0].last_pb);
-              form.setValue('weekId', data[0].week_id);
-            }
-          }
+      const storeId = storeOptions.find((s) => s.name === storeName)?.id;
+      if (!storeId) return;
 
-          setLoading(false);
+      setLoading(true);
+      setInitialPb(0);
+
+      const data = await getOrCreateWeekEntry(storeId, weekStart, weekEnd);
+
+      if (data?.[0]) {
+        const week = data[0];
+
+        if (week.needs_pb) {
+          setShowInitialPbDialog(true);
         }
+
+        setInitialPb(week.last_pb ?? 0);
+
+        // THE IMPORTANT PART: RESET FORM
+        form.reset({
+          storeName,
+          weekId: week.week_id,
+          entries: [],
+          payouts: [],
+          additionalCash: [],
+        });
       }
+
+      setLoading(false);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeName]);
+  }, [storeName, tab]);
 
   return (
     <>
@@ -124,14 +139,6 @@ export default function RegisterPage() {
                 Enter daily register data for{' '}
                 <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
                   {storeName}
-                </span>{' '}
-                for the week of{' '}
-                <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
-                  {weekStart}
-                </span>{' '}
-                to{' '}
-                <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
-                  {weekEnd}
                 </span>
               </p>
             ) : (
@@ -168,7 +175,39 @@ export default function RegisterPage() {
                   />
                 </CardContent>
               </Card>
-
+              {storeName && (
+                <div className='flex  justify-center'>
+                  <Tabs
+                    value={tab}
+                    onValueChange={(value) =>
+                      setTab(value as 'THIS_WEEK' | 'LAST_WEEK')
+                    }
+                  >
+                    <TabsList className='flex flex-1 flex-wrap bg-muted/60 rounded-lg p-1 gap-4'>
+                      <TabsTrigger
+                        value='LAST_WEEK'
+                        className='flex flex-col items-center'
+                      >
+                        <span>Last Week</span>
+                        <span className='font-xs text-primary'>
+                          {getCurrentWeekDateUTC(-7).weekStart} -{' '}
+                          {getCurrentWeekDateUTC(-7).weekEnd}
+                        </span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value='THIS_WEEK'
+                        className='flex flex-col items-center'
+                      >
+                        <span>This Week</span>
+                        <span className='font-xs text-primary'>
+                          {getCurrentWeekDateUTC(0).weekStart} -{' '}
+                          {getCurrentWeekDateUTC(0).weekEnd}
+                        </span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
+              )}
               {loading && (
                 <Card>
                   <CardContent className='flex items-center justify-center py-12'>
@@ -242,7 +281,7 @@ export default function RegisterPage() {
               <Button
                 onClick={async () => {
                   const storeId = storeOptions.find(
-                    (s) => s.name === storeName
+                    (s) => s.name === storeName,
                   )?.id;
 
                   if (storeId) {
@@ -251,7 +290,7 @@ export default function RegisterPage() {
                       (data) => {
                         form.setValue('weekId', data?.id);
                         setShowInitialPbDialog(false);
-                      }
+                      },
                     );
                     setLoading(false);
                   }

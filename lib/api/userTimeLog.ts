@@ -1,11 +1,9 @@
 'use server';
 
 import { createClient as createServerClient } from '@/lib/supabase/server';
-import { getCurrentWeekDateUTC } from '../utils/week-calculation';
 
-export async function getTimeLogsForWeek(storeId: number) {
+export async function getTimeLogsForWeek(storeId: number, weekStart: string) {
   const supabase = await createServerClient();
-  const { weekStart } = getCurrentWeekDateUTC(); // YYYY-MM-DD (UTC Monday)
 
   const startUtc = new Date(`${weekStart}T00:00:00Z`);
   const endUtc = new Date(startUtc);
@@ -31,7 +29,6 @@ export async function getTimeLogsForWeek(storeId: number) {
   return data; // Raw UTC logs
 }
 
-
 export async function getDeviceStatus(storeId: number) {
   const supabase = await createServerClient();
 
@@ -44,8 +41,7 @@ export async function getDeviceStatus(storeId: number) {
   if (error) throw error;
 
   const isOnline =
-    new Date(data.last_seen).getTime() >
-    Date.now() - 5 * 60 * 60 * 1000;
+    new Date(data.last_seen).getTime() > Date.now() - 5 * 60 * 60 * 1000;
 
   return {
     ...data,

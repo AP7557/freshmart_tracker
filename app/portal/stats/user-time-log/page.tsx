@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Store, CheckCircle } from 'lucide-react';
 import { useGlobalData } from '../../GlobalDataProvider';
 import { ComboBox } from '@/components/shared/combobox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Store } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserCard } from '@/components/stats/user-time-log/user-card';
 import { getDeviceStatus, getTimeLogsForWeek } from '@/lib/api/userTimeLog';
 import { buildEmployeeWeeks } from '@/components/stats/user-time-log/pair-logs';
@@ -13,8 +15,6 @@ import {
   addWeeklyPayoutOrAdditionalCash,
   getOrCreateWeekEntry,
 } from '@/lib/api/register';
-import { useRouter } from 'next/navigation';
-import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getCurrentWeekDateUTC } from '@/lib/utils/week-calculation';
 import { formatToEST } from '@/lib/utils/date-format';
@@ -22,8 +22,10 @@ import { formatToEST } from '@/lib/utils/date-format';
 export default function UserLogPage() {
   const router = useRouter();
   const { storeOptions } = useGlobalData();
-  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
-
+  const [tab, setTab] = useState<'THIS_WEEK' | 'LAST_WEEK'>('THIS_WEEK');
+  const { weekStart, weekEnd } = getCurrentWeekDateUTC(
+    tab === 'THIS_WEEK' ? 0 : -7,
+  );
   const [selectedStore, setSelectedStore] = useState<string>('');
   const [users, setUsers] = useState<Record<string, UserWeek>>({});
   const [payroll, setPayroll] = useState<Record<string, number>>({});
@@ -47,18 +49,13 @@ export default function UserLogPage() {
     try {
       setSubmitting(true);
 
-      const payoutOrAdditionalCashInserts = Object.entries(payroll).map(
-        ([name, amount]) => ({
-          week_id: weekId,
-          name,
-          amount,
-        }),
-      );
+      const payouts = Object.entries(payroll).map(([name, amount]) => ({
+        week_id: weekId,
+        name,
+        amount,
+      }));
 
-      await addWeeklyPayoutOrAdditionalCash(
-        payoutOrAdditionalCashInserts,
-        'insert_weekly_payouts',
-      );
+      await addWeeklyPayoutOrAdditionalCash(payouts, 'insert_weekly_payouts');
 
       setSuccess(true);
 
@@ -84,9 +81,9 @@ export default function UserLogPage() {
       setDeviceStatus(null); // reset when changing stores
 
       try {
-        const rawLogs = await getTimeLogsForWeek(storeId);
-        const grouped = buildEmployeeWeeks(rawLogs);
-        const data = await getOrCreateWeekEntry(storeId);
+        const rawLogs = await getTimeLogsForWeek(storeId, weekStart);
+        const grouped = buildEmployeeWeeks(rawLogs, weekStart);
+        const data = await getOrCreateWeekEntry(storeId, weekStart, weekEnd);
         const status = await getDeviceStatus(storeId);
 
         if (status) {
@@ -106,7 +103,7 @@ export default function UserLogPage() {
     }
 
     fetchLogs();
-  }, [selectedStore, storeOptions]);
+  }, [selectedStore, storeOptions, tab]);
 
   const isDeviceBlockingPayroll =
     deviceStatus &&
@@ -126,14 +123,6 @@ export default function UserLogPage() {
             Viewing time logs for{' '}
             <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
               {selectedStore}
-            </span>{' '}
-            for the week of{' '}
-            <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
-              {weekStart}
-            </span>{' '}
-            to{' '}
-            <span className='font-medium text-primary underline decoration-primary underline-offset-2'>
-              {weekEnd}
             </span>
           </p>
         ) : (
@@ -211,6 +200,39 @@ export default function UserLogPage() {
         )}
       </Card>
 
+      {selectedStore && (
+        <div className='flex  justify-center'>
+          <Tabs
+            value={tab}
+            onValueChange={(value) =>
+              setTab(value as 'THIS_WEEK' | 'LAST_WEEK')
+            }
+          >
+            <TabsList className='flex flex-1 flex-wrap bg-muted/60 rounded-lg p-1 gap-4'>
+              <TabsTrigger
+                value='LAST_WEEK'
+                className='flex flex-col items-center'
+              >
+                <span>Last Week</span>
+                <span className='font-xs text-primary'>
+                  {getCurrentWeekDateUTC(-7).weekStart} -{' '}
+                  {getCurrentWeekDateUTC(-7).weekEnd}
+                </span>
+              </TabsTrigger>
+              <TabsTrigger
+                value='THIS_WEEK'
+                className='flex flex-col items-center'
+              >
+                <span>This Week</span>
+                <span className='font-xs text-primary'>
+                  {getCurrentWeekDateUTC(0).weekStart} -{' '}
+                  {getCurrentWeekDateUTC(0).weekEnd}
+                </span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
       {/* User Cards */}
       {selectedStore && (
         <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6'>

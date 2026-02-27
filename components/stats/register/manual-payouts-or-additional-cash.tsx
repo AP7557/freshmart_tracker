@@ -73,7 +73,7 @@ export default function ManualPayoutsOrAdditionalCash({
 
       const data = await addWeeklyPayoutOrAdditionalCash(
         payoutOrAdditionalCashInserts,
-        rpcName
+        rpcName,
       );
 
       if (data) {
@@ -99,18 +99,13 @@ export default function ManualPayoutsOrAdditionalCash({
       setLoading(true);
       const data = await getWeeklyPayoutOrAdditionalCash(weekId, dbName);
 
-      if (data && data.length > 0) {
-        // Map the data to match your field array structure if needed
-        const formatted = data.map((entry) => {
-          return {
-            name: entry.name,
-            amount: entry.amount,
-            id: entry.id,
-          };
-        });
-        // Populate the field array
-        replacePayoutOrAdditionalCash(formatted);
-      }
+      const formatted = (data ?? []).map((entry) => ({
+        name: entry.name,
+        amount: entry.amount,
+        id: entry.id,
+      }));
+
+      replacePayoutOrAdditionalCash(formatted);
 
       setLoading(false);
     })();
@@ -226,7 +221,7 @@ export default function ManualPayoutsOrAdditionalCash({
           <Button
             type='button'
             onClick={form.handleSubmit((values: RegisterForm) =>
-              handleSavePayoutOrAdditionalCash(values)
+              handleSavePayoutOrAdditionalCash(values),
             )}
             disabled={loading}
             className='bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary text-primary-foreground'

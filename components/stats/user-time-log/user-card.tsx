@@ -22,17 +22,17 @@ export function UserCard({
     if (storedRate && storedRate != '0') {
       setRate(Number(storedRate));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     localStorage.setItem(`${user.name}-rate`, String(rate));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rate]);
 
   useEffect(() => {
-    onPayChange(`${user.name} Pay`, Number(totalPay));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    onPayChange(`${user.name} Pay`, Math.round(Number(totalPay)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalPay]);
 
   return (
