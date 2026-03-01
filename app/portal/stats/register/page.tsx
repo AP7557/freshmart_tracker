@@ -122,7 +122,8 @@ export default function RegisterPage() {
 
       setLoading(false);
     })();
-  }, [storeName, tab]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeName, storeOptions, tab]);
 
   return (
     <>
@@ -176,37 +177,50 @@ export default function RegisterPage() {
                 </CardContent>
               </Card>
               {storeName && (
-                <div className='flex  justify-center'>
-                  <Tabs
-                    value={tab}
-                    onValueChange={(value) =>
-                      setTab(value as 'THIS_WEEK' | 'LAST_WEEK')
-                    }
-                  >
-                    <TabsList className='flex flex-1 flex-wrap bg-muted/60 rounded-lg p-1 gap-4'>
-                      <TabsTrigger
-                        value='LAST_WEEK'
-                        className='flex flex-col items-center'
+                <Card className='w-full max-w-md mx-auto'>
+                  <CardContent>
+                    <Tabs
+                      value={tab}
+                      onValueChange={(value) =>
+                        setTab(value as 'THIS_WEEK' | 'LAST_WEEK')
+                      }
+                      className='w-full'
+                    >
+                      <TabsList
+                        className='
+                          grid
+                          grid-cols-1
+                          md:grid-cols-2
+                          flex-1
+                          w-full
+                          bg-secondary/10 
+                        '
                       >
-                        <span>Last Week</span>
-                        <span className='font-xs text-primary'>
-                          {getCurrentWeekDateUTC(-7).weekStart} -{' '}
-                          {getCurrentWeekDateUTC(-7).weekEnd}
-                        </span>
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value='THIS_WEEK'
-                        className='flex flex-col items-center'
-                      >
-                        <span>This Week</span>
-                        <span className='font-xs text-primary'>
-                          {getCurrentWeekDateUTC(0).weekStart} -{' '}
-                          {getCurrentWeekDateUTC(0).weekEnd}
-                        </span>
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
+                        <TabsTrigger
+                          value='LAST_WEEK'
+                          className='flex flex-col items-center justify-center text-center py-2'
+                        >
+                          <span className='text-sm font-medium'>Last Week</span>
+                          <span className='text-xs text-muted-foreground'>
+                            {getCurrentWeekDateUTC(-7).weekStart} -{' '}
+                            {getCurrentWeekDateUTC(-7).weekEnd}
+                          </span>
+                        </TabsTrigger>
+
+                        <TabsTrigger
+                          value='THIS_WEEK'
+                          className='flex flex-col items-center justify-center text-center py-2'
+                        >
+                          <span className='text-sm font-medium'>This Week</span>
+                          <span className='text-xs text-muted-foreground'>
+                            {getCurrentWeekDateUTC(0).weekStart} -{' '}
+                            {getCurrentWeekDateUTC(0).weekEnd}
+                          </span>
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </CardContent>
+                </Card>
               )}
               {loading && (
                 <Card>
@@ -223,7 +237,11 @@ export default function RegisterPage() {
 
               {!loading && storeName && (
                 <div className='space-y-6 sm:space-y-8'>
-                  <DailyEntries form={form} />
+                  <DailyEntries
+                    form={form}
+                    weekStart={weekStart}
+                    weekEnd={weekEnd}
+                  />
                   <ManualPayoutsOrAdditionalCash
                     form={form}
                     name={'payouts'}
@@ -286,12 +304,15 @@ export default function RegisterPage() {
 
                   if (storeId) {
                     setLoading(true);
-                    await createRegisterWeekWithNoPB(initialPb, storeId).then(
-                      (data) => {
-                        form.setValue('weekId', data?.id);
-                        setShowInitialPbDialog(false);
-                      },
-                    );
+                    await createRegisterWeekWithNoPB(
+                      initialPb,
+                      storeId,
+                      weekStart,
+                      weekEnd,
+                    ).then((data) => {
+                      form.setValue('weekId', data?.id);
+                      setShowInitialPbDialog(false);
+                    });
                     setLoading(false);
                   }
                 }}

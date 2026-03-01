@@ -22,8 +22,12 @@ import { formatMoney } from '@/lib/utils/format-number';
 
 export default function DailyEntries({
   form,
+  weekStart,
+  weekEnd,
 }: {
   form: UseFormReturn<RegisterForm>;
+  weekStart: string;
+  weekEnd: string;
 }) {
   const [loading, setLoading] = useState(false);
   form.watch('entries');
@@ -39,15 +43,26 @@ export default function DailyEntries({
     name: 'entries',
   });
 
-  const d = new Date();
   const handleAddEntry = () => {
     if (entryFields.length >= 7) {
       alert('You can only add up to 7 entries per week.');
       return;
     }
 
+    const existingDates = entryFields.map((e) =>
+      new Date(e.entry_date).toISOString().slice(0, 10),
+    );
+
+    const date = new Date(weekStart);
+    while (
+      existingDates.includes(date.toISOString().slice(0, 10)) &&
+      date.toISOString().slice(0, 10) <= weekEnd
+    ) {
+      date.setDate(date.getDate() + 1);
+    }
+
     appendEntry({
-      entry_date: new Date(d.setDate(d.getDate() - 1)),
+      entry_date: date,
       business: 0,
       payout: 0,
       card: 0,
@@ -171,6 +186,8 @@ export default function DailyEntries({
                                 setLoading={setLoading}
                                 weekId={weekId}
                                 cashValue={cash}
+                                weekStart={weekStart}
+                                weekEnd={weekEnd}
                               />
                             </div>
                           </AccordionContent>
@@ -188,6 +205,8 @@ export default function DailyEntries({
                         setLoading={setLoading}
                         weekId={weekId}
                         cashValue={cash}
+                        weekStart={weekStart}
+                        weekEnd={weekEnd}
                       />
                     </div>
                   </div>

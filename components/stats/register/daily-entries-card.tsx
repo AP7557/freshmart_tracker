@@ -13,10 +13,8 @@ import {
   updateDailyEntry,
 } from '@/lib/api/register';
 import { formatMoney } from '@/lib/utils/format-number';
-import { getCurrentWeekDateUTC } from '@/lib/utils/week-calculation';
 
-const isDateDisabled = (date: Date) => {
-  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
+const isDateDisabled = (date: Date, weekStart: string, weekEnd: string) => {
   const dString = date.toISOString().slice(0, 10);
   return dString < weekStart || dString > weekEnd;
 };
@@ -29,6 +27,8 @@ export default function DailyEntriesCard({
   weekId,
   loading,
   cashValue,
+  weekStart,
+  weekEnd,
 }: {
   form: UseFormReturn<RegisterForm>;
   removeEntry: UseFieldArrayRemove;
@@ -37,6 +37,8 @@ export default function DailyEntriesCard({
   weekId: number;
   loading: boolean;
   cashValue: number;
+  weekStart: string;
+  weekEnd: string;
 }) {
   const dirty = form.formState.dirtyFields.entries?.[index];
   const isNew = !form.getValues(`entries.${index}.entry_id`);
@@ -69,7 +71,7 @@ export default function DailyEntriesCard({
 
     // 1️⃣ Sort all entries
     const sortedEntries = [...values.entries].sort((a, b) =>
-      a.entry_date > b.entry_date ? 1 : -1
+      a.entry_date > b.entry_date ? 1 : -1,
     );
 
     // 2️⃣ Find which one matches this entry
@@ -121,7 +123,9 @@ export default function DailyEntriesCard({
                 placeholder='Select date'
                 selectedValue={field.value}
                 setValue={(value: Date) => field.onChange(value)}
-                shouldBeDisabled={isDateDisabled}
+                shouldBeDisabled={(date) =>
+                  isDateDisabled(date, weekStart, weekEnd)
+                }
               />
               <FormMessage className='text-red-500 mt-1 text-sm' />
             </FormItem>
@@ -218,7 +222,7 @@ export default function DailyEntriesCard({
         <div className='flex items-end gap-2 lg:col-span-2'>
           <Button
             onClick={form.handleSubmit((values: RegisterForm) =>
-              handleSaveEntry(values, index)
+              handleSaveEntry(values, index),
             )}
             type='submit'
             disabled={loading || (!hasChanges && !isNew)}

@@ -1,7 +1,5 @@
 'use server';
 import { createClient as createServerClient } from '@/lib/supabase/server';
-
-import { getCurrentWeekDateUTC } from '../utils/week-calculation';
 import { RegisterForm } from '@/app/portal/stats/register/page';
 
 type TotalsSummary = {
@@ -18,7 +16,11 @@ type TotalsSummary = {
   pbThisWeek: number;
 };
 
-export const getOrCreateWeekEntry = async (storeId: number, weekStart: string, weekEnd: string) => {
+export const getOrCreateWeekEntry = async (
+  storeId: number,
+  weekStart: string,
+  weekEnd: string,
+) => {
   const supabase = await createServerClient();
 
   const { data, error } = await supabase.rpc('insert_register_week', {
@@ -38,8 +40,9 @@ export const getOrCreateWeekEntry = async (storeId: number, weekStart: string, w
 export const createRegisterWeekWithNoPB = async (
   pdLastWeek: number,
   storeId: number,
+  weekStart: string,
+  weekEnd: string,
 ) => {
-  const { weekStart, weekEnd } = getCurrentWeekDateUTC();
   const supabase = await createServerClient();
 
   const { data, error } = await supabase
