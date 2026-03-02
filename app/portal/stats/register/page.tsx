@@ -305,7 +305,6 @@ export default function RegisterPage() {
                   if (storeId) {
                     setLoading(true);
                     await createRegisterWeekWithNoPB(
-                      initialPb,
                       storeId,
                       weekStart,
                       weekEnd,

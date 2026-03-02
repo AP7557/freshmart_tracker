@@ -38,7 +38,7 @@ export function DatePicker({
           variant='secondary'
           className={cn(
             'pl-3 text-left font-normal text-base',
-            !selectedValue && 'text-muted-foreground'
+            !selectedValue && 'text-muted-foreground',
           )}
         >
           {selectedValue ? (
@@ -53,16 +53,17 @@ export function DatePicker({
         <Calendar
           mode='single'
           selected={selectedValue}
-          month={selectedValue} // set the current month view
+          month={selectedValue ?? new Date()}
           onSelect={(date) => {
-            setValue(date as Date); // form now stores UTC
+            if (!date) return; // 🔑 critical fix
+            setValue(date); // form now stores UTC
             setOpen(false);
           }}
           onMonthChange={(monthDate) => {
             const newDate = new Date(
               monthDate.getFullYear(),
               monthDate.getMonth(),
-              1
+              1,
             );
             setValue(newDate);
           }}
